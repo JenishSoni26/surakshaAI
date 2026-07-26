@@ -1,0 +1,87 @@
+'use client';
+import { useState } from 'react';
+import { api } from '@/lib/api';
+import Navbar from '@/components/Navbar';
+import Footer from '@/components/Footer';
+import FAB from '@/components/FAB';
+
+export default function QRScannerPage() {
+  const [url, setUrl] = useState('');
+  const [result, setResult] = useState(null);
+  const [loading, setLoading] = useState(false);
+
+  const handleScan = async () => {
+    if (!url.trim()) return;
+    setLoading(true); setResult(null);
+    try { const data = await api.scanQR(url); setResult(data); } catch (err) { setResult({ error: err.message }); } finally { setLoading(false); }
+  };
+
+  const samples = ['http://free-recharge-offer.tk/claim', 'upi://pay?pa=verified-shop@paytm&pn=VerifiedShop&am=200', 'https://pay.suspicious-merchant.xyz/collect?amt=5000'];
+
+  return (
+    <div className="flex flex-col min-h-screen">
+      <Navbar />
+      <main className="flex-grow pt-24 pb-12">
+        <div className="max-w-4xl mx-auto px-4">
+          <div className="text-center mb-10 animate-fade-in-up">
+            <div className="w-16 h-16 rounded-full bg-tertiary-container/20 mx-auto flex items-center justify-center mb-4">
+              <span className="material-symbols-outlined text-3xl text-tertiary">qr_code_scanner</span>
+            </div>
+            <h1 className="text-3xl font-bold mb-3">QR Code Scanner</h1>
+            <p className="text-on-surface-variant max-w-xl mx-auto">Paste the URL from a QR code to check if it's safe before making any payment or clicking any link.</p>
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div className="bg-surface-container-lowest rounded-3xl shadow-xl border border-outline-variant/10 p-6 animate-fade-in-up delay-100">
+              <h2 className="text-lg font-semibold mb-4 flex items-center gap-2"><span className="material-symbols-outlined text-primary">link</span>Enter QR Code URL</h2>
+              <div className="bg-surface-container rounded-2xl p-8 mb-4 flex flex-col items-center justify-center border-2 border-dashed border-outline-variant/30">
+                <span className="material-symbols-outlined text-5xl text-on-surface-variant/30 mb-3">qr_code_2</span>
+                <p className="text-xs text-on-surface-variant text-center">Paste the decoded QR code URL below<br/>or enter a UPI payment link</p>
+              </div>
+              <input type="text" value={url} onChange={e => setUrl(e.target.value)} placeholder="https://example.com or upi://pay?..."
+                onKeyDown={e => e.key === 'Enter' && handleScan()}
+                className="w-full bg-surface-container rounded-xl px-4 py-3 text-sm border border-outline-variant/20 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all mb-4" />
+              <div className="flex flex-wrap gap-2 mb-4">
+                {samples.map((s, i) => (
+                  <button key={i} onClick={() => setUrl(s)} className="text-xs bg-surface-container px-3 py-1.5 rounded-full text-on-surface-variant hover:bg-primary-fixed/30 hover:text-primary transition-colors truncate max-w-[200px]">{s.substring(0, 30)}...</button>
+                ))}
+              </div>
+              <button onClick={handleScan} disabled={loading || !url.trim()}
+                className="w-full bg-primary text-on-primary py-3 rounded-xl text-sm font-bold shadow-lg hover:opacity-90 transition-all disabled:opacity-50 flex items-center justify-center gap-2">
+                {loading ? <><span className="material-symbols-outlined animate-spin">progress_activity</span>Scanning...</> : <><span className="material-symbols-outlined">qr_code_scanner</span>Scan QR Code</>}
+              </button>
+            </div>
+
+            <div className="bg-surface-container-lowest rounded-3xl shadow-xl border border-outline-variant/10 p-6 animate-fade-in-up delay-200">
+              <h2 className="text-lg font-semibold mb-4 flex items-center gap-2"><span className="material-symbols-outlined text-primary">analytics</span>Scan Results</h2>
+              {!result && !loading && (
+                <div className="flex flex-col items-center justify-center h-64 text-on-surface-variant">
+                  <span className="material-symbols-outlined text-5xl mb-3 opacity-30">qr_code</span>
+                  <p className="text-sm">Enter a QR code URL to analyze</p>
+                </div>
+              )}
+              {result && !result.error && (
+                <div className="space-y-4 animate-fade-in">
+                  <div className={`rounded-2xl p-5 text-center ${result.risk_score >= 70 ? 'bg-error-container/20' : result.risk_score >= 40 ? 'bg-tertiary-container/10' : 'bg-success/5'}`}>
+                    <div className={`text-4xl font-bold mb-1 ${result.risk_score >= 70 ? 'text-error' : result.risk_score >= 40 ? 'text-tertiary' : 'text-success'}`}>{result.risk_score}/100</div>
+                    <div className={`text-sm font-semibold ${result.risk_score >= 70 ? 'text-error' : result.risk_score >= 40 ? 'text-tertiary' : 'text-success'}`}>{result.risk_score >= 70 ? 'Dangerous' : result.risk_score >= 40 ? 'Suspicious' : 'Safe'}</div>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <span className="text-xs font-semibold text-on-surface-variant">Status:</span>
+                    <span className={`px-3 py-1 rounded-full text-xs font-bold ${result.status === 'blocked' ? 'bg-error-container text-on-error-container' : result.status === 'flagged' ? 'bg-tertiary-container text-on-tertiary-container' : 'bg-success/10 text-success'}`}>{result.status.toUpperCase()}</span>
+                  </div>
+                  <div className="bg-surface-container rounded-2xl p-4 border-l-4 border-primary">
+                    <div className="text-xs font-semibold text-primary mb-2 flex items-center gap-1"><span className="material-symbols-outlined text-sm">smart_toy</span>AI Analysis</div>
+                    <p className="text-sm text-on-surface-variant leading-relaxed whitespace-pre-line">{result.ai_explanation}</p>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      </main>
+      <Footer />
+      <FAB />
+    </div>
+  );
+}

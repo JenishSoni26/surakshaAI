@@ -1,0 +1,13 @@
+{
+  "name": "surakshapay",
+  "version": "1.0.0",
+  "private": true,
+  "description": "SurakshaPay AI Security Hub - Full Stack Application",
+  "scripts": {
+    "dev": "npm run dev:backend & npm run dev:frontend",
+    "dev:frontend": "cd frontend && npm run dev",
+    "dev:backend": "cd backend && npm run dev",
+    "install:all": "cd frontend && npm install && cd ../backend && npm install",
+    "build": "cd frontend && npm run build"
+  }
+}
