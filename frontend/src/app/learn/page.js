@@ -54,31 +54,34 @@ export default function LearnPage() {
             <div className="flex justify-center py-20"><span className="material-symbols-outlined text-4xl text-primary animate-spin">progress_activity</span></div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {modules.map((mod, i) => (
-                <div key={mod.id} className={`bg-surface-container-lowest rounded-3xl shadow-xl border border-outline-variant/10 p-6 hover:-translate-y-1 hover:shadow-2xl transition-all duration-300 animate-fade-in-up delay-${Math.min(i, 5)}00 relative overflow-hidden`}>
-                  {mod.userProgress?.completed && (
-                    <div className="absolute top-4 right-4"><span className="material-symbols-outlined text-success icon-fill">check_circle</span></div>
-                  )}
-                  <div className="bg-primary/10 w-12 h-12 rounded-2xl flex items-center justify-center mb-4">
-                    <span className="material-symbols-outlined text-2xl text-primary">{mod.icon}</span>
-                  </div>
-                  <h3 className="text-base font-bold mb-2 text-on-surface">{mod.title}</h3>
-                  <p className="text-xs text-on-surface-variant mb-4 leading-relaxed">{mod.description}</p>
-                  <div className="flex items-center gap-2 mb-4">
-                    <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${difficultyColors[mod.difficulty]}`}>{mod.difficulty}</span>
-                    <span className="text-[10px] text-on-surface-variant flex items-center gap-1"><span className="material-symbols-outlined text-xs">schedule</span>{mod.duration_minutes} min</span>
-                  </div>
-                  {mod.userProgress?.completed && (
-                    <div className="flex items-center gap-2 text-xs text-success font-semibold mb-3">
-                      <span className="material-symbols-outlined text-sm">emoji_events</span>
-                      Score: {mod.userProgress.score}%
+              {modules.map((mod, i) => {
+                const delays = ['delay-100', 'delay-200', 'delay-300', 'delay-400', 'delay-500'];
+                return (
+                  <div key={mod.id} className={`bg-surface-container-lowest rounded-3xl shadow-xl border border-outline-variant/10 p-6 hover:-translate-y-1 hover:shadow-2xl transition-all duration-300 animate-fade-in-up ${delays[Math.min(i, 4)]} relative overflow-hidden`}>
+                    {mod.userProgress?.completed && (
+                      <div className="absolute top-4 right-4"><span className="material-symbols-outlined text-success icon-fill">check_circle</span></div>
+                    )}
+                    <div className="bg-primary/10 w-12 h-12 rounded-2xl flex items-center justify-center mb-4">
+                      <span className="material-symbols-outlined text-2xl text-primary">{mod.icon}</span>
                     </div>
-                  )}
-                  <Link href={`/learn/${mod.id}`} className="w-full bg-primary text-on-primary py-2.5 rounded-xl text-xs font-bold hover:opacity-90 transition-all flex items-center justify-center gap-2">
-                    <span className="material-symbols-outlined text-sm">{mod.userProgress?.completed ? 'replay' : 'play_arrow'}</span>{mod.userProgress?.completed ? 'Retake Module' : 'Start Module'}
-                  </Link>
-                </div>
-              ))}
+                    <h3 className="text-base font-bold mb-2 text-on-surface">{mod.title}</h3>
+                    <p className="text-xs text-on-surface-variant mb-4 leading-relaxed">{mod.description}</p>
+                    <div className="flex items-center gap-2 mb-4">
+                      <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${difficultyColors[mod.difficulty]}`}>{mod.difficulty}</span>
+                      <span className="text-[10px] text-on-surface-variant flex items-center gap-1"><span className="material-symbols-outlined text-xs">schedule</span>{mod.duration_minutes} min</span>
+                    </div>
+                    {mod.userProgress?.completed && (
+                      <div className="flex items-center gap-2 text-xs text-success font-semibold mb-3">
+                        <span className="material-symbols-outlined text-sm">emoji_events</span>
+                        Score: {mod.userProgress.score}%
+                      </div>
+                    )}
+                    <Link href={`/learn/${mod.id}`} className="w-full bg-primary text-on-primary py-2.5 rounded-xl text-xs font-bold hover:opacity-90 transition-all flex items-center justify-center gap-2">
+                      <span className="material-symbols-outlined text-sm">{mod.userProgress?.completed ? 'replay' : 'play_arrow'}</span>{mod.userProgress?.completed ? 'Retake Module' : 'Start Module'}
+                    </Link>
+                  </div>
+                );
+              })}
             </div>
           )}
         </div>

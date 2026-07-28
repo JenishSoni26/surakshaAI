@@ -77,8 +77,10 @@ export default function EmergencyPage() {
           {/* Emergency Contacts */}
           <h2 className="text-xl font-bold mb-4 animate-fade-in-up delay-200">Emergency Helplines</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
-            {contacts.map((c, i) => (
-              <div key={c.id} className={`bg-surface-container-lowest rounded-2xl shadow-xl border border-outline-variant/10 p-5 hover:-translate-y-1 transition-all duration-300 animate-fade-in-up delay-${Math.min(i + 2, 5)}00`}>
+            {contacts.map((c, i) => {
+              const delays = ['delay-100', 'delay-200', 'delay-300', 'delay-400', 'delay-500'];
+              return (
+                <div key={c.id} className={`bg-surface-container-lowest rounded-2xl shadow-xl border border-outline-variant/10 p-5 hover:-translate-y-1 transition-all duration-300 animate-fade-in-up ${delays[Math.min(i + 1, 4)]}`}>
                 <div className="flex items-start gap-4">
                   <div className={`w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 ${iconColors[c.icon] || 'bg-surface-container text-on-surface-variant'}`}>
                     <span className="material-symbols-outlined text-2xl">{c.icon}</span>
@@ -91,8 +93,9 @@ export default function EmergencyPage() {
                     </a>
                   </div>
                 </div>
-              </div>
-            ))}
+                </div>
+              );
+            })}
           </div>
 
           {/* Fraud Reporting Guide */}

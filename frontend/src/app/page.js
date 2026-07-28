@@ -91,12 +91,15 @@ export default function HomePage() {
         <section className="bg-surface-container-low py-12 mb-32 border-y border-outline-variant/10">
           <div className="max-w-7xl mx-auto px-4">
             <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-              {stats.map((stat, i) => (
-                <div key={i} className={`bg-surface p-6 rounded-2xl shadow-xl hover:-translate-y-1 transition-transform animate-fade-in-up delay-${i}00`}>
-                  <div className="text-primary text-2xl font-bold mb-1">{stat.value}</div>
-                  <div className="text-on-surface-variant text-xs font-medium">{stat.label}</div>
-                </div>
-              ))}
+              {stats.map((stat, i) => {
+                const delays = ['delay-100', 'delay-200', 'delay-300', 'delay-400'];
+                return (
+                  <div key={i} className={`bg-surface p-6 rounded-2xl shadow-xl hover:-translate-y-1 transition-transform animate-fade-in-up ${delays[i] || ''}`}>
+                    <div className="text-primary text-2xl font-bold mb-1">{stat.value}</div>
+                    <div className="text-on-surface-variant text-xs font-medium">{stat.label}</div>
+                  </div>
+                );
+              })}
             </div>
           </div>
         </section>
@@ -205,15 +208,18 @@ export default function HomePage() {
             </p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {features.map((f, i) => (
-              <div key={i} className={`bg-surface p-8 rounded-3xl border border-outline-variant/10 shadow-lg hover:shadow-xl hover:-translate-y-2 transition-all duration-300 animate-fade-in-up delay-${i}00`}>
-                <div className={`${FEATURE_COLOR_CLASSES[f.color]} w-14 h-14 rounded-2xl flex items-center justify-center mb-6`}>
-                  <span className="material-symbols-outlined text-3xl">{f.icon}</span>
+            {features.map((f, i) => {
+              const delays = ['delay-100', 'delay-200', 'delay-300', 'delay-400', 'delay-500'];
+              return (
+                <div key={i} className={`bg-surface p-8 rounded-3xl border border-outline-variant/10 shadow-lg hover:shadow-xl hover:-translate-y-2 transition-all duration-300 animate-fade-in-up ${delays[i] || ''}`}>
+                  <div className={`${FEATURE_COLOR_CLASSES[f.color] || 'bg-primary-container/20 text-primary'} w-14 h-14 rounded-2xl flex items-center justify-center mb-6`}>
+                    <span className="material-symbols-outlined text-3xl">{f.icon}</span>
+                  </div>
+                  <h3 className="text-xl font-semibold mb-3 text-on-surface">{f.title}</h3>
+                  <p className="text-sm text-on-surface-variant leading-relaxed">{f.desc}</p>
                 </div>
-                <h3 className="text-xl font-semibold mb-3 text-on-surface">{f.title}</h3>
-                <p className="text-sm text-on-surface-variant leading-relaxed">{f.desc}</p>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </section>
 
@@ -229,13 +235,16 @@ export default function HomePage() {
             <div className="relative">
               <div className="hidden md:block absolute top-1/2 left-0 w-full h-0.5 bg-outline-variant/30 -translate-y-1/2 z-0"></div>
               <div className="grid grid-cols-1 md:grid-cols-4 gap-8 relative z-10">
-                {steps.map((step, i) => (
-                  <div key={i} className={`flex flex-col items-center text-center animate-fade-in-up delay-${i}00`}>
-                    <div className="bg-primary text-on-primary w-16 h-16 rounded-full flex items-center justify-center text-xl font-bold mb-6 shadow-lg">{step.num}</div>
-                    <h4 className="text-xl font-semibold mb-2">{step.title}</h4>
-                    <p className="text-sm text-on-surface-variant">{step.desc}</p>
-                  </div>
-                ))}
+                {steps.map((step, i) => {
+                  const delays = ['delay-100', 'delay-200', 'delay-300', 'delay-400'];
+                  return (
+                    <div key={i} className={`flex flex-col items-center text-center animate-fade-in-up ${delays[i] || ''}`}>
+                      <div className="bg-primary text-on-primary w-16 h-16 rounded-full flex items-center justify-center text-xl font-bold mb-6 shadow-lg">{step.num}</div>
+                      <h4 className="text-xl font-semibold mb-2">{step.title}</h4>
+                      <p className="text-sm text-on-surface-variant">{step.desc}</p>
+                    </div>
+                  );
+                })}
               </div>
             </div>
           </div>
