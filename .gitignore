@@ -37,3 +37,7 @@ Thumbs.db
 # Generated Test Reports & Artifacts
 backend/tests/reports/latest-report.*
 backend/tests/reports/*.html
+<<<<<<< HEAD
+=======
+
+>>>>>>> 484a7ad (Phase 2A: Enhanced deterministic fraud detection and evaluation framework)
