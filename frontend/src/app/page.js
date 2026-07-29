@@ -4,12 +4,22 @@ import Footer from '@/components/Footer';
 import FAB from '@/components/FAB';
 import Link from 'next/link';
 
+// Class names are written out in full per color so Tailwind's build-time
+// scanner can find them - a dynamically interpolated `bg-${color}-container`
+// would be silently missing from production CSS.
+const FEATURE_COLOR_CLASSES = {
+  primary: 'bg-primary-container/20 text-primary',
+  secondary: 'bg-secondary-container/20 text-secondary',
+  tertiary: 'bg-tertiary-container/20 text-tertiary',
+  error: 'bg-error-container/20 text-error',
+};
+
 const features = [
-  { icon: 'psychology', title: 'AI Scam Detection', desc: 'Analyze suspicious SMS, emails, and messages using real-time machine learning models.', color: 'primary' },
+  { icon: 'psychology', title: 'AI Scam Detection', desc: 'Analyze suspicious SMS, emails, and messages for fraud patterns and phishing links.', color: 'primary' },
   { icon: 'account_balance_wallet', title: 'UPI Guardian', desc: 'Real-time monitoring of UPI requests and transaction verification for complete peace of mind.', color: 'secondary' },
   { icon: 'qr_code_scanner', title: 'QR Code Scanner', desc: 'Scan QR codes before interacting to identify malicious links or unauthorized payment destinations.', color: 'tertiary' },
-  { icon: 'record_voice_over', title: 'Voice Scam Detection', desc: 'Detect deepfake voices and suspicious call patterns using advanced audio analysis technology.', color: 'primary' },
-  { icon: 'school', title: 'Financial Literacy', desc: 'Interactive guides and simulations to help you recognize and avoid the latest financial scams.', color: 'secondary' },
+  { icon: 'record_voice_over', title: 'Voice Scam Detection', desc: 'Record or upload a call clip and detect audio patterns typical of synthetic or cloned voices.', color: 'primary' },
+  { icon: 'school', title: 'Financial Literacy', desc: 'Interactive lessons and quizzes to help you recognize and avoid the latest financial scams.', color: 'secondary' },
   { icon: 'emergency', title: 'Emergency Support', desc: 'One-tap access to freeze accounts and report fraud to official authorities instantly.', color: 'error' },
 ];
 
@@ -102,7 +112,7 @@ export default function HomePage() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {features.map((f, i) => (
               <div key={i} className={`bg-surface p-8 rounded-3xl border border-outline-variant/10 shadow-lg hover:shadow-xl hover:-translate-y-2 transition-all duration-300 animate-fade-in-up delay-${i}00`}>
-                <div className={`bg-${f.color}-container/20 w-14 h-14 rounded-2xl flex items-center justify-center text-${f.color} mb-6`}>
+                <div className={`${FEATURE_COLOR_CLASSES[f.color]} w-14 h-14 rounded-2xl flex items-center justify-center mb-6`}>
                   <span className="material-symbols-outlined text-3xl">{f.icon}</span>
                 </div>
                 <h3 className="text-xl font-semibold mb-3 text-on-surface">{f.title}</h3>

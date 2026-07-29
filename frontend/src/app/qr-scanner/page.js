@@ -1,6 +1,7 @@
 'use client';
 import { useState } from 'react';
 import { api } from '@/lib/api';
+import RiskResultCard from '@/components/RiskResultCard';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import FAB from '@/components/FAB';
@@ -28,7 +29,7 @@ export default function QRScannerPage() {
               <span className="material-symbols-outlined text-3xl text-tertiary">qr_code_scanner</span>
             </div>
             <h1 className="text-3xl font-bold mb-3">QR Code Scanner</h1>
-            <p className="text-on-surface-variant max-w-xl mx-auto">Paste the URL from a QR code to check if it's safe before making any payment or clicking any link.</p>
+            <p className="text-on-surface-variant max-w-xl mx-auto">Paste the URL from a QR code to check if it&apos;s safe before making any payment or clicking any link.</p>
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -61,20 +62,7 @@ export default function QRScannerPage() {
                 </div>
               )}
               {result && !result.error && (
-                <div className="space-y-4 animate-fade-in">
-                  <div className={`rounded-2xl p-5 text-center ${result.risk_score >= 70 ? 'bg-error-container/20' : result.risk_score >= 40 ? 'bg-tertiary-container/10' : 'bg-success/5'}`}>
-                    <div className={`text-4xl font-bold mb-1 ${result.risk_score >= 70 ? 'text-error' : result.risk_score >= 40 ? 'text-tertiary' : 'text-success'}`}>{result.risk_score}/100</div>
-                    <div className={`text-sm font-semibold ${result.risk_score >= 70 ? 'text-error' : result.risk_score >= 40 ? 'text-tertiary' : 'text-success'}`}>{result.risk_score >= 70 ? 'Dangerous' : result.risk_score >= 40 ? 'Suspicious' : 'Safe'}</div>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <span className="text-xs font-semibold text-on-surface-variant">Status:</span>
-                    <span className={`px-3 py-1 rounded-full text-xs font-bold ${result.status === 'blocked' ? 'bg-error-container text-on-error-container' : result.status === 'flagged' ? 'bg-tertiary-container text-on-tertiary-container' : 'bg-success/10 text-success'}`}>{result.status.toUpperCase()}</span>
-                  </div>
-                  <div className="bg-surface-container rounded-2xl p-4 border-l-4 border-primary">
-                    <div className="text-xs font-semibold text-primary mb-2 flex items-center gap-1"><span className="material-symbols-outlined text-sm">smart_toy</span>AI Analysis</div>
-                    <p className="text-sm text-on-surface-variant leading-relaxed whitespace-pre-line">{result.ai_explanation}</p>
-                  </div>
-                </div>
+                <RiskResultCard riskScore={result.risk_score} status={result.status} threatType={result.threat_type} aiExplanation={result.ai_explanation} />
               )}
             </div>
           </div>

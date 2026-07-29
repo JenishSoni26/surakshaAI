@@ -1,5 +1,6 @@
 'use client';
 import { useState, useEffect } from 'react';
+import Link from 'next/link';
 import { api } from '@/lib/api';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
@@ -67,16 +68,15 @@ export default function LearnPage() {
                     <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${difficultyColors[mod.difficulty]}`}>{mod.difficulty}</span>
                     <span className="text-[10px] text-on-surface-variant flex items-center gap-1"><span className="material-symbols-outlined text-xs">schedule</span>{mod.duration_minutes} min</span>
                   </div>
-                  {mod.userProgress?.completed ? (
-                    <div className="flex items-center gap-2 text-xs text-success font-semibold">
+                  {mod.userProgress?.completed && (
+                    <div className="flex items-center gap-2 text-xs text-success font-semibold mb-3">
                       <span className="material-symbols-outlined text-sm">emoji_events</span>
                       Score: {mod.userProgress.score}%
                     </div>
-                  ) : (
-                    <button className="w-full bg-primary text-on-primary py-2.5 rounded-xl text-xs font-bold hover:opacity-90 transition-all flex items-center justify-center gap-2">
-                      <span className="material-symbols-outlined text-sm">play_arrow</span>Start Module
-                    </button>
                   )}
+                  <Link href={`/learn/${mod.id}`} className="w-full bg-primary text-on-primary py-2.5 rounded-xl text-xs font-bold hover:opacity-90 transition-all flex items-center justify-center gap-2">
+                    <span className="material-symbols-outlined text-sm">{mod.userProgress?.completed ? 'replay' : 'play_arrow'}</span>{mod.userProgress?.completed ? 'Retake Module' : 'Start Module'}
+                  </Link>
                 </div>
               ))}
             </div>

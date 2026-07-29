@@ -60,14 +60,63 @@ function analyzeQR(url) {
   return { risk_score: score, status, threat_type: threatType, ai_explanation: explanation };
 }
 
-function analyzeVoice() {
-  const scenarios = [
-    { risk_score: 78, status: 'flagged', threat_type: 'Potential Deepfake', ai_explanation: 'Voice analysis detected anomalies in pitch modulation and spectral consistency. Patterns suggest potential AI-generated audio.' },
-    { risk_score: 15, status: 'safe', threat_type: 'None', ai_explanation: 'Voice analysis indicates natural speech patterns. No signs of AI generation or voice cloning detected.' },
-    { risk_score: 92, status: 'blocked', threat_type: 'Voice Cloning Detected', ai_explanation: 'High confidence detection of voice cloning technology. Audio fingerprint matches known deepfake generation patterns.' },
-    { risk_score: 45, status: 'flagged', threat_type: 'Suspicious Audio', ai_explanation: 'Some anomalies detected in audio quality. Background noise patterns suggest the call may be routed through VOIP services.' },
-  ];
-  return scenarios[Math.floor(Math.random() * scenarios.length)];
+// Real signal-derived thresholds for natural human speech, used to score
+// audio features extracted client-side from an actual recording/upload
+// (see frontend/src/lib/audioAnalysis.js). Nothing here is randomized -
+// the same clip always produces the same score.
+function analyzeVoice(features) {
+  const {
+    durationSec = 0,
+    rms = 0,
+    silenceRatio = 0,
+    zcr = 0,
+    volumeVariance = 0,
+    clippingRatio = 0,
+  } = features;
+
+  let score = 0;
+  const threats = [];
+
+  if (durationSec < 1.2) {
+    score += 15;
+    threats.push(`Clip is very short (${durationSec.toFixed(1)}s) — too little data for a confident reading`);
+  }
+
+  if (durationSec >= 1.2 && silenceRatio < 0.04) {
+    score += 22;
+    threats.push(`Almost no pauses detected (${(silenceRatio * 100).toFixed(0)}% silence) — natural speech usually has 10-40% pause time; gapless audio can indicate synthetic or heavily edited speech`);
+  }
+
+  if (durationSec >= 1.2 && volumeVariance < 0.0015) {
+    score += 24;
+    threats.push(`Loudness is unusually flat (variance ${volumeVariance.toFixed(4)}) — real voices naturally rise and fall; a constant level is a common trait of TTS/voice-clone audio`);
+  }
+
+  if (zcr > 0 && (zcr < 0.015 || zcr > 0.28)) {
+    score += 16;
+    threats.push(`Zero-crossing rate (${(zcr * 100).toFixed(1)}%) falls outside the typical range for natural speech, which can indicate synthetic or heavily processed audio`);
+  }
+
+  if (clippingRatio > 0.02) {
+    score += 12;
+    threats.push(`${(clippingRatio * 100).toFixed(1)}% of samples are clipped — audio may have been re-encoded, over-driven, or artificially generated`);
+  }
+
+  if (rms > 0 && rms < 0.008) {
+    score += 10;
+    threats.push('Signal level is extremely low — mostly silence or background noise, insufficient voice content to analyze confidently');
+  }
+
+  score = Math.min(score, 100);
+  let status = 'safe', threatType = 'None';
+  if (score >= 60) { status = 'blocked'; threatType = 'Likely AI-Generated Voice'; }
+  else if (score >= 30) { status = 'flagged'; threatType = 'Suspicious Audio Patterns'; }
+
+  const explanation = threats.length > 0
+    ? `Audio signal analysis found ${threats.length} anomaly indicator(s):\n• ${threats.join('\n• ')}`
+    : 'Audio signal analysis found natural pause patterns, loudness variation, and spectral characteristics consistent with genuine human speech.';
+
+  return { risk_score: score, status, threat_type: threatType, ai_explanation: explanation };
 }
 
 module.exports = function(db) {
@@ -109,10 +158,17 @@ module.exports = function(db) {
 
   router.post('/voice', optionalAuth, (req, res) => {
     try {
-      const result = analyzeVoice();
+      const { features, sourceType, fileName } = req.body || {};
+      if (!features || typeof features.durationSec !== 'number' || features.durationSec <= 0) {
+        return res.status(400).json({ error: 'No audio features received. Record or upload an audio clip first.' });
+      }
+      const result = analyzeVoice(features);
       const scanId = uuidv4();
+      const contentLabel = fileName
+        ? `upload: ${fileName}`
+        : `${sourceType || 'recording'} (${features.durationSec.toFixed(1)}s)`;
       db.run('INSERT INTO scans (id, user_id, type, content, risk_score, status, threat_type, ai_explanation) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
-        [scanId, req.user?.id || null, 'voice', 'voice_upload', result.risk_score, result.status, result.threat_type, result.ai_explanation]);
+        [scanId, req.user?.id || null, 'voice', contentLabel, result.risk_score, result.status, result.threat_type, result.ai_explanation]);
       res.json({ id: scanId, ...result });
     } catch (err) { console.error('Voice scan error:', err); res.status(500).json({ error: 'Voice analysis failed.' }); }
   });

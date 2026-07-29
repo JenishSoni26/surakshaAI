@@ -7,11 +7,10 @@ import Link from 'next/link';
 import Script from 'next/script';
 
 const sideLinks = [
-  { icon: 'dashboard', label: 'Overview', active: true },
-  { icon: 'security', label: 'Security Logs' },
-  { icon: 'shield', label: 'UPI Safety' },
-  { icon: 'school', label: 'Literacy Hub' },
-  { icon: 'settings', label: 'Settings', bottom: true },
+  { icon: 'dashboard', label: 'Overview', href: '/dashboard', active: true },
+  { icon: 'security', label: 'Security Logs', href: '/dashboard#security-logs' },
+  { icon: 'shield', label: 'UPI Safety', href: '/upi-guardian' },
+  { icon: 'school', label: 'Literacy Hub', href: '/learn' },
 ];
 
 export default function DashboardPage() {
@@ -100,10 +99,10 @@ export default function DashboardPage() {
             <div><h2 className="font-bold text-primary text-lg">Dashboard</h2><p className="text-[10px] text-on-surface-variant">AI Safety Monitor</p></div>
           </div>
           <div className="flex-1 flex flex-col gap-1">
-            {sideLinks.filter(l => !l.bottom).map((l, i) => (
-              <a key={i} className={`rounded-xl flex items-center gap-3 p-3 transition-all text-sm ${l.active ? 'bg-primary-container text-on-primary-container font-semibold' : 'text-on-surface-variant hover:bg-surface-variant'}`} href="#">
+            {sideLinks.map((l, i) => (
+              <Link key={i} href={l.href} className={`rounded-xl flex items-center gap-3 p-3 transition-all text-sm ${l.active ? 'bg-primary-container text-on-primary-container font-semibold' : 'text-on-surface-variant hover:bg-surface-variant'}`}>
                 <span className="material-symbols-outlined text-xl">{l.icon}</span>{l.label}
-              </a>
+              </Link>
             ))}
             <div className="mt-auto">
               <Link href="/profile" className="rounded-xl flex items-center gap-3 p-3 text-on-surface-variant hover:bg-surface-variant transition-all text-sm">
@@ -168,7 +167,7 @@ export default function DashboardPage() {
             </div>
 
             {/* Security Logs */}
-            <div className="bg-surface-container-lowest rounded-xl p-5 shadow-xl border border-outline-variant/10 mb-8 overflow-hidden">
+            <div id="security-logs" className="bg-surface-container-lowest rounded-xl p-5 shadow-xl border border-outline-variant/10 mb-8 overflow-hidden scroll-mt-24">
               <div className="flex justify-between items-center mb-4">
                 <h3 className="text-lg font-semibold">Security Logs</h3>
                 <button className="text-primary text-xs font-semibold hover:underline">Export CSV</button>

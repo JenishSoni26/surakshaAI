@@ -32,8 +32,8 @@ export const api = {
   scanMessage: (text) => apiFetch('/scans/message', { method: 'POST', body: JSON.stringify({ text }) }),
   scanUPI: (upiId) => apiFetch('/scans/upi', { method: 'POST', body: JSON.stringify({ upiId }) }),
   scanQR: (url) => apiFetch('/scans/qr', { method: 'POST', body: JSON.stringify({ url }) }),
-  scanVoice: () => apiFetch('/scans/voice', { method: 'POST', body: JSON.stringify({}) }),
-  
+  scanVoice: (features, sourceType, fileName) => apiFetch('/scans/voice', { method: 'POST', body: JSON.stringify({ features, sourceType, fileName }) }),
+
   // Dashboard
   getStats: () => apiFetch('/dashboard/stats'),
   getLogs: (params = {}) => {
@@ -41,9 +41,12 @@ export const api = {
     return apiFetch(`/dashboard/logs?${query}`);
   },
   getCharts: () => apiFetch('/dashboard/charts'),
-  
+
   // Learn
   getModules: (category) => apiFetch(`/learn/modules${category ? `?category=${category}` : ''}`),
+  getModule: (id) => apiFetch(`/learn/modules/${id}`),
+  getQuiz: (id) => apiFetch(`/learn/modules/${id}/quiz`),
+  submitQuiz: (id, answers) => apiFetch(`/learn/modules/${id}/quiz/submit`, { method: 'POST', body: JSON.stringify({ answers }) }),
   updateProgress: (moduleId, score) => apiFetch('/learn/progress', { method: 'POST', body: JSON.stringify({ moduleId, score }) }),
   
   // Emergency

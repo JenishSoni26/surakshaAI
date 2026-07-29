@@ -59,11 +59,11 @@ export default function EmergencyPage() {
 
           {/* Confirmation Modal */}
           {showConfirm && (
-            <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-[100] flex items-center justify-center p-4 animate-fade-in">
+            <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-[100] flex items-center justify-center p-4 animate-fade-in" role="dialog" aria-modal="true" aria-labelledby="freeze-confirm-title">
               <div className="bg-surface-container-lowest rounded-3xl shadow-2xl p-6 max-w-sm w-full">
                 <div className="text-center">
                   <span className="material-symbols-outlined text-5xl text-error mb-3">warning</span>
-                  <h3 className="text-lg font-bold text-error mb-2">Confirm Emergency Freeze</h3>
+                  <h3 id="freeze-confirm-title" className="text-lg font-bold text-error mb-2">Confirm Emergency Freeze</h3>
                   <p className="text-sm text-on-surface-variant mb-6">This will freeze all linked bank accounts. Are you sure you want to proceed?</p>
                   <div className="flex gap-3">
                     <button onClick={() => setShowConfirm(false)} className="flex-1 bg-surface-container text-on-surface-variant py-2.5 rounded-xl text-sm font-semibold">Cancel</button>

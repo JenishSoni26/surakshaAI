@@ -76,6 +76,18 @@ async function initializeDatabase() {
   `);
 
   db.run(`
+    CREATE TABLE IF NOT EXISTS quiz_questions (
+      id TEXT PRIMARY KEY,
+      module_id TEXT NOT NULL,
+      question TEXT NOT NULL,
+      options TEXT NOT NULL,
+      correct_index INTEGER NOT NULL,
+      explanation TEXT DEFAULT '',
+      order_index INTEGER DEFAULT 0
+    )
+  `);
+
+  db.run(`
     CREATE TABLE IF NOT EXISTS emergency_contacts (
       id TEXT PRIMARY KEY,
       name TEXT NOT NULL,
@@ -103,6 +115,15 @@ async function initializeDatabase() {
   
   if (userCount === 0) {
     seedData(db);
+  }
+
+  // Quiz content/questions are seeded independently of user seeding so that
+  // existing databases (created before this feature existed) get backfilled
+  // on next startup instead of being stuck with empty modules forever.
+  const quizResult = db.exec('SELECT COUNT(*) as count FROM quiz_questions');
+  const quizCount = quizResult.length > 0 ? quizResult[0].values[0][0] : 0;
+  if (quizCount === 0) {
+    seedQuizContent(db);
   }
 
   // Save to disk
@@ -193,6 +214,109 @@ function seedData(db) {
   });
 
   console.log('✅ Database seeded with demo data');
+}
+
+function seedQuizContent(db) {
+  const lessons = {
+    'Identifying Phishing SMS': {
+      content: 'Phishing SMS messages impersonate banks, delivery services, or government agencies to trick you into clicking a link or sharing sensitive details.\n• Real banks never ask you to "verify" your account via an SMS link.\n• Urgent, threatening language ("blocked in 24 hours") is a pressure tactic, not a real deadline.\n• Check the actual link domain, not just the display text - scam links rarely match the official domain.\n• When in doubt, contact the bank directly using the number on your card or official app.',
+      questions: [
+        { q: 'Your SBI account will be blocked in 24 hours, click here to verify" — what should you do?', options: ['Click the link immediately to avoid being blocked', "Ignore the message and verify by calling the bank's official number", 'Reply with your account number to confirm', 'Forward it to friends to warn them, then click it yourself'], correct: 1, explanation: "Banks never ask you to verify accounts via SMS links. Always confirm suspicious messages through the bank's official app or helpline number." },
+        { q: 'Do Indian banks ever ask you to share your OTP over a phone call or SMS reply to "resolve an issue"?', options: ['Yes, always', 'No — banks never ask for your OTP under any circumstance', 'Only for urgent cases', 'Only if you called them first'], correct: 1, explanation: 'An OTP is meant only for you to enter on the official app/website. No legitimate bank employee will ever ask you to read it out or send it.' },
+        { q: 'Which of these is a red flag in a phishing SMS?', options: ['A generic greeting like "Dear Customer"', 'Urgent language and threats of account suspension', 'A shortened or slightly misspelled link', 'All of the above'], correct: 3, explanation: 'Phishing messages typically combine several of these traits at once — genuine bank communication is personalized and rarely time-pressures you.' },
+      ],
+    },
+    'Safe UPI Practices': {
+      content: 'UPI is designed so that receiving money never requires your PIN — only sending money does.\n• Never enter your UPI PIN in response to a "collect request" you did not initiate.\n• Verify the recipient name shown by the app before confirming a payment.\n• Treat "refund" or "cashback" requests that ask you to scan/pay as scams.\n• For large payments to a new UPI ID, confirm with the recipient over a phone call first.',
+      questions: [
+        { q: 'To RECEIVE money via UPI, do you need to enter your UPI PIN?', options: ['Yes, always', 'No — the PIN is only needed to send/pay money', 'Only for amounts above ₹2,000', 'Only on weekends'], correct: 1, explanation: 'Entering your PIN always means money is leaving your account. If an app asks for a PIN to "receive" a payment, it is a scam.' },
+        { q: 'A stranger sends you a "collect request" for ₹1, claiming it will "verify" your account. What should you do?', options: ['Approve it since it is only ₹1', 'Decline it — collect requests are for you to pay, never to "verify" identity', 'Approve it and then block the sender', 'Share your PIN to confirm your identity'], correct: 1, explanation: 'Scammers use tiny collect requests to test whether a victim will approve unfamiliar payment prompts without reading them carefully.' },
+        { q: 'What is the safest way to verify a UPI ID before sending a large payment?', options: ['Trust the name shown by the app alone', 'Send ₹1 first and hope for a reply', 'Call the recipient on a known number to confirm', "Assume it's safe if the handle ends in a bank suffix"], correct: 2, explanation: "A phone call to a number you already trust is the most reliable way to confirm you're paying the right person." },
+      ],
+    },
+    'QR Code Safety': {
+      content: 'Scanning a QR code and entering your UPI PIN always sends money out of your account — it is never used to receive a payment.\n• Be suspicious of any "scan to get a refund/cashback" request.\n• Scammers sometimes paste a fake QR sticker over a shop\'s real one.\n• Always check the merchant/payee name that appears after scanning, before entering your PIN.',
+      questions: [
+        { q: 'Scanning a QR code and entering your UPI PIN will…', options: ['Add money to your account', 'Send money out of your account', 'Do nothing without further confirmation', 'Only verify your identity'], correct: 1, explanation: 'QR + PIN is always a payment action in UPI, regardless of what the scammer claims it is for.' },
+        { q: 'At a shop, you are asked to scan a QR code "to receive your refund." This is most likely…', options: ['Normal and safe', 'A scam — receiving money never requires scanning a QR and entering a PIN', 'Required by RBI rules for refunds', 'Only safe if you do it twice'], correct: 1, explanation: 'Refunds are credited automatically to your original payment method — they never require you to scan and enter a PIN.' },
+        { q: "What should you check before scanning a public QR code, e.g. one pasted at a shop counter?", options: ['Nothing, all QR codes are safe', 'That it looks official', 'That it has not been pasted over the merchant\'s original QR code', 'The color of the QR code'], correct: 2, explanation: "Fraudsters sometimes stick a fake QR code directly over a legitimate merchant's QR to redirect payments to themselves." },
+      ],
+    },
+    'Voice Call Scams': {
+      content: 'Impersonation calls claiming to be from police, RBI, or your bank use fear and urgency to pressure victims into transferring money.\n• Government agencies never conduct arrests or investigations over a phone call, and never ask for money transfers to "safe accounts".\n• Caller ID can be spoofed — a number that looks official is not proof of identity.\n• AI voice cloning can now mimic a familiar voice convincingly; always verify unusual requests independently. Try the [Voice Scam Detector](/voice-detector) to check a suspicious recording.',
+      questions: [
+        { q: 'A caller claims to be from the police, says your account is linked to money laundering, and demands you transfer funds to a "safe account" immediately. This is…', options: ['A legitimate emergency procedure', 'A classic "digital arrest" scam — agencies never ask for fund transfers over a call', 'Only a scam if they also ask for an OTP', 'Normal if the caller ID shows a government number'], correct: 1, explanation: 'No Indian law enforcement or banking authority conducts investigations or demands money transfers by phone. This pattern is known as a "digital arrest" scam.' },
+        { q: "Caller ID showing a bank's real phone number guarantees the call is genuine.", options: ['True — caller ID cannot be faked', 'False — caller ID can be spoofed by scammers', 'Only true for landlines', 'Only false outside India'], correct: 1, explanation: 'Caller ID spoofing tools let scammers display any number they want, including real bank or government helpline numbers.' },
+        { q: 'What is a "voice clone" scam?', options: ['A phone with two SIM cards', "Using AI to mimic a familiar voice (e.g. a relative) to trick you into sending money", 'A call center with many agents', 'A voicemail spam message'], correct: 1, explanation: "AI voice cloning tools can recreate a familiar voice from a short audio sample, then use it to fake an emergency and request money." },
+      ],
+    },
+    'Online Shopping Fraud': {
+      content: 'Fake e-commerce sites use extreme discounts and unusual payment demands to separate shoppers from their money.\n• Be wary of huge discounts (80-90% off) paired with UPI-only or direct-transfer payment, with no cash-on-delivery option.\n• Prefer platforms/payment gateways that offer buyer protection.\n• Check seller reviews, ratings, and how long the store has existed before buying from an unfamiliar site.',
+      questions: [
+        { q: 'A website offers a smartphone at 90% off, payable only via direct UPI transfer, with no cash-on-delivery option. This is…', options: ['A great deal — buy immediately', 'Likely fraud — extreme discounts plus UPI-only payment is a common scam pattern', 'Safe if the site shows a lock icon', 'Safe if a phone number is listed'], correct: 1, explanation: 'Legitimate large retailers rarely demand upfront direct transfers with no protection — this combination is a well-known fraud pattern.' },
+        { q: 'What is the safest payment method when shopping on an unfamiliar online store?', options: ['Direct bank transfer', 'UPI to a personal handle', 'Cash on Delivery or a trusted payment gateway with buyer protection', 'Sharing your card details over WhatsApp'], correct: 2, explanation: 'COD and protected gateways let you dispute or reverse a payment if the seller does not deliver — direct transfers offer no such protection.' },
+        { q: 'Before buying from a new online store, you should…', options: ['Just trust the ads you see on social media', "Check reviews, seller history, and verify the site's contact details", 'Enter your card details to "unlock" a discount', 'Assume all websites are safe'], correct: 1, explanation: 'A quick review and history check can reveal whether other buyers have reported non-delivery or fraud.' },
+      ],
+    },
+    'Social Media Scams': {
+      content: 'Scammers exploit trust on social platforms through fake profiles, urgent money requests, and "too good to be true" investment tips.\n• A message from a "friend" asking for urgent money from an unfamiliar account should be verified by a direct call.\n• No legitimate investment guarantees fixed, high, risk-free returns.\n• Upfront "registration fees" for easy online jobs are a common scam pattern.',
+      questions: [
+        { q: 'A "friend" messages from a new, unfamiliar account asking to borrow money urgently. Best action?', options: ['Send money immediately since they are a friend', "Verify by calling them on their known number first", 'Ask them to prove it is them in the same chat', 'Ignore it and never speak to them again'], correct: 1, explanation: "Compromised or cloned accounts are commonly used to impersonate friends. A call to their known number confirms it's really them." },
+        { q: 'An investment group promises "guaranteed" 30% monthly returns with no risk. This is…', options: ['A great legitimate opportunity', 'A red flag — no legitimate investment guarantees fixed high returns', 'Safe if many people have joined', "Safe if the admin seems knowledgeable"], correct: 1, explanation: 'All real investments carry risk. Guaranteed high returns are the hallmark of a Ponzi scheme.' },
+        { q: 'A job offer asks you to pay an upfront "registration fee" to start easy online tasks with daily payouts. This is…', options: ['Normal hiring practice', 'A common task-based job scam pattern', 'A scam only if the fee is above ₹5,000', 'Safe if offered on WhatsApp'], correct: 1, explanation: 'Legitimate employers never charge job seekers a fee to start work — this is a widespread scam format.' },
+      ],
+    },
+    'Advanced Fraud Patterns': {
+      content: 'Sophisticated fraud often chains multiple techniques together — impersonation, malware, and social engineering.\n• A SIM swap lets a scammer receive your OTPs and calls on a SIM they control.\n• Search-engine ads and results can surface fake "customer care" numbers planted by scammers.\n• Remote-access apps (AnyDesk, TeamViewer) requested by an unknown "support agent" give them full control of your device.',
+      questions: [
+        { q: 'A "SIM swap" attack lets a scammer…', options: ['Change your phone wallpaper remotely', 'Get a new SIM issued in your number, intercepting your OTPs and calls', 'Access your phone camera only', "Pay your electricity bill"], correct: 1, explanation: 'With a swapped SIM, the scammer receives all your OTPs and calls, letting them bypass 2-factor authentication on your accounts.' },
+        { q: 'You search "Bank X customer care" online and call the first number shown. Why can this be risky?', options: ['It is always the safest way to get help', 'Scammers plant fake customer-care numbers in search results and ads', 'Only landlines are risky to call', 'It is risky only on Sundays'], correct: 1, explanation: 'Fraudsters buy ads and post listings with fake support numbers that route to their own call centers. Always use the number from your bank\'s official app or card.' },
+        { q: 'A caller asks you to install a remote-support app (like AnyDesk) to "fix an issue" with your banking app. You should…', options: ['Install it immediately to resolve the issue', 'Refuse — this gives scammers full control of your device and banking apps', 'Install it but mute the call', 'Only install it if they sound professional'], correct: 1, explanation: 'Once installed, remote-access apps let a scammer see your screen and operate your phone, including your banking apps, in real time.' },
+      ],
+    },
+    'Cyber Law & Reporting': {
+      content: "India's cyber crime helpline is 1930, and complaints can also be filed online at cybercrime.gov.in.\n• Reporting within the first hours (the \"golden window\") gives banks the best chance to freeze funds before withdrawal.\n• You can file both an online complaint and, if needed, a police FIR.\n• Keep screenshots, transaction IDs, and timestamps as evidence before reporting.",
+      questions: [
+        { q: 'What is the national cyber crime helpline number in India?', options: ['100', '1930', '108', '1091'], correct: 1, explanation: '1930 is the dedicated 24/7 helpline for reporting cyber crime and online financial fraud in India.' },
+        { q: 'Reporting a financial fraud within the "golden window" (as soon as possible) matters because…', options: ['It does not matter, funds can always be recovered later', 'It increases the chance banks can freeze the fraudulent transaction before withdrawal', 'It only applies to cheque fraud', 'It has no legal significance'], correct: 1, explanation: 'Banks can often freeze funds still sitting in the fraudulent account if reported quickly — but the odds drop sharply once the money is withdrawn.' },
+        { q: 'Where can you file an online complaint for cyber financial fraud in India?', options: ['cybercrime.gov.in', 'Only in person at a police station', 'Only through a lawyer', "Only through your bank's app"], correct: 0, explanation: 'cybercrime.gov.in is the official portal for reporting cyber crime complaints nationwide, alongside calling 1930.' },
+      ],
+    },
+    'Digital Banking Security': {
+      content: 'Basic account hygiene prevents most common takeover attempts.\n• Avoid net banking on public/shared computers; if unavoidable, use a private window and always log out.\n• Enable Two-Factor Authentication (2FA) wherever your bank offers it.\n• Use a long, unique passphrase for banking — never reuse passwords across sites.',
+      questions: [
+        { q: 'What is the safest way to access net banking on a public or shared computer?', options: ['Save your password in the browser for convenience', 'Avoid it, or use a private/incognito window and always log out', 'Leave yourself logged in for next time', "Use the same password as your email"], correct: 1, explanation: 'Shared devices can retain cached sessions or have keyloggers installed — avoiding banking on them, or logging out fully, limits exposure.' },
+        { q: 'Two-Factor Authentication (2FA) helps because…', options: ['It makes login slower for no reason', 'It adds a second verification step, so a stolen password alone is not enough', 'It is only useful for email, not banking', 'It replaces the need for a password entirely'], correct: 1, explanation: 'Even if a password is leaked or guessed, 2FA requires a second factor (like an OTP) that the attacker typically does not have.' },
+        { q: 'Which of these is the strongest password choice for your banking app?', options: ['Your birthdate', '"password123"', 'A long, unique passphrase with mixed characters, not reused elsewhere', "Your pet's name"], correct: 2, explanation: 'Long, unique, unpredictable passphrases resist both guessing and credential-stuffing attacks that reuse leaked passwords from other sites.' },
+      ],
+    },
+    'Investment Scam Detection': {
+      content: 'Fraudulent investment schemes promise unrealistic, guaranteed returns to lure victims.\n• A Ponzi scheme pays early investors using money from new investors, not real profit.\n• Before investing, check whether the advisor or platform is registered with SEBI (for securities) or another proper regulator.\n• Unsolicited "inside tips" on Telegram/WhatsApp promising guaranteed profits are a major red flag.',
+      questions: [
+        { q: 'A scheme pays existing investors using money collected from new investors, rather than real profit. This is a…', options: ['Mutual fund', 'Ponzi scheme', 'Fixed deposit', 'Government bond'], correct: 1, explanation: 'Ponzi schemes rely on a constant stream of new investors to pay earlier ones, and collapse once recruitment slows down.' },
+        { q: 'Before investing through an advisor or platform, you should verify…', options: ['Nothing, just trust the reviews', 'Whether they are SEBI-registered (for securities) or otherwise properly regulated', 'Only their social media follower count', 'That their photo looks trustworthy'], correct: 1, explanation: 'Regulatory registration is a checkable, factual signal of legitimacy — unlike follower counts or appearances, which are easy to fake.' },
+        { q: 'An unsolicited Telegram/WhatsApp message promises "inside tips" for guaranteed stock profits. Best response?', options: ['Follow the tips and invest heavily', 'Treat it as a red flag and ignore or report it', 'Share it with friends so you can all invest together', 'Pay a "membership fee" to access more tips'], correct: 1, explanation: 'Guaranteed-profit "inside tips" from unsolicited messages are a widely used bait for pump-and-dump and Ponzi-style investment scams.' },
+      ],
+    },
+  };
+
+  const modules = db.exec('SELECT id, title FROM learning_modules');
+  if (modules.length === 0) return;
+  const rows = modules[0].values; // [[id, title], ...]
+
+  rows.forEach(([moduleId, title]) => {
+    const lesson = lessons[title];
+    if (!lesson) return;
+    db.run('UPDATE learning_modules SET content = ? WHERE id = ?', [lesson.content, moduleId]);
+    lesson.questions.forEach((q, i) => {
+      db.run(
+        'INSERT INTO quiz_questions (id, module_id, question, options, correct_index, explanation, order_index) VALUES (?, ?, ?, ?, ?, ?, ?)',
+        [uuidv4(), moduleId, q.q, JSON.stringify(q.options), q.correct, q.explanation, i]
+      );
+    });
+  });
+
+  console.log('✅ Quiz content seeded');
 }
 
 module.exports = { initializeDatabase, saveDb, DB_PATH };
