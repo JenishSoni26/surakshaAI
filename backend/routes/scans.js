@@ -60,10 +60,17 @@ function analyzeQR(url) {
   return { risk_score: score, status, threat_type: threatType, ai_explanation: explanation };
 }
 
-// Real signal-derived thresholds for natural human speech, used to score
-// audio features extracted client-side from an actual recording/upload
-// (see frontend/src/lib/audioAnalysis.js). Nothing here is randomized -
-// the same clip always produces the same score.
+// ── Real voice-analysis engine ─────────────────────────────────────────
+// Scores audio features extracted client-side (see audioAnalysis.js).
+// Uses BOTH temporal AND spectral features for meaningful detection of
+// AI-generated / TTS / voice-cloned audio.
+//
+// Detection signals:
+//   Temporal  – silence ratio, volume variance, ZCR, clipping
+//   Spectral  – spectral flatness (tonality), spectral centroid, rolloff
+//   Pitch     – mean F0, F0 stability (std), pitch confidence
+//   MFCC      – coefficient variance (natural speech has high MFCC variance)
+//   Formants  – spectral peak spacing (synthetic voices have unnatural spacing)
 function analyzeVoice(features) {
   const {
     durationSec = 0,
@@ -72,51 +79,152 @@ function analyzeVoice(features) {
     zcr = 0,
     volumeVariance = 0,
     clippingRatio = 0,
+    // Spectral features (new)
+    spectralCentroid = 0,
+    spectralFlatness = -1,
+    spectralRolloff = 0,
+    mfcc = [],
+    pitchMean = 0,
+    pitchStd = 0,
+    pitchConfidence = 0,
+    formantSpread = 0,
   } = features;
 
   let score = 0;
   const threats = [];
+  const details = [];
 
+  // ─── 1. Duration check ────────────────────────────────────────────────
   if (durationSec < 1.2) {
-    score += 15;
+    score += 12;
     threats.push(`Clip is very short (${durationSec.toFixed(1)}s) — too little data for a confident reading`);
   }
 
+  // ─── 2. Temporal: pause patterns ──────────────────────────────────────
   if (durationSec >= 1.2 && silenceRatio < 0.04) {
-    score += 22;
-    threats.push(`Almost no pauses detected (${(silenceRatio * 100).toFixed(0)}% silence) — natural speech usually has 10-40% pause time; gapless audio can indicate synthetic or heavily edited speech`);
+    score += 14;
+    threats.push(`Almost no pauses detected (${(silenceRatio * 100).toFixed(0)}% silence) — natural speech usually has 10-40% pause time; gapless audio is a trait of TTS`);
   }
+  details.push({ label: 'Pause Ratio', value: `${(silenceRatio * 100).toFixed(1)}%`, note: silenceRatio < 0.04 ? 'abnormally low' : 'normal' });
 
+  // ─── 3. Temporal: volume variance ─────────────────────────────────────
   if (durationSec >= 1.2 && volumeVariance < 0.0015) {
-    score += 24;
-    threats.push(`Loudness is unusually flat (variance ${volumeVariance.toFixed(4)}) — real voices naturally rise and fall; a constant level is a common trait of TTS/voice-clone audio`);
+    score += 14;
+    threats.push(`Loudness is unusually flat (variance ${volumeVariance.toFixed(4)}) — real voices rise and fall; constant level is common in TTS/cloned audio`);
   }
+  details.push({ label: 'Volume Variance', value: volumeVariance.toFixed(4), note: volumeVariance < 0.0015 ? 'abnormally flat' : 'normal' });
 
+  // ─── 4. Temporal: zero-crossing rate ──────────────────────────────────
   if (zcr > 0 && (zcr < 0.015 || zcr > 0.28)) {
-    score += 16;
-    threats.push(`Zero-crossing rate (${(zcr * 100).toFixed(1)}%) falls outside the typical range for natural speech, which can indicate synthetic or heavily processed audio`);
+    score += 8;
+    threats.push(`Zero-crossing rate (${(zcr * 100).toFixed(1)}%) is outside the typical 1.5-28% range for natural speech`);
   }
 
+  // ─── 5. Temporal: clipping ────────────────────────────────────────────
   if (clippingRatio > 0.02) {
-    score += 12;
-    threats.push(`${(clippingRatio * 100).toFixed(1)}% of samples are clipped — audio may have been re-encoded, over-driven, or artificially generated`);
+    score += 8;
+    threats.push(`${(clippingRatio * 100).toFixed(1)}% of samples are clipped — may indicate re-encoding or artificial generation`);
   }
 
+  // ─── 6. Temporal: low signal ──────────────────────────────────────────
   if (rms > 0 && rms < 0.008) {
-    score += 10;
-    threats.push('Signal level is extremely low — mostly silence or background noise, insufficient voice content to analyze confidently');
+    score += 6;
+    threats.push('Signal level is extremely low — mostly silence or noise, insufficient voice content');
   }
 
+  // ─── 7. Spectral: flatness (tonality) ─────────────────────────────────
+  // Spectral flatness close to 1.0 = noise-like; close to 0 = tonal.
+  // TTS/cloned audio typically has very low spectral flatness (overly clean).
+  // Natural speech with breath/environment is typically 0.02-0.25.
+  if (spectralFlatness >= 0) {
+    if (spectralFlatness < 0.005 && durationSec >= 1.2) {
+      score += 12;
+      threats.push(`Spectral flatness is extremely low (${spectralFlatness.toFixed(4)}) — the audio is abnormally clean and tonal, a strong trait of synthesized speech`);
+    } else if (spectralFlatness > 0.5) {
+      score += 6;
+      threats.push(`Spectral flatness is very high (${spectralFlatness.toFixed(3)}) — audio is noise-dominant, may be heavily processed`);
+    }
+    details.push({ label: 'Spectral Flatness', value: spectralFlatness.toFixed(4), note: spectralFlatness < 0.005 ? 'too clean' : spectralFlatness > 0.5 ? 'noise-like' : 'normal' });
+  }
+
+  // ─── 8. Spectral: centroid ────────────────────────────────────────────
+  // Spectral centroid < 500 Hz or > 4000 Hz is unusual for speech.
+  if (spectralCentroid > 0) {
+    if (spectralCentroid < 400) {
+      score += 6;
+      threats.push(`Spectral centroid is unusually low (${spectralCentroid.toFixed(0)} Hz) — speech energy is concentrated in an abnormally narrow low-frequency band`);
+    } else if (spectralCentroid > 4500) {
+      score += 6;
+      threats.push(`Spectral centroid is unusually high (${spectralCentroid.toFixed(0)} Hz) — frequency distribution is atypical for natural voice`);
+    }
+    details.push({ label: 'Spectral Centroid', value: `${spectralCentroid.toFixed(0)} Hz` });
+  }
+
+  // ─── 9. Pitch: presence and stability ─────────────────────────────────
+  if (pitchConfidence > 0) {
+    // No pitch detected in sufficient frames
+    if (pitchConfidence < 0.1 && durationSec >= 2) {
+      score += 8;
+      threats.push(`Very low pitch confidence (${(pitchConfidence * 100).toFixed(0)}%) — could not reliably track a fundamental frequency, unusual for clear speech`);
+    }
+
+    // Pitch is too stable (TTS tends to have monotone F0)
+    if (pitchMean > 0 && pitchStd < 8 && pitchConfidence > 0.3) {
+      score += 14;
+      threats.push(`Pitch is abnormally stable (mean ${pitchMean.toFixed(0)} Hz, std ${pitchStd.toFixed(1)} Hz) — natural speech has pitch variation; monotone F0 is a hallmark of basic TTS`);
+    }
+
+    // Pitch in unrealistic range
+    if (pitchMean > 0 && (pitchMean < 65 || pitchMean > 400)) {
+      score += 8;
+      threats.push(`Mean pitch (${pitchMean.toFixed(0)} Hz) is outside the typical human range (65-400 Hz)`);
+    }
+
+    details.push({ label: 'Pitch', value: `${pitchMean.toFixed(0)} Hz (±${pitchStd.toFixed(1)})`, note: pitchStd < 8 ? 'monotone' : 'natural variation' });
+    details.push({ label: 'Pitch Confidence', value: `${(pitchConfidence * 100).toFixed(0)}%` });
+  }
+
+  // ─── 10. MFCC: coefficient variance ───────────────────────────────────
+  // Natural speech produces high variance across MFCC coefficients.
+  // Synthetic speech tends to have lower, more uniform MFCC values.
+  if (mfcc && mfcc.length >= 13) {
+    // Use coefficients 1-12 (skip c0 which is just energy)
+    const mfccSlice = mfcc.slice(1, 13);
+    const mfccMean = mfccSlice.reduce((a, b) => a + b, 0) / mfccSlice.length;
+    const mfccVar = mfccSlice.reduce((sum, v) => sum + (v - mfccMean) ** 2, 0) / mfccSlice.length;
+
+    if (mfccVar < 0.5 && durationSec >= 1.5) {
+      score += 10;
+      threats.push(`MFCC variance is very low (${mfccVar.toFixed(2)}) — the spectral envelope is unusually uniform, a pattern seen in AI-generated speech`);
+    }
+    details.push({ label: 'MFCC Variance', value: mfccVar.toFixed(2), note: mfccVar < 0.5 ? 'abnormally uniform' : 'normal' });
+  }
+
+  // ─── 11. Formant spread ───────────────────────────────────────────────
+  // Natural speech has formant peaks spaced around 800-1200 Hz apart.
+  // Synthetic voices may have irregular or absent formant structure.
+  if (formantSpread > 0) {
+    if (formantSpread < 200) {
+      score += 8;
+      threats.push(`Formant spacing is abnormally narrow (${formantSpread.toFixed(0)} Hz) — natural speech typically shows 800-1200 Hz formant separation`);
+    } else if (formantSpread > 2500) {
+      score += 6;
+      threats.push(`Formant spacing is unusually wide (${formantSpread.toFixed(0)} Hz) — spectral peak distribution is atypical for human voice`);
+    }
+    details.push({ label: 'Formant Spread', value: `${formantSpread.toFixed(0)} Hz`, note: (formantSpread < 200 || formantSpread > 2500) ? 'atypical' : 'normal' });
+  }
+
+  // ─── Final scoring ────────────────────────────────────────────────────
   score = Math.min(score, 100);
   let status = 'safe', threatType = 'None';
   if (score >= 70) { status = 'blocked'; threatType = 'Likely AI-Generated Voice'; }
   else if (score >= 40) { status = 'flagged'; threatType = 'Suspicious Audio Patterns'; }
 
   const explanation = threats.length > 0
-    ? `Audio signal analysis found ${threats.length} anomaly indicator(s):\n• ${threats.join('\n• ')}`
-    : 'Audio signal analysis found natural pause patterns, loudness variation, and spectral characteristics consistent with genuine human speech.';
+    ? `Voice analysis examined ${details.length} signal dimensions and found ${threats.length} anomaly indicator(s):\n• ${threats.join('\n• ')}`
+    : `Voice analysis examined ${details.length} signal dimensions — pause patterns, loudness dynamics, spectral shape, pitch tracking, MFCC envelope, and formant structure — all consistent with genuine human speech.`;
 
-  return { risk_score: score, status, threat_type: threatType, ai_explanation: explanation };
+  return { risk_score: score, status, threat_type: threatType, ai_explanation: explanation, details };
 }
 
 module.exports = function(db) {

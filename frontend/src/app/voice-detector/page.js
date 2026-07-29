@@ -135,14 +135,35 @@ export default function VoiceDetectorPage() {
     try {
       const features = await extractAudioFeatures(audioBlob);
       const data = await api.scanVoice(features, sourceType, fileName || undefined);
-      setResult({
-        ...data,
-        metrics: [
-          { label: 'Pause Ratio', value: `${Math.round(features.silenceRatio * 100)}%`, percent: 100 - Math.min(features.silenceRatio * 100 * 4, 100) },
-          { label: 'Loudness Variation', value: features.volumeVariance.toFixed(4), percent: Math.min(features.volumeVariance * 40000, 100) },
-          { label: 'Zero-Crossing Rate', value: `${(features.zcr * 100).toFixed(1)}%`, percent: Math.min(features.zcr * 300, 100) },
-        ],
-      });
+
+      // Build display metrics from extracted features
+      const metrics = [
+        { label: 'Pause Ratio', value: `${Math.round(features.silenceRatio * 100)}%`, percent: 100 - Math.min(features.silenceRatio * 100 * 4, 100) },
+        { label: 'Loudness Variation', value: features.volumeVariance.toFixed(4), percent: Math.min(features.volumeVariance * 40000, 100) },
+        { label: 'Zero-Crossing Rate', value: `${(features.zcr * 100).toFixed(1)}%`, percent: Math.min(features.zcr * 300, 100) },
+      ];
+
+      // Add spectral metrics if available
+      if (features.spectralFlatness >= 0) {
+        metrics.push({ label: 'Spectral Flatness', value: features.spectralFlatness.toFixed(4), percent: Math.min(features.spectralFlatness * 400, 100) });
+      }
+      if (features.spectralCentroid > 0) {
+        metrics.push({ label: 'Spectral Centroid', value: `${features.spectralCentroid.toFixed(0)} Hz`, percent: Math.min((features.spectralCentroid / 5000) * 100, 100) });
+      }
+      if (features.pitchMean > 0) {
+        metrics.push({ label: 'Pitch (F0)', value: `${features.pitchMean.toFixed(0)} Hz ±${features.pitchStd.toFixed(1)}`, percent: Math.min((features.pitchStd / 50) * 100, 100) });
+      }
+      if (features.mfcc && features.mfcc.length >= 13) {
+        const mfccSlice = features.mfcc.slice(1, 13);
+        const mfccMean = mfccSlice.reduce((a, b) => a + b, 0) / mfccSlice.length;
+        const mfccVar = mfccSlice.reduce((sum, v) => sum + (v - mfccMean) ** 2, 0) / mfccSlice.length;
+        metrics.push({ label: 'MFCC Variance', value: mfccVar.toFixed(2), percent: Math.min(mfccVar * 20, 100) });
+      }
+      if (features.formantSpread > 0) {
+        metrics.push({ label: 'Formant Spread', value: `${features.formantSpread.toFixed(0)} Hz`, percent: Math.min((features.formantSpread / 2000) * 100, 100) });
+      }
+
+      setResult({ ...data, metrics });
     } catch (err) {
       setError(err.message || 'Could not analyze this audio clip. Try a different file.');
     } finally {
@@ -231,8 +252,12 @@ export default function VoiceDetectorPage() {
                 <p className="font-semibold text-on-surface">How it works:</p>
                 <p>• Records from your mic or accepts an uploaded audio file</p>
                 <p>• Decodes real PCM samples with the Web Audio API</p>
-                <p>• Measures pause ratio, loudness variance, clipping, and zero-crossing rate</p>
-                <p>• Flags patterns unusual for genuine human speech</p>
+                <p>• Extracts temporal features: pause ratio, loudness variance, clipping</p>
+                <p>• Computes spectral features: FFT, spectral flatness, centroid, rolloff</p>
+                <p>• Tracks pitch (F0) via autocorrelation to detect monotone TTS</p>
+                <p>• Calculates 13 MFCC coefficients to profile the spectral envelope</p>
+                <p>• Estimates formant spread from spectral peak spacing</p>
+                <p>• Scores all dimensions to flag AI-generated or cloned voices</p>
               </div>
             </div>
 
