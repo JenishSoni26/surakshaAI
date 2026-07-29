@@ -109,8 +109,8 @@ function analyzeVoice(features) {
 
   score = Math.min(score, 100);
   let status = 'safe', threatType = 'None';
-  if (score >= 60) { status = 'blocked'; threatType = 'Likely AI-Generated Voice'; }
-  else if (score >= 30) { status = 'flagged'; threatType = 'Suspicious Audio Patterns'; }
+  if (score >= 70) { status = 'blocked'; threatType = 'Likely AI-Generated Voice'; }
+  else if (score >= 40) { status = 'flagged'; threatType = 'Suspicious Audio Patterns'; }
 
   const explanation = threats.length > 0
     ? `Audio signal analysis found ${threats.length} anomaly indicator(s):\n• ${threats.join('\n• ')}`
