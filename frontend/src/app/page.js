@@ -101,6 +101,101 @@ export default function HomePage() {
           </div>
         </section>
 
+        {/* Voice Scam Detection CTA Section */}
+        <section className="max-w-7xl mx-auto px-4 mb-32">
+          <Link href="/voice-detector" className="block group">
+            <div className="relative overflow-hidden bg-gradient-to-br from-primary/10 via-surface to-tertiary-container/20 rounded-3xl border border-primary/15 shadow-xl hover:shadow-2xl transition-all duration-500 hover:-translate-y-1">
+              {/* Background glow effects */}
+              <div className="absolute -top-20 -right-20 w-72 h-72 bg-primary/5 rounded-full blur-3xl group-hover:scale-125 transition-transform duration-700"></div>
+              <div className="absolute -bottom-16 -left-16 w-56 h-56 bg-tertiary/5 rounded-full blur-3xl group-hover:scale-125 transition-transform duration-700"></div>
+
+              <div className="relative z-10 grid grid-cols-1 md:grid-cols-2 gap-8 p-8 md:p-12 items-center">
+                {/* Left: Content */}
+                <div className="animate-fade-in-up">
+                  <div className="flex items-center gap-3 mb-4">
+                    <div className="w-12 h-12 rounded-2xl bg-primary/10 flex items-center justify-center">
+                      <span className="material-symbols-outlined text-2xl text-primary icon-fill">record_voice_over</span>
+                    </div>
+                    <span className="text-xs font-bold text-primary bg-primary/10 px-3 py-1 rounded-full uppercase tracking-wider">New Feature</span>
+                  </div>
+                  <h2 className="text-2xl md:text-3xl font-bold text-on-background mb-3">
+                    AI Voice Scam Detector
+                  </h2>
+                  <p className="text-on-surface-variant mb-6 leading-relaxed">
+                    Got a suspicious call? Record it or upload the clip — our engine analyzes 11 signal dimensions to detect AI-generated and cloned voices in real time.
+                  </p>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-8">
+                    {[
+                      { icon: 'graphic_eq', text: 'FFT Spectral Analysis' },
+                      { icon: 'music_note', text: 'Pitch (F0) Tracking' },
+                      { icon: 'equalizer', text: '13-Band MFCC Extraction' },
+                      { icon: 'voice_selection', text: 'Formant Detection' },
+                    ].map((item, i) => (
+                      <div key={i} className="flex items-center gap-2 text-sm text-on-surface-variant">
+                        <span className="material-symbols-outlined text-primary text-base">{item.icon}</span>
+                        {item.text}
+                      </div>
+                    ))}
+                  </div>
+                  <div className="inline-flex items-center gap-2 bg-primary text-on-primary px-8 py-3 rounded-xl text-sm font-bold shadow-lg group-hover:shadow-xl group-hover:scale-[1.02] transition-all duration-300">
+                    <span className="material-symbols-outlined text-xl">mic</span>
+                    Try Voice Detector
+                    <span className="material-symbols-outlined text-lg group-hover:translate-x-1 transition-transform">arrow_forward</span>
+                  </div>
+                </div>
+
+                {/* Right: Animated Soundwave Visualizer */}
+                <div className="flex flex-col items-center justify-center animate-fade-in-up delay-200">
+                  <div className="relative w-full max-w-xs">
+                    {/* Soundwave visualization */}
+                    <div className="bg-surface-container-lowest/80 backdrop-blur-sm rounded-3xl p-8 border border-outline-variant/10 shadow-lg">
+                      <div className="flex items-center gap-2 mb-4">
+                        <div className="w-3 h-3 rounded-full bg-error animate-pulse"></div>
+                        <span className="text-xs font-semibold text-on-surface-variant">Analyzing audio signal...</span>
+                      </div>
+                      {/* Animated bars */}
+                      <div className="flex items-end justify-center gap-1 h-24 mb-6">
+                        {[35, 55, 25, 70, 45, 85, 30, 60, 40, 75, 20, 50, 65, 35, 80, 45, 55, 30, 70, 40].map((h, i) => (
+                          <div key={i}
+                            className="w-1.5 rounded-full bg-primary/70"
+                            style={{
+                              height: `${h}%`,
+                              animation: `soundwave 1.2s ease-in-out ${i * 0.06}s infinite alternate`,
+                            }}
+                          ></div>
+                        ))}
+                      </div>
+                      {/* Feature readouts */}
+                      <div className="space-y-2">
+                        {[
+                          { label: 'Spectral Flatness', value: '0.0821', bar: 32 },
+                          { label: 'Pitch Stability', value: '±24.3 Hz', bar: 68 },
+                          { label: 'MFCC Variance', value: '4.82', bar: 85 },
+                        ].map((item, i) => (
+                          <div key={i}>
+                            <div className="flex justify-between text-xs mb-1">
+                              <span className="text-on-surface-variant">{item.label}</span>
+                              <span className="font-bold text-on-surface">{item.value}</span>
+                            </div>
+                            <div className="w-full bg-surface-container-high h-1.5 rounded-full overflow-hidden">
+                              <div className="h-full rounded-full bg-primary transition-all duration-1000"
+                                style={{ width: `${item.bar}%` }}></div>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                      <div className="mt-4 flex items-center gap-2 bg-success/10 rounded-xl px-3 py-2">
+                        <span className="material-symbols-outlined text-success text-base">check_circle</span>
+                        <span className="text-xs font-semibold text-success">Human voice — 94% confidence</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </Link>
+        </section>
+
         {/* Features Section */}
         <section className="max-w-7xl mx-auto px-4 mb-32">
           <div className="text-center mb-12 animate-fade-in-up">

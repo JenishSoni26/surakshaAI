@@ -1,5 +1,6 @@
 'use client';
 import { useState } from 'react';
+import Link from 'next/link';
 import { api } from '@/lib/api';
 import RiskResultCard from '@/components/RiskResultCard';
 import Navbar from '@/components/Navbar';
@@ -90,6 +91,20 @@ export default function ScamAnalyzerPage() {
               )}
             </div>
           </div>
+
+          {/* Voice Detection Banner */}
+          <Link href="/voice-detector" className="block group mt-8 animate-fade-in-up delay-300">
+            <div className="bg-gradient-to-r from-primary/5 via-surface to-tertiary-container/10 rounded-2xl border border-primary/10 p-5 flex items-center gap-4 hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300">
+              <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center shrink-0">
+                <span className="material-symbols-outlined text-2xl text-primary icon-fill">record_voice_over</span>
+              </div>
+              <div className="flex-1 min-w-0">
+                <div className="text-sm font-bold text-on-surface mb-0.5">Got a suspicious call instead?</div>
+                <div className="text-xs text-on-surface-variant">Try our Voice Scam Detector — record or upload a call clip for AI-powered analysis</div>
+              </div>
+              <span className="material-symbols-outlined text-primary text-xl group-hover:translate-x-1 transition-transform shrink-0">arrow_forward</span>
+            </div>
+          </Link>
         </div>
       </main>
       <Footer />
