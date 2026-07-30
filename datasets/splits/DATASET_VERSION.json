@@ -1,0 +1,30 @@
+{
+  "dataset_version": "1.0.0",
+  "creation_timestamp": "2026-07-30T14:22:00Z",
+  "source_datasets": [
+    "Combined SMS Spam Dataset (Kaggle)",
+    "UCI SMS Spam Collection",
+    "Indian Financial Messages Synthetic (SurakshaAI Curated)"
+  ],
+  "preprocessing_version": "2C-Checkpoint3",
+  "random_seed": 42,
+  "split_ratios": {
+    "train": 0.8,
+    "validation": 0.1,
+    "test": 0.1
+  },
+  "sha256_hashes": {
+    "cleaned_trackA.csv": "4cc32ad4851cd80dc2e39f7953c78acb19912ba82b2c6c0add02367f53d9fccf",
+    "train.csv": "383d930b78b523ea42da69764916a810023f2803a8593705b92413f068cf9f7d",
+    "validation.csv": "e99d887dcf1e7364cc589d6eefe3828b13e10463d92485c65f061ada9574018c",
+    "test.csv": "b59c5aaa9c12f08a58ac1aa3a7a3ccb442b0edd1a1f50dbffc78a4cf78289828"
+  },
+  "expected_model_compatibility": [
+    "LogisticRegression",
+    "LinearSVC",
+    "MultinomialNB",
+    "RandomForest",
+    "XGBoost",
+    "LightGBM"
+  ]
+}

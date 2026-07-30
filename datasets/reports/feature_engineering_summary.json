@@ -1,0 +1,348 @@
+{
+  "train_shape_word": [
+    8654,
+    10000
+  ],
+  "val_shape_word": [
+    1082,
+    10000
+  ],
+  "test_shape_word": [
+    1082,
+    10000
+  ],
+  "train_shape_char": [
+    8654,
+    10000
+  ],
+  "val_shape_char": [
+    1082,
+    10000
+  ],
+  "test_shape_char": [
+    1082,
+    10000
+  ],
+  "train_shape_combined": [
+    8654,
+    20000
+  ],
+  "val_shape_combined": [
+    1082,
+    20000
+  ],
+  "test_shape_combined": [
+    1082,
+    20000
+  ],
+  "models_saved": [
+    "d:\\Harsh\\HACKATHONS\\AI MAVERICK - 2026\\surakshaAI\\backend\\services\\ai\\models\\tfidf_word_vectorizer.joblib",
+    "d:\\Harsh\\HACKATHONS\\AI MAVERICK - 2026\\surakshaAI\\backend\\services\\ai\\models\\tfidf_char_vectorizer.joblib"
+  ],
+  "top_scam_word_features": [
+    {
+      "feature": "url_token",
+      "scam_tfidf_mean": 0.0249,
+      "safe_tfidf_mean": 0.0001
+    },
+    {
+      "feature": "within",
+      "scam_tfidf_mean": 0.0235,
+      "safe_tfidf_mean": 0.0004
+    },
+    {
+      "feature": "at url_token",
+      "scam_tfidf_mean": 0.0231,
+      "safe_tfidf_mean": 0.0
+    },
+    {
+      "feature": "minutes at",
+      "scam_tfidf_mean": 0.0231,
+      "safe_tfidf_mean": 0.0
+    },
+    {
+      "feature": "minutes at url_token",
+      "scam_tfidf_mean": 0.0231,
+      "safe_tfidf_mean": 0.0
+    },
+    {
+      "feature": "minutes",
+      "scam_tfidf_mean": 0.0235,
+      "safe_tfidf_mean": 0.0009
+    },
+    {
+      "feature": "http",
+      "scam_tfidf_mean": 0.0179,
+      "safe_tfidf_mean": 0.0009
+    },
+    {
+      "feature": "your",
+      "scam_tfidf_mean": 0.0315,
+      "safe_tfidf_mean": 0.0145
+    },
+    {
+      "feature": "free",
+      "scam_tfidf_mean": 0.0187,
+      "safe_tfidf_mean": 0.0023
+    },
+    {
+      "feature": "call",
+      "scam_tfidf_mean": 0.0217,
+      "safe_tfidf_mean": 0.0064
+    },
+    {
+      "feature": "www",
+      "scam_tfidf_mean": 0.0157,
+      "safe_tfidf_mean": 0.0007
+    },
+    {
+      "feature": "txt",
+      "scam_tfidf_mean": 0.0131,
+      "safe_tfidf_mean": 0.0005
+    },
+    {
+      "feature": "our",
+      "scam_tfidf_mean": 0.0165,
+      "safe_tfidf_mean": 0.004
+    },
+    {
+      "feature": "currency_token",
+      "scam_tfidf_mean": 0.0203,
+      "safe_tfidf_mean": 0.008
+    },
+    {
+      "feature": "now",
+      "scam_tfidf_mean": 0.0199,
+      "safe_tfidf_mean": 0.0082
+    },
+    {
+      "feature": "claim",
+      "scam_tfidf_mean": 0.0112,
+      "safe_tfidf_mean": 0.0
+    },
+    {
+      "feature": "click",
+      "scam_tfidf_mean": 0.0118,
+      "safe_tfidf_mean": 0.0007
+    },
+    {
+      "feature": "stop",
+      "scam_tfidf_mean": 0.0123,
+      "safe_tfidf_mean": 0.0013
+    },
+    {
+      "feature": "mobile",
+      "scam_tfidf_mean": 0.0114,
+      "safe_tfidf_mean": 0.0006
+    },
+    {
+      "feature": "com",
+      "scam_tfidf_mean": 0.0151,
+      "safe_tfidf_mean": 0.0043
+    }
+  ],
+  "top_safe_word_features": [
+    {
+      "feature": "me",
+      "scam_tfidf_mean": 0.0048,
+      "safe_tfidf_mean": 0.018
+    },
+    {
+      "feature": "hpl",
+      "scam_tfidf_mean": 0.0,
+      "safe_tfidf_mean": 0.0118
+    },
+    {
+      "feature": "enron",
+      "scam_tfidf_mean": 0.0,
+      "safe_tfidf_mean": 0.0115
+    },
+    {
+      "feature": "my",
+      "scam_tfidf_mean": 0.0043,
+      "safe_tfidf_mean": 0.015
+    },
+    {
+      "feature": "xls",
+      "scam_tfidf_mean": 0.0,
+      "safe_tfidf_mean": 0.0106
+    },
+    {
+      "feature": "2000",
+      "scam_tfidf_mean": 0.0016,
+      "safe_tfidf_mean": 0.0118
+    },
+    {
+      "feature": "ok",
+      "scam_tfidf_mean": 0.0009,
+      "safe_tfidf_mean": 0.0103
+    },
+    {
+      "feature": "attached",
+      "scam_tfidf_mean": 0.0002,
+      "safe_tfidf_mean": 0.0084
+    },
+    {
+      "feature": "am",
+      "scam_tfidf_mean": 0.002,
+      "safe_tfidf_mean": 0.0102
+    },
+    {
+      "feature": "was",
+      "scam_tfidf_mean": 0.0031,
+      "safe_tfidf_mean": 0.0112
+    },
+    {
+      "feature": "that",
+      "scam_tfidf_mean": 0.008,
+      "safe_tfidf_mean": 0.0157
+    },
+    {
+      "feature": "ect",
+      "scam_tfidf_mean": 0.0,
+      "safe_tfidf_mean": 0.0077
+    },
+    {
+      "feature": "meter",
+      "scam_tfidf_mean": 0.0,
+      "safe_tfidf_mean": 0.0075
+    },
+    {
+      "feature": "but",
+      "scam_tfidf_mean": 0.0038,
+      "safe_tfidf_mean": 0.0111
+    },
+    {
+      "feature": "deal",
+      "scam_tfidf_mean": 0.001,
+      "safe_tfidf_mean": 0.0081
+    },
+    {
+      "feature": "nom",
+      "scam_tfidf_mean": 0.0001,
+      "safe_tfidf_mean": 0.0071
+    },
+    {
+      "feature": "2001",
+      "scam_tfidf_mean": 0.0,
+      "safe_tfidf_mean": 0.0069
+    },
+    {
+      "feature": "so",
+      "scam_tfidf_mean": 0.0047,
+      "safe_tfidf_mean": 0.0114
+    },
+    {
+      "feature": "see attached",
+      "scam_tfidf_mean": 0.0,
+      "safe_tfidf_mean": 0.0068
+    },
+    {
+      "feature": "lor",
+      "scam_tfidf_mean": 0.0,
+      "safe_tfidf_mean": 0.0064
+    }
+  ],
+  "top_scam_char_features": [
+    {
+      "feature": " ur",
+      "scam_tfidf_mean": 0.018,
+      "safe_tfidf_mean": 0.0024
+    },
+    {
+      "feature": "_toke",
+      "scam_tfidf_mean": 0.0189,
+      "safe_tfidf_mean": 0.0037
+    },
+    {
+      "feature": "_to",
+      "scam_tfidf_mean": 0.0189,
+      "safe_tfidf_mean": 0.0037
+    },
+    {
+      "feature": "_tok",
+      "scam_tfidf_mean": 0.0189,
+      "safe_tfidf_mean": 0.0037
+    },
+    {
+      "feature": "toke",
+      "scam_tfidf_mean": 0.0188,
+      "safe_tfidf_mean": 0.0037
+    },
+    {
+      "feature": "token",
+      "scam_tfidf_mean": 0.0188,
+      "safe_tfidf_mean": 0.0037
+    },
+    {
+      "feature": "tok",
+      "scam_tfidf_mean": 0.0189,
+      "safe_tfidf_mean": 0.0037
+    },
+    {
+      "feature": "oken",
+      "scam_tfidf_mean": 0.0188,
+      "safe_tfidf_mean": 0.0038
+    },
+    {
+      "feature": "oken ",
+      "scam_tfidf_mean": 0.0188,
+      "safe_tfidf_mean": 0.0038
+    },
+    {
+      "feature": "l_to",
+      "scam_tfidf_mean": 0.0147,
+      "safe_tfidf_mean": 0.0001
+    },
+    {
+      "feature": "l_tok",
+      "scam_tfidf_mean": 0.0147,
+      "safe_tfidf_mean": 0.0001
+    },
+    {
+      "feature": "l_t",
+      "scam_tfidf_mean": 0.0147,
+      "safe_tfidf_mean": 0.0001
+    },
+    {
+      "feature": "ken ",
+      "scam_tfidf_mean": 0.0186,
+      "safe_tfidf_mean": 0.004
+    },
+    {
+      "feature": "rl_to",
+      "scam_tfidf_mean": 0.0146,
+      "safe_tfidf_mean": 0.0
+    },
+    {
+      "feature": " url_",
+      "scam_tfidf_mean": 0.0146,
+      "safe_tfidf_mean": 0.0
+    },
+    {
+      "feature": "rl_",
+      "scam_tfidf_mean": 0.0146,
+      "safe_tfidf_mean": 0.0
+    },
+    {
+      "feature": "url_t",
+      "scam_tfidf_mean": 0.0146,
+      "safe_tfidf_mean": 0.0
+    },
+    {
+      "feature": "url_",
+      "scam_tfidf_mean": 0.0146,
+      "safe_tfidf_mean": 0.0
+    },
+    {
+      "feature": "rl_t",
+      "scam_tfidf_mean": 0.0146,
+      "safe_tfidf_mean": 0.0
+    },
+    {
+      "feature": " url",
+      "scam_tfidf_mean": 0.0146,
+      "safe_tfidf_mean": 0.0001
+    }
+  ]
+}

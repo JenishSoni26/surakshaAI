@@ -1,0 +1,25 @@
+{
+  "raw_comb_rows": 10961,
+  "raw_uci_rows": 5572,
+  "raw_synth_rows": 800,
+  "raw_total_rows": 17333,
+  "empty_removed": 16,
+  "email_dumps_removed": 714,
+  "html_docs_removed": 0,
+  "filtered_stage_rows": 16603,
+  "placeholders_injected": {
+    "URL_TOKEN": 465,
+    "PHONE_TOKEN": 33,
+    "EMAIL_TOKEN": 25,
+    "UPI_TOKEN": 0,
+    "CURRENCY_TOKEN": 2080
+  },
+  "duplicates_removed": 5785,
+  "final_processed_rows": 10818,
+  "final_safe_rows": 8208,
+  "final_scam_rows": 2610,
+  "vocab_raw_size": 58998,
+  "vocab_processed_size": 38433,
+  "avg_length_raw": 364.57,
+  "avg_length_processed": 280.47
+}
