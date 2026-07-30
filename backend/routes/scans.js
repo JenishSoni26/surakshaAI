@@ -42,6 +42,22 @@ function analyzeMessage(text) {
     };
   }
 
+  // Maximum Input Length Validation (2,000 characters)
+  if (text.length > 2000) {
+    return {
+      riskScore: 0,
+      risk_score: 0,
+      riskLevel: 'SAFE',
+      status: 'safe',
+      confidence: 1.0,
+      threat_type: 'Input Exceeds Max Length',
+      detectedPatterns: ['Exceeded Maximum Length'],
+      reason: 'Message exceeds maximum allowed length of 2,000 characters.',
+      recommendation: 'Please trim message to under 2,000 characters for analysis.',
+      ai_explanation: 'Message exceeds maximum length of 2,000 characters. Please trim and retry.'
+    };
+  }
+
   const lower = text.toLowerCase();
   let score = 0;
   const detectedPatterns = [];
@@ -283,7 +299,23 @@ function analyzeQR(url) {
 
   if (url.startsWith('upi://')) {
     const params = new URLSearchParams(url.replace('upi://pay?', ''));
-    const pa = params.get('pa') || '';
+    const pa = (params.get('pa') || '').trim();
+
+    if (!pa) {
+      return {
+        riskScore: 75,
+        risk_score: 75,
+        riskLevel: 'HIGH',
+        status: 'blocked',
+        confidence: 0.95,
+        threat_type: 'Malformed UPI QR Payload',
+        detectedPatterns: ['Missing Payee Address'],
+        reason: 'QR contains a UPI payment link but lacks a valid payee address (pa parameter).',
+        recommendation: 'DO NOT proceed with payment. Scan a valid merchant QR code.',
+        ai_explanation: 'Malformed UPI payment link: missing payee VPA address.'
+      };
+    }
+
     const upiResult = analyzeUPI(pa);
     return {
       ...upiResult,
@@ -532,12 +564,13 @@ module.exports = function(db) {
       const { upiId } = req.body;
       if (!upiId) return res.status(400).json({ error: 'UPI ID is required.' });
 
-      const result = analyzeUPI(upiId);
+      const normalizedUpi = upiId.trim().toLowerCase();
+      const result = analyzeUPI(normalizedUpi);
       const scanId = uuidv4();
 
       db.run(
         'INSERT INTO scans (id, user_id, type, content, risk_score, status, threat_type, ai_explanation) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
-        [scanId, req.user?.id || null, 'upi', upiId, result.risk_score, result.status, result.threat_type, result.ai_explanation]
+        [scanId, req.user?.id || null, 'upi', normalizedUpi, result.risk_score, result.status, result.threat_type, result.ai_explanation]
       );
 
       res.json({ id: scanId, ...result });

@@ -50,8 +50,18 @@ export default function VoiceDetectorPage() {
   function stopVisualizer() {
     if (rafRef.current) cancelAnimationFrame(rafRef.current);
     rafRef.current = null;
-    if (streamRef.current) { streamRef.current.getTracks().forEach(t => t.stop()); streamRef.current = null; }
-    if (audioCtxRef.current) { audioCtxRef.current.close(); audioCtxRef.current = null; }
+    if (streamRef.current) {
+      try {
+        streamRef.current.getTracks().forEach(t => t.stop());
+      } catch (e) {
+        console.error('Error stopping stream tracks:', e);
+      }
+      streamRef.current = null;
+    }
+    if (audioCtxRef.current) {
+      try { audioCtxRef.current.close(); } catch (e) {}
+      audioCtxRef.current = null;
+    }
     setLevels(new Array(24).fill(4));
   }
 
@@ -99,13 +109,22 @@ export default function VoiceDetectorPage() {
       mediaRecorderRef.current = recorder;
       setIsRecording(true);
     } catch (err) {
+      stopVisualizer();
       setError('Microphone access was denied or unavailable. You can upload an audio file instead.');
     }
   };
 
   const stopRecording = () => {
-    mediaRecorderRef.current?.stop();
-    setIsRecording(false);
+    try {
+      if (mediaRecorderRef.current && mediaRecorderRef.current.state !== 'inactive') {
+        mediaRecorderRef.current.stop();
+      }
+    } catch (e) {
+      console.error('Error stopping recorder:', e);
+    } finally {
+      setIsRecording(false);
+      stopVisualizer();
+    }
   };
 
   const handleFileSelect = (e) => {
@@ -127,58 +146,28 @@ export default function VoiceDetectorPage() {
     setFileName(file.name);
   };
 
-  const handleAnalyze = async () => {
-    if (!audioBlob) return;
-    setLoading(true);
-    setResult(null);
-    setError('');
-    try {
-      const features = await extractAudioFeatures(audioBlob);
-      const data = await api.scanVoice(features, sourceType, fileName || undefined);
-
-      // Build display metrics from extracted features
-      const metrics = [
-        { label: 'Pause Ratio', value: `${Math.round(features.silenceRatio * 100)}%`, percent: 100 - Math.min(features.silenceRatio * 100 * 4, 100) },
-        { label: 'Loudness Variation', value: features.volumeVariance.toFixed(4), percent: Math.min(features.volumeVariance * 40000, 100) },
-        { label: 'Zero-Crossing Rate', value: `${(features.zcr * 100).toFixed(1)}%`, percent: Math.min(features.zcr * 300, 100) },
-      ];
-
-      // Add spectral metrics if available
-      if (features.spectralFlatness >= 0) {
-        metrics.push({ label: 'Spectral Flatness', value: features.spectralFlatness.toFixed(4), percent: Math.min(features.spectralFlatness * 400, 100) });
-      }
-      if (features.spectralCentroid > 0) {
-        metrics.push({ label: 'Spectral Centroid', value: `${features.spectralCentroid.toFixed(0)} Hz`, percent: Math.min((features.spectralCentroid / 5000) * 100, 100) });
-      }
-      if (features.pitchMean > 0) {
-        metrics.push({ label: 'Pitch (F0)', value: `${features.pitchMean.toFixed(0)} Hz ±${features.pitchStd.toFixed(1)}`, percent: Math.min((features.pitchStd / 50) * 100, 100) });
-      }
-      if (features.mfcc && features.mfcc.length >= 13) {
-        const mfccSlice = features.mfcc.slice(1, 13);
-        const mfccMean = mfccSlice.reduce((a, b) => a + b, 0) / mfccSlice.length;
-        const mfccVar = mfccSlice.reduce((sum, v) => sum + (v - mfccMean) ** 2, 0) / mfccSlice.length;
-        metrics.push({ label: 'MFCC Variance', value: mfccVar.toFixed(2), percent: Math.min(mfccVar * 20, 100) });
-      }
-      if (features.formantSpread > 0) {
-        metrics.push({ label: 'Formant Spread', value: `${features.formantSpread.toFixed(0)} Hz`, percent: Math.min((features.formantSpread / 2000) * 100, 100) });
-      }
-
-      setResult({ ...data, metrics });
-    } catch (err) {
-      setError(err.message || 'Could not analyze this audio clip. Try a different file.');
-    } finally {
-      setLoading(false);
+  const handleDrop = (e) => {
+    e.preventDefault();
+    const file = e.dataTransfer.files?.[0];
+    if (file) {
+      const pseudoEvent = { target: { files: [file] } };
+      handleFileSelect(pseudoEvent);
     }
   };
 
-  const clearClip = () => {
-    if (audioUrl) URL.revokeObjectURL(audioUrl);
-    setAudioBlob(null);
-    setAudioUrl(null);
-    setSourceType(null);
-    setFileName('');
+  const runAnalysis = async () => {
+    if (!audioBlob) return;
+    setLoading(true);
     resetResult();
-    if (fileInputRef.current) fileInputRef.current.value = '';
+    try {
+      const features = await extractAudioFeatures(audioBlob);
+      const res = await api.scanVoice(features, sourceType, fileName);
+      setResult(res);
+    } catch (err) {
+      setError(err.message || 'Voice analysis failed. Please try a different audio clip.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -190,95 +179,196 @@ export default function VoiceDetectorPage() {
             <div className="w-16 h-16 rounded-full bg-primary/10 mx-auto flex items-center justify-center mb-4">
               <span className="material-symbols-outlined text-3xl text-primary">record_voice_over</span>
             </div>
-            <h1 className="text-3xl font-bold mb-3">Voice Scam Detector</h1>
-            <p className="text-on-surface-variant max-w-xl mx-auto">Record or upload a call clip. We analyze real signal characteristics — pause patterns, loudness variation, and pitch consistency — to flag audio that looks synthetic or heavily processed.</p>
+            <h1 className="text-3xl font-bold text-on-background mb-3">AI Voice Scam Detector</h1>
+            <p className="text-on-surface-variant max-w-xl mx-auto">
+              Record a live call clip or upload an audio recording. Our multi-signal DSP engine analyzes pitch stability, silence dynamics, spectral flatness, and MFCC patterns to flag AI-synthesized deepfakes.
+            </p>
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            {/* Capture Panel */}
-            <div className="bg-surface-container-lowest rounded-3xl shadow-xl border border-outline-variant/10 p-6 animate-fade-in-up delay-100">
-              <h2 className="text-lg font-semibold mb-6 flex items-center gap-2"><span className="material-symbols-outlined text-primary">mic</span>Voice Analysis</h2>
+            {/* Input Column */}
+            <div className="space-y-6 animate-fade-in-up delay-100">
+              {/* Record Card */}
+              <div className="bg-surface-container-lowest rounded-3xl shadow-xl border border-outline-variant/10 p-6">
+                <h2 className="text-lg font-semibold mb-2 flex items-center gap-2">
+                  <span className="material-symbols-outlined text-primary">mic</span>Record Live Call Clip
+                </h2>
+                <p className="text-xs text-on-surface-variant mb-4">
+                  Record 3 to 10 seconds of clear speech for the most accurate analysis.
+                </p>
 
-              <div className="flex flex-col items-center justify-center py-6">
-                {supportsRecording && (
-                  <>
-                    <button onClick={isRecording ? stopRecording : startRecording} disabled={loading}
-                      aria-label={isRecording ? 'Stop recording' : 'Start recording'}
-                      className={`w-32 h-32 rounded-full flex items-center justify-center transition-all duration-300 shadow-lg ${isRecording ? 'bg-error animate-pulse scale-110' : 'bg-primary hover:scale-105'} text-on-primary disabled:opacity-50`}>
-                      <span className="material-symbols-outlined text-5xl">{isRecording ? 'stop' : 'mic'}</span>
-                    </button>
-                    <p className="text-sm text-on-surface-variant mt-6">{isRecording ? 'Recording... tap to stop' : 'Tap to record from your microphone'}</p>
-                    <div className="flex items-end gap-1 mt-4 h-14" aria-hidden="true">
-                      {levels.map((h, i) => (
-                        <div key={i} className={`w-1.5 rounded-full transition-all ${isRecording ? 'bg-error' : 'bg-outline-variant/40'}`} style={{ height: `${h}px` }}></div>
-                      ))}
-                    </div>
-                    <div className="text-xs text-on-surface-variant my-4">or</div>
-                  </>
+                {/* Waveform Visualizer */}
+                <div className="bg-surface-container rounded-2xl p-6 mb-4 flex items-center justify-center gap-1 h-24 border border-outline-variant/10">
+                  {levels.map((h, i) => (
+                    <div
+                      key={i}
+                      className={`w-1.5 rounded-full transition-all duration-75 ${
+                        isRecording ? 'bg-primary shadow-sm' : 'bg-outline-variant/40'
+                      }`}
+                      style={{ height: `${h}px` }}
+                    />
+                  ))}
+                </div>
+
+                {!isRecording ? (
+                  <button
+                    onClick={startRecording}
+                    disabled={!supportsRecording || loading}
+                    className="w-full bg-primary text-on-primary py-3 rounded-xl text-sm font-bold shadow-lg hover:opacity-90 transition-all disabled:opacity-50 flex items-center justify-center gap-2"
+                  >
+                    <span className="material-symbols-outlined">fiber_manual_record</span>
+                    Start Recording
+                  </button>
+                ) : (
+                  <button
+                    onClick={stopRecording}
+                    className="w-full bg-error text-on-error py-3 rounded-xl text-sm font-bold shadow-lg hover:opacity-90 transition-all flex items-center justify-center gap-2 animate-pulse"
+                  >
+                    <span className="material-symbols-outlined">stop</span>
+                    Stop & Capture Clip
+                  </button>
                 )}
 
-                <button onClick={() => fileInputRef.current?.click()} disabled={loading || isRecording}
-                  className="bg-surface-container hover:bg-surface-container-high text-on-surface px-5 py-2.5 rounded-xl text-sm font-semibold flex items-center gap-2 transition-colors disabled:opacity-50">
-                  <span className="material-symbols-outlined text-lg">upload_file</span>Upload Audio File
-                </button>
-                <input ref={fileInputRef} type="file" accept="audio/*" onChange={handleFileSelect} className="hidden" />
                 {!supportsRecording && (
-                  <p className="text-xs text-on-surface-variant mt-3 text-center">Microphone recording isn&apos;t available in this browser — upload a call recording instead.</p>
+                  <p className="text-[11px] text-tertiary mt-2 text-center">
+                    Live mic recording is unavailable in this browser context. Please use the file upload option below.
+                  </p>
                 )}
               </div>
 
+              {/* Upload Card */}
+              <div className="bg-surface-container-lowest rounded-3xl shadow-xl border border-outline-variant/10 p-6">
+                <h2 className="text-lg font-semibold mb-2 flex items-center gap-2">
+                  <span className="material-symbols-outlined text-primary">upload_file</span>Upload Audio File
+                </h2>
+                <p className="text-xs text-on-surface-variant mb-4">
+                  Supports MP3, WAV, M4A, OGG, and WebM audio files up to 15MB.
+                </p>
+
+                <div
+                  onDragOver={(e) => e.preventDefault()}
+                  onDrop={handleDrop}
+                  onClick={() => fileInputRef.current?.click()}
+                  className="bg-surface-container rounded-2xl p-6 text-center border-2 border-dashed border-outline-variant/30 hover:border-primary/50 cursor-pointer transition-colors"
+                >
+                  <span className="material-symbols-outlined text-4xl text-primary mb-2">audio_file</span>
+                  <p className="text-xs font-semibold text-on-surface mb-1">
+                    {fileName ? fileName : 'Click or drag & drop audio file here'}
+                  </p>
+                  <p className="text-[10px] text-on-surface-variant">MP3, WAV, M4A up to 15MB</p>
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    accept="audio/*"
+                    onChange={handleFileSelect}
+                    className="hidden"
+                  />
+                </div>
+              </div>
+
+              {/* Clip Selected Bar & Analyze Action */}
               {audioUrl && (
-                <div className="bg-surface-container rounded-2xl p-4 mb-4 flex items-center gap-3">
-                  <span className="material-symbols-outlined text-primary">graphic_eq</span>
-                  <audio src={audioUrl} controls className="flex-1 h-10" />
-                  <button onClick={clearClip} aria-label="Remove clip" className="text-on-surface-variant hover:text-error transition-colors">
-                    <span className="material-symbols-outlined text-lg">close</span>
+                <div className="bg-surface-container-lowest rounded-3xl shadow-xl border border-primary/20 p-6 animate-fade-in space-y-4">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-xs font-bold text-primary flex items-center gap-1">
+                        <span className="material-symbols-outlined text-sm">audiotrack</span>
+                        Clip Ready ({sourceType === 'upload' ? 'Uploaded' : 'Recorded'})
+                      </p>
+                      {fileName && <p className="text-[11px] text-on-surface-variant truncate max-w-[240px]">{fileName}</p>}
+                    </div>
+                  </div>
+
+                  <audio src={audioUrl} controls className="w-full h-8" />
+
+                  <button
+                    onClick={runAnalysis}
+                    disabled={loading}
+                    className="w-full bg-primary text-on-primary py-3.5 rounded-xl text-sm font-bold shadow-lg hover:opacity-90 transition-all disabled:opacity-50 flex items-center justify-center gap-2"
+                  >
+                    {loading ? (
+                      <>
+                        <span className="material-symbols-outlined animate-spin">progress_activity</span>
+                        Extracting Acoustic DSP Features...
+                      </>
+                    ) : (
+                      <>
+                        <span className="material-symbols-outlined">equalizer</span>
+                        Analyze Voice Clip for Scams
+                      </>
+                    )}
                   </button>
                 </div>
               )}
-
-              {error && (
-                <div className="bg-error-container/20 text-error rounded-xl p-3 text-xs mb-4 flex items-start gap-2">
-                  <span className="material-symbols-outlined text-base shrink-0">error</span>{error}
-                </div>
-              )}
-
-              <button onClick={handleAnalyze} disabled={!audioBlob || loading}
-                className="w-full bg-primary text-on-primary py-3 rounded-xl text-sm font-bold shadow-lg hover:opacity-90 transition-all disabled:opacity-50 flex items-center justify-center gap-2 mb-4">
-                {loading ? <><span className="material-symbols-outlined animate-spin">progress_activity</span>Analyzing audio...</> : <><span className="material-symbols-outlined">radar</span>Analyze Clip</>}
-              </button>
-
-              <div className="bg-surface-container rounded-2xl p-4 text-xs text-on-surface-variant space-y-2">
-                <p className="font-semibold text-on-surface">How it works:</p>
-                <p>• Records from your mic or accepts an uploaded audio file</p>
-                <p>• Decodes real PCM samples with the Web Audio API</p>
-                <p>• Extracts temporal features: pause ratio, loudness variance, clipping</p>
-                <p>• Computes spectral features: FFT, spectral flatness, centroid, rolloff</p>
-                <p>• Tracks pitch (F0) via autocorrelation to detect monotone TTS</p>
-                <p>• Calculates 13 MFCC coefficients to profile the spectral envelope</p>
-                <p>• Estimates formant spread from spectral peak spacing</p>
-                <p>• Scores all dimensions to flag AI-generated or cloned voices</p>
-              </div>
             </div>
 
-            {/* Results Panel */}
+            {/* Results Column */}
             <div className="bg-surface-container-lowest rounded-3xl shadow-xl border border-outline-variant/10 p-6 animate-fade-in-up delay-200">
-              <h2 className="text-lg font-semibold mb-4 flex items-center gap-2"><span className="material-symbols-outlined text-primary">analytics</span>Detection Results</h2>
-              {!result && !loading && (
-                <div className="flex flex-col items-center justify-center h-64 text-on-surface-variant">
-                  <span className="material-symbols-outlined text-5xl mb-3 opacity-30">graphic_eq</span>
-                  <p className="text-sm text-center">Record or upload a clip, then tap Analyze</p>
+              <h2 className="text-lg font-semibold mb-4 flex items-center gap-2">
+                <span className="material-symbols-outlined text-primary">analytics</span>Voice Analysis Results
+              </h2>
+
+              {error && (
+                <div className="bg-error-container/20 text-error rounded-2xl p-4 text-xs leading-relaxed mb-4">
+                  {error}
                 </div>
               )}
+
+              {!result && !loading && !error && (
+                <div className="flex flex-col items-center justify-center h-72 text-on-surface-variant text-center">
+                  <span className="material-symbols-outlined text-5xl mb-3 opacity-30">graphic_eq</span>
+                  <p className="text-sm font-semibold mb-1">No audio clip analyzed yet</p>
+                  <p className="text-xs max-w-xs text-on-surface-variant/80">
+                    Record a live call clip or upload an audio file, then click Analyze to run spectral DSP threat detection.
+                  </p>
+                </div>
+              )}
+
               {loading && (
-                <div className="flex flex-col items-center justify-center h-64">
-                  <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mb-4 animate-pulse-glow">
+                <div className="flex flex-col items-center justify-center h-72 text-center space-y-3">
+                  <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center animate-pulse-glow">
                     <span className="material-symbols-outlined text-3xl text-primary animate-spin">progress_activity</span>
                   </div>
-                  <p className="text-sm text-on-surface-variant">Decoding and analyzing audio signal...</p>
+                  <p className="text-sm font-semibold text-on-surface">Running DSP Acoustic Analysis...</p>
+                  <p className="text-xs text-on-surface-variant max-w-xs">
+                    Evaluating volume dynamics, silence ratios, zero-crossing rate, pitch autocorrelation, spectral flatness, and MFCC variance.
+                  </p>
                 </div>
               )}
-              {result && <RiskResultCard riskScore={result.risk_score} status={result.status} threatType={result.threat_type} aiExplanation={result.ai_explanation} metrics={result.metrics} />}
+
+              {result && !loading && (
+                <div className="space-y-4">
+                  <RiskResultCard
+                    riskScore={result.risk_score}
+                    status={result.status}
+                    threatType={result.threat_type}
+                    aiExplanation={result.ai_explanation}
+                  />
+
+                  {/* Signal Dimensions Breakdown */}
+                  {result.details && result.details.length > 0 && (
+                    <div className="bg-surface-container rounded-2xl p-4 space-y-2 border border-outline-variant/10">
+                      <p className="text-xs font-bold text-on-surface mb-2 flex items-center gap-1">
+                        <span className="material-symbols-outlined text-sm text-primary">equalizer</span>
+                        Extracted Signal Metrics
+                      </p>
+                      <div className="grid grid-cols-2 gap-2 text-xs">
+                        {result.details.map((d, i) => (
+                          <div key={i} className="bg-surface-container-lowest p-2 rounded-xl border border-outline-variant/10">
+                            <span className="text-[10px] text-on-surface-variant block">{d.label}</span>
+                            <span className="font-bold text-on-surface text-xs">{d.value}</span>
+                            {d.note && (
+                              <span className={`block text-[9px] font-semibold ${d.note.includes('abnormal') || d.note.includes('too clean') || d.note.includes('monotone') ? 'text-error' : 'text-success'}`}>
+                                {d.note}
+                              </span>
+                            )}
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
           </div>
         </div>

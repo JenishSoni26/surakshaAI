@@ -1,6 +1,7 @@
 'use client';
 import { useState } from 'react';
 import { api } from '@/lib/api';
+import RiskResultCard from '@/components/RiskResultCard';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import FAB from '@/components/FAB';
@@ -12,12 +13,14 @@ export default function UPIGuardianPage() {
   const [history, setHistory] = useState([]);
 
   const handleVerify = async () => {
-    if (!upiId.trim()) return;
+    const trimmed = upiId.trim();
+    if (!trimmed) return;
     setLoading(true);
+    setResult(null);
     try {
-      const data = await api.scanUPI(upiId);
+      const data = await api.scanUPI(trimmed);
       setResult(data);
-      setHistory(prev => [{ upiId, ...data, time: new Date().toLocaleTimeString() }, ...prev].slice(0, 5));
+      setHistory(prev => [{ upiId: trimmed.toLowerCase(), ...data, time: new Date().toLocaleTimeString() }, ...prev].slice(0, 5));
     } catch (err) {
       setResult({ error: err.message });
     } finally {
@@ -60,24 +63,12 @@ export default function UPIGuardianPage() {
                 ))}
               </div>
 
-              {/* Result */}
+              {/* Result using RiskResultCard */}
               {result && !result.error && (
-                <div className="animate-fade-in-up">
-                  <div className={`rounded-2xl p-6 ${result.status === 'verified' ? 'bg-success/5 border border-success/20' : result.status === 'blocked' ? 'bg-error-container/20 border border-error/20' : 'bg-tertiary-container/10 border border-tertiary/20'}`}>
-                    <div className="flex items-center gap-3 mb-4">
-                      <span className={`material-symbols-outlined text-3xl ${result.status === 'verified' ? 'text-success' : result.status === 'blocked' ? 'text-error' : 'text-tertiary'} icon-fill`}>
-                        {result.status === 'verified' ? 'verified_user' : result.status === 'blocked' ? 'gpp_bad' : 'warning'}
-                      </span>
-                      <div>
-                        <div className="font-bold text-on-surface">{upiId}</div>
-                        <div className={`text-xs font-semibold ${result.status === 'verified' ? 'text-success' : result.status === 'blocked' ? 'text-error' : 'text-tertiary'}`}>{result.status.toUpperCase()} — Risk: {result.risk_score}/100</div>
-                      </div>
-                    </div>
-                    <div className="bg-surface/60 rounded-xl p-4 border-l-4 border-primary">
-                      <p className="text-sm text-on-surface-variant leading-relaxed">{result.ai_explanation}</p>
-                    </div>
-                  </div>
-                </div>
+                <RiskResultCard riskScore={result.risk_score} status={result.status} threatType={result.threat_type} aiExplanation={result.ai_explanation} />
+              )}
+              {result?.error && (
+                <div className="bg-error-container/20 text-error rounded-2xl p-4 text-sm">{result.error}</div>
               )}
             </div>
 

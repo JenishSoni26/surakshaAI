@@ -1,6 +1,5 @@
 'use client';
 import { useState } from 'react';
-import Link from 'next/link';
 import { api } from '@/lib/api';
 import RiskResultCard from '@/components/RiskResultCard';
 import Navbar from '@/components/Navbar';
@@ -14,6 +13,10 @@ export default function ScamAnalyzerPage() {
 
   const handleAnalyze = async () => {
     if (!text.trim()) return;
+    if (text.length > 2000) {
+      setResult({ error: 'Message exceeds maximum allowed length of 2,000 characters. Please trim and try again.' });
+      return;
+    }
     setLoading(true);
     setResult(null);
     try {
@@ -49,8 +52,12 @@ export default function ScamAnalyzerPage() {
             {/* Input Panel */}
             <div className="bg-surface-container-lowest rounded-3xl shadow-xl border border-outline-variant/10 p-6 animate-fade-in-up delay-100">
               <h2 className="text-lg font-semibold mb-4 flex items-center gap-2"><span className="material-symbols-outlined text-primary">edit_note</span>Paste Suspicious Message</h2>
-              <textarea value={text} onChange={e => setText(e.target.value)} rows={8} placeholder="Paste the suspicious message here..."
-                className="w-full bg-surface-container rounded-2xl px-4 py-3 text-sm border border-outline-variant/20 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all resize-none mb-4" />
+              <textarea value={text} onChange={e => setText(e.target.value)} rows={8} maxLength={2000} placeholder="Paste the suspicious message here..."
+                className="w-full bg-surface-container rounded-2xl px-4 py-3 text-sm border border-outline-variant/20 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all resize-none mb-1" />
+              <div className="flex justify-between items-center mb-4 text-[10px] text-on-surface-variant">
+                <span>Max 2,000 characters</span>
+                <span className={text.length >= 1900 ? 'text-tertiary font-bold' : ''}>{text.length}/2000</span>
+              </div>
               <div className="flex flex-wrap gap-2 mb-4">
                 <span className="text-xs text-on-surface-variant font-semibold">Try samples:</span>
                 {sampleMessages.map((msg, i) => (
@@ -91,20 +98,6 @@ export default function ScamAnalyzerPage() {
               )}
             </div>
           </div>
-
-          {/* Voice Detection Banner */}
-          <Link href="/voice-detector" className="block group mt-8 animate-fade-in-up delay-300">
-            <div className="bg-gradient-to-r from-primary/5 via-surface to-tertiary-container/10 rounded-2xl border border-primary/10 p-5 flex items-center gap-4 hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300">
-              <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center shrink-0">
-                <span className="material-symbols-outlined text-2xl text-primary icon-fill">record_voice_over</span>
-              </div>
-              <div className="flex-1 min-w-0">
-                <div className="text-sm font-bold text-on-surface mb-0.5">Got a suspicious call instead?</div>
-                <div className="text-xs text-on-surface-variant">Try our Voice Scam Detector — record or upload a call clip for AI-powered analysis</div>
-              </div>
-              <span className="material-symbols-outlined text-primary text-xl group-hover:translate-x-1 transition-transform shrink-0">arrow_forward</span>
-            </div>
-          </Link>
         </div>
       </main>
       <Footer />
