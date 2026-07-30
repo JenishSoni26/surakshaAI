@@ -25,9 +25,11 @@ async function initializeDatabase() {
       id TEXT PRIMARY KEY,
       name TEXT NOT NULL,
       email TEXT UNIQUE NOT NULL,
-      password_hash TEXT NOT NULL,
+      password_hash TEXT DEFAULT '',
       phone TEXT DEFAULT '',
       avatar_url TEXT DEFAULT '',
+      google_id TEXT DEFAULT '',
+      auth_provider TEXT DEFAULT 'local',
       two_factor_enabled INTEGER DEFAULT 0,
       login_alerts INTEGER DEFAULT 1,
       email_notifications INTEGER DEFAULT 1,
@@ -36,6 +38,10 @@ async function initializeDatabase() {
       updated_at TEXT DEFAULT (datetime('now'))
     )
   `);
+
+  // Migrate existing databases: add google_id and auth_provider if missing
+  try { db.run(`ALTER TABLE users ADD COLUMN google_id TEXT DEFAULT ''`); } catch (e) {}
+  try { db.run(`ALTER TABLE users ADD COLUMN auth_provider TEXT DEFAULT 'local'`); } catch (e) {}
 
   db.run(`
     CREATE TABLE IF NOT EXISTS scans (

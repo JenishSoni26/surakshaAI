@@ -1,6 +1,8 @@
 'use client';
 import { useState, useRef, useEffect } from 'react';
 import { api } from '@/lib/api';
+import { useLanguage } from '@/lib/i18n';
+import { useFeatureAuth } from '@/lib/featureAuth';
 import { extractAudioFeatures } from '@/lib/audioAnalysis';
 import RiskResultCard from '@/components/RiskResultCard';
 import Navbar from '@/components/Navbar';
@@ -20,6 +22,8 @@ export default function VoiceDetectorPage() {
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState(null);
   const [error, setError] = useState('');
+  const { t, lang } = useLanguage();
+  const { requireAuth } = useFeatureAuth();
 
   const mediaRecorderRef = useRef(null);
   const streamRef = useRef(null);
@@ -53,90 +57,96 @@ export default function VoiceDetectorPage() {
     if (streamRef.current) {
       try {
         streamRef.current.getTracks().forEach(t => t.stop());
-      } catch (e) {
-        console.error('Error stopping stream tracks:', e);
-      }
+      } catch (e) {}
       streamRef.current = null;
     }
     if (audioCtxRef.current) {
-      try { audioCtxRef.current.close(); } catch (e) {}
+      try {
+        audioCtxRef.current.close();
+      } catch (e) {}
       audioCtxRef.current = null;
     }
+    analyserRef.current = null;
     setLevels(new Array(24).fill(4));
   }
 
   useEffect(() => {
-    setSupportsRecording(
-      typeof window !== 'undefined' &&
-      !!navigator.mediaDevices?.getUserMedia &&
-      typeof window.MediaRecorder !== 'undefined'
-    );
-    return () => stopVisualizer();
+    if (typeof window !== 'undefined' && navigator.mediaDevices?.getUserMedia && window.MediaRecorder) {
+      setSupportsRecording(true);
+    }
+    return () => {
+      stopVisualizer();
+      if (audioUrl) URL.revokeObjectURL(audioUrl);
+    };
   }, []);
 
   const startRecording = async () => {
     resetResult();
-    setAudioBlob(null);
-    if (audioUrl) URL.revokeObjectURL(audioUrl);
-    setAudioUrl(null);
+    setError('');
+    chunksRef.current = [];
+
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
       streamRef.current = stream;
 
-      const AudioContextClass = window.AudioContext || window.webkitAudioContext;
-      const audioCtx = new AudioContextClass();
+      const AudioContext = window.AudioContext || window.webkitAudioContext;
+      const audioCtx = new AudioContext();
       audioCtxRef.current = audioCtx;
       const source = audioCtx.createMediaStreamSource(stream);
       const analyser = audioCtx.createAnalyser();
       analyser.fftSize = 128;
       source.connect(analyser);
       analyserRef.current = analyser;
-      rafRef.current = requestAnimationFrame(drawLevels);
 
-      const mimeType = MediaRecorder.isTypeSupported('audio/webm') ? 'audio/webm' : '';
-      const recorder = new MediaRecorder(stream, mimeType ? { mimeType } : undefined);
-      chunksRef.current = [];
-      recorder.ondataavailable = (e) => { if (e.data.size > 0) chunksRef.current.push(e.data); };
+      drawLevels();
+
+      const recorder = new MediaRecorder(stream);
+      mediaRecorderRef.current = recorder;
+
+      recorder.ondataavailable = (e) => {
+        if (e.data && e.data.size > 0) {
+          chunksRef.current.push(e.data);
+        }
+      };
+
       recorder.onstop = () => {
         const blob = new Blob(chunksRef.current, { type: recorder.mimeType || 'audio/webm' });
+        chunksRef.current = [];
+        if (audioUrl) URL.revokeObjectURL(audioUrl);
         setAudioBlob(blob);
         setAudioUrl(URL.createObjectURL(blob));
         setSourceType('recording');
         setFileName('');
         stopVisualizer();
+        setIsRecording(false);
       };
-      recorder.start();
-      mediaRecorderRef.current = recorder;
+
+      recorder.start(100);
       setIsRecording(true);
     } catch (err) {
       stopVisualizer();
-      setError('Microphone access was denied or unavailable. You can upload an audio file instead.');
+      setIsRecording(false);
+      setError(t('voice.micBlocked'));
     }
   };
 
   const stopRecording = () => {
-    try {
-      if (mediaRecorderRef.current && mediaRecorderRef.current.state !== 'inactive') {
-        mediaRecorderRef.current.stop();
-      }
-    } catch (e) {
-      console.error('Error stopping recorder:', e);
-    } finally {
-      setIsRecording(false);
-      stopVisualizer();
+    if (mediaRecorderRef.current && mediaRecorderRef.current.state !== 'inactive') {
+      mediaRecorderRef.current.stop();
     }
   };
 
   const handleFileSelect = (e) => {
+    resetResult();
     const file = e.target.files?.[0];
     if (!file) return;
-    resetResult();
-    if (!file.type.startsWith('audio/')) {
-      setError('Please choose an audio file (mp3, wav, m4a, ogg, webm...).');
+
+    if (file.size > MAX_FILE_BYTES) {
+      setError(t('voice.fileTooLarge'));
       return;
     }
-    if (file.size > MAX_FILE_BYTES) {
-      setError('File is too large. Please choose an audio clip under 15MB.');
+    if (!file.type.startsWith('audio/') && !/\.(mp3|wav|m4a|aac|ogg|webm|flac)$/i.test(file.name)) {
+      setError(t('voice.unsupportedFormat'));
       return;
     }
     if (audioUrl) URL.revokeObjectURL(audioUrl);
@@ -155,20 +165,47 @@ export default function VoiceDetectorPage() {
     }
   };
 
-  const runAnalysis = async () => {
+  const handleAnalyze = requireAuth(async () => {
     if (!audioBlob) return;
     setLoading(true);
-    resetResult();
+    setResult(null);
+    setError('');
     try {
       const features = await extractAudioFeatures(audioBlob);
-      const res = await api.scanVoice(features, sourceType, fileName);
-      setResult(res);
+      const data = await api.scanVoice(features, sourceType, fileName || undefined, lang);
+
+      const metrics = [
+        { label: 'Pause Ratio', value: `${Math.round(features.silenceRatio * 100)}%`, percent: 100 - Math.min(features.silenceRatio * 100 * 4, 100) },
+        { label: 'Loudness Variation', value: features.volumeVariance.toFixed(4), percent: Math.min(features.volumeVariance * 40000, 100) },
+        { label: 'Zero-Crossing Rate', value: `${(features.zcr * 100).toFixed(1)}%`, percent: Math.min(features.zcr * 300, 100) },
+      ];
+
+      if (features.spectralFlatness >= 0) {
+        metrics.push({ label: 'Spectral Flatness', value: features.spectralFlatness.toFixed(4), percent: Math.min(features.spectralFlatness * 400, 100) });
+      }
+      if (features.spectralCentroid > 0) {
+        metrics.push({ label: 'Spectral Centroid', value: `${features.spectralCentroid.toFixed(0)} Hz`, percent: Math.min((features.spectralCentroid / 5000) * 100, 100) });
+      }
+      if (features.pitchMean > 0) {
+        metrics.push({ label: 'Pitch (F0)', value: `${features.pitchMean.toFixed(0)} Hz ±${features.pitchStd.toFixed(1)}`, percent: Math.min((features.pitchStd / 50) * 100, 100) });
+      }
+      if (features.mfcc && features.mfcc.length >= 13) {
+        const mfccSlice = features.mfcc.slice(1, 13);
+        const mfccMean = mfccSlice.reduce((a, b) => a + b, 0) / mfccSlice.length;
+        const mfccVar = mfccSlice.reduce((sum, v) => sum + (v - mfccMean) ** 2, 0) / mfccSlice.length;
+        metrics.push({ label: 'MFCC Variance', value: mfccVar.toFixed(2), percent: Math.min(mfccVar * 20, 100) });
+      }
+      if (features.formantSpread > 0) {
+        metrics.push({ label: 'Formant Spread', value: `${features.formantSpread.toFixed(0)} Hz`, percent: Math.min((features.formantSpread / 2000) * 100, 100) });
+      }
+
+      setResult({ ...data, metrics });
     } catch (err) {
-      setError(err.message || 'Voice analysis failed. Please try a different audio clip.');
+      setError(err.message || t('voice.analysisFailed'));
     } finally {
       setLoading(false);
     }
-  };
+  });
 
   return (
     <div className="flex flex-col min-h-screen">
@@ -177,198 +214,105 @@ export default function VoiceDetectorPage() {
         <div className="max-w-4xl mx-auto px-4">
           <div className="text-center mb-10 animate-fade-in-up">
             <div className="w-16 h-16 rounded-full bg-primary/10 mx-auto flex items-center justify-center mb-4">
-              <span className="material-symbols-outlined text-3xl text-primary">record_voice_over</span>
+              <span className="material-symbols-outlined text-3xl text-primary">graphic_eq</span>
             </div>
-            <h1 className="text-3xl font-bold text-on-background mb-3">AI Voice Scam Detector</h1>
-            <p className="text-on-surface-variant max-w-xl mx-auto">
-              Record a live call clip or upload an audio recording. Our multi-signal DSP engine analyzes pitch stability, silence dynamics, spectral flatness, and MFCC patterns to flag AI-synthesized deepfakes.
-            </p>
+            <h1 className="text-3xl font-bold text-on-background mb-3">{t('voice.title')}</h1>
+            <p className="text-on-surface-variant max-w-xl mx-auto">{t('voice.subtitle')}</p>
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            {/* Input Column */}
-            <div className="space-y-6 animate-fade-in-up delay-100">
-              {/* Record Card */}
-              <div className="bg-surface-container-lowest rounded-3xl shadow-xl border border-outline-variant/10 p-6">
-                <h2 className="text-lg font-semibold mb-2 flex items-center gap-2">
-                  <span className="material-symbols-outlined text-primary">mic</span>Record Live Call Clip
+            <div className="bg-surface-container-lowest rounded-3xl shadow-xl border border-outline-variant/10 p-6 flex flex-col justify-between animate-fade-in-up delay-100">
+              <div>
+                <h2 className="text-lg font-semibold mb-4 flex items-center gap-2">
+                  <span className="material-symbols-outlined text-primary">mic</span>
+                  {t('voice.inputLabel')}
                 </h2>
-                <p className="text-xs text-on-surface-variant mb-4">
-                  Record 3 to 10 seconds of clear speech for the most accurate analysis.
-                </p>
 
-                {/* Waveform Visualizer */}
-                <div className="bg-surface-container rounded-2xl p-6 mb-4 flex items-center justify-center gap-1 h-24 border border-outline-variant/10">
-                  {levels.map((h, i) => (
-                    <div
-                      key={i}
-                      className={`w-1.5 rounded-full transition-all duration-75 ${
-                        isRecording ? 'bg-primary shadow-sm' : 'bg-outline-variant/40'
-                      }`}
-                      style={{ height: `${h}px` }}
-                    />
-                  ))}
-                </div>
-
-                {!isRecording ? (
-                  <button
-                    onClick={startRecording}
-                    disabled={!supportsRecording || loading}
-                    className="w-full bg-primary text-on-primary py-3 rounded-xl text-sm font-bold shadow-lg hover:opacity-90 transition-all disabled:opacity-50 flex items-center justify-center gap-2"
-                  >
-                    <span className="material-symbols-outlined">fiber_manual_record</span>
-                    Start Recording
-                  </button>
-                ) : (
-                  <button
-                    onClick={stopRecording}
-                    className="w-full bg-error text-on-error py-3 rounded-xl text-sm font-bold shadow-lg hover:opacity-90 transition-all flex items-center justify-center gap-2 animate-pulse"
-                  >
-                    <span className="material-symbols-outlined">stop</span>
-                    Stop & Capture Clip
-                  </button>
-                )}
-
-                {!supportsRecording && (
-                  <p className="text-[11px] text-tertiary mt-2 text-center">
-                    Live mic recording is unavailable in this browser context. Please use the file upload option below.
-                  </p>
-                )}
-              </div>
-
-              {/* Upload Card */}
-              <div className="bg-surface-container-lowest rounded-3xl shadow-xl border border-outline-variant/10 p-6">
-                <h2 className="text-lg font-semibold mb-2 flex items-center gap-2">
-                  <span className="material-symbols-outlined text-primary">upload_file</span>Upload Audio File
-                </h2>
-                <p className="text-xs text-on-surface-variant mb-4">
-                  Supports MP3, WAV, M4A, OGG, and WebM audio files up to 15MB.
-                </p>
-
-                <div
-                  onDragOver={(e) => e.preventDefault()}
-                  onDrop={handleDrop}
-                  onClick={() => fileInputRef.current?.click()}
-                  className="bg-surface-container rounded-2xl p-6 text-center border-2 border-dashed border-outline-variant/30 hover:border-primary/50 cursor-pointer transition-colors"
-                >
-                  <span className="material-symbols-outlined text-4xl text-primary mb-2">audio_file</span>
-                  <p className="text-xs font-semibold text-on-surface mb-1">
-                    {fileName ? fileName : 'Click or drag & drop audio file here'}
-                  </p>
-                  <p className="text-[10px] text-on-surface-variant">MP3, WAV, M4A up to 15MB</p>
-                  <input
-                    ref={fileInputRef}
-                    type="file"
-                    accept="audio/*"
-                    onChange={handleFileSelect}
-                    className="hidden"
-                  />
-                </div>
-              </div>
-
-              {/* Clip Selected Bar & Analyze Action */}
-              {audioUrl && (
-                <div className="bg-surface-container-lowest rounded-3xl shadow-xl border border-primary/20 p-6 animate-fade-in space-y-4">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-xs font-bold text-primary flex items-center gap-1">
-                        <span className="material-symbols-outlined text-sm">audiotrack</span>
-                        Clip Ready ({sourceType === 'upload' ? 'Uploaded' : 'Recorded'})
-                      </p>
-                      {fileName && <p className="text-[11px] text-on-surface-variant truncate max-w-[240px]">{fileName}</p>}
-                    </div>
-                  </div>
-
-                  <audio src={audioUrl} controls className="w-full h-8" />
-
-                  <button
-                    onClick={runAnalysis}
-                    disabled={loading}
-                    className="w-full bg-primary text-on-primary py-3.5 rounded-xl text-sm font-bold shadow-lg hover:opacity-90 transition-all disabled:opacity-50 flex items-center justify-center gap-2"
-                  >
-                    {loading ? (
-                      <>
-                        <span className="material-symbols-outlined animate-spin">progress_activity</span>
-                        Extracting Acoustic DSP Features...
-                      </>
-                    ) : (
-                      <>
-                        <span className="material-symbols-outlined">equalizer</span>
-                        Analyze Voice Clip for Scams
-                      </>
+                <div className="bg-surface-container/60 border border-outline-variant/20 rounded-2xl p-4 mb-4">
+                  <div className="flex items-center justify-between mb-3">
+                    <span className="text-xs font-semibold text-on-surface-variant flex items-center gap-1.5">
+                      <span className="material-symbols-outlined text-base text-primary">mic</span>
+                      {t('voice.micRecord')}
+                    </span>
+                    {isRecording && (
+                      <span className="inline-flex items-center gap-1 text-[11px] text-tertiary font-bold animate-pulse">
+                        <span className="w-2 h-2 rounded-full bg-tertiary"></span> {t('voice.recordingActive')}
+                      </span>
                     )}
-                  </button>
-                </div>
-              )}
-            </div>
-
-            {/* Results Column */}
-            <div className="bg-surface-container-lowest rounded-3xl shadow-xl border border-outline-variant/10 p-6 animate-fade-in-up delay-200">
-              <h2 className="text-lg font-semibold mb-4 flex items-center gap-2">
-                <span className="material-symbols-outlined text-primary">analytics</span>Voice Analysis Results
-              </h2>
-
-              {error && (
-                <div className="bg-error-container/20 text-error rounded-2xl p-4 text-xs leading-relaxed mb-4">
-                  {error}
-                </div>
-              )}
-
-              {!result && !loading && !error && (
-                <div className="flex flex-col items-center justify-center h-72 text-on-surface-variant text-center">
-                  <span className="material-symbols-outlined text-5xl mb-3 opacity-30">graphic_eq</span>
-                  <p className="text-sm font-semibold mb-1">No audio clip analyzed yet</p>
-                  <p className="text-xs max-w-xs text-on-surface-variant/80">
-                    Record a live call clip or upload an audio file, then click Analyze to run spectral DSP threat detection.
-                  </p>
-                </div>
-              )}
-
-              {loading && (
-                <div className="flex flex-col items-center justify-center h-72 text-center space-y-3">
-                  <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center animate-pulse-glow">
-                    <span className="material-symbols-outlined text-3xl text-primary animate-spin">progress_activity</span>
                   </div>
-                  <p className="text-sm font-semibold text-on-surface">Running DSP Acoustic Analysis...</p>
-                  <p className="text-xs text-on-surface-variant max-w-xs">
-                    Evaluating volume dynamics, silence ratios, zero-crossing rate, pitch autocorrelation, spectral flatness, and MFCC variance.
-                  </p>
-                </div>
-              )}
 
-              {result && !loading && (
-                <div className="space-y-4">
-                  <RiskResultCard
-                    riskScore={result.risk_score}
-                    status={result.status}
-                    threatType={result.threat_type}
-                    aiExplanation={result.ai_explanation}
-                  />
+                  <div className="flex items-center justify-center gap-1 h-14 bg-surface-container-lowest rounded-xl px-4 border border-outline-variant/10 mb-3">
+                    {levels.map((h, i) => (
+                      <span key={i} style={{ height: `${h}px` }}
+                        className={`w-1 rounded-full transition-all duration-75 ${isRecording ? 'bg-primary' : 'bg-outline-variant/40'}`} />
+                    ))}
+                  </div>
 
-                  {/* Signal Dimensions Breakdown */}
-                  {result.details && result.details.length > 0 && (
-                    <div className="bg-surface-container rounded-2xl p-4 space-y-2 border border-outline-variant/10">
-                      <p className="text-xs font-bold text-on-surface mb-2 flex items-center gap-1">
-                        <span className="material-symbols-outlined text-sm text-primary">equalizer</span>
-                        Extracted Signal Metrics
-                      </p>
-                      <div className="grid grid-cols-2 gap-2 text-xs">
-                        {result.details.map((d, i) => (
-                          <div key={i} className="bg-surface-container-lowest p-2 rounded-xl border border-outline-variant/10">
-                            <span className="text-[10px] text-on-surface-variant block">{d.label}</span>
-                            <span className="font-bold text-on-surface text-xs">{d.value}</span>
-                            {d.note && (
-                              <span className={`block text-[9px] font-semibold ${d.note.includes('abnormal') || d.note.includes('too clean') || d.note.includes('monotone') ? 'text-error' : 'text-success'}`}>
-                                {d.note}
-                              </span>
-                            )}
-                          </div>
-                        ))}
-                      </div>
-                    </div>
+                  {supportsRecording ? (
+                    !isRecording ? (
+                      <button onClick={startRecording} disabled={loading}
+                        className="w-full py-2.5 rounded-xl border border-primary/30 text-primary hover:bg-primary/10 transition-colors text-sm font-semibold flex items-center justify-center gap-2">
+                        <span className="material-symbols-outlined text-lg">radio_button_checked</span>
+                        {t('voice.startRec')}
+                      </button>
+                    ) : (
+                      <button onClick={stopRecording}
+                        className="w-full py-2.5 rounded-xl bg-tertiary-container text-on-tertiary-container hover:bg-tertiary/20 transition-colors text-sm font-semibold flex items-center justify-center gap-2">
+                        <span className="material-symbols-outlined text-lg">stop</span>
+                        {t('voice.stopRec')}
+                      </button>
+                    )
+                  ) : (
+                    <p className="text-xs text-on-surface-variant/70 text-center">{t('voice.recNotSupported')}</p>
                   )}
                 </div>
-              )}
+
+                <div className="relative flex items-center my-3">
+                  <div className="flex-grow border-t border-outline-variant/20"></div>
+                  <span className="px-2 text-[11px] text-on-surface-variant uppercase tracking-wider font-semibold">{t('voice.orDivider')}</span>
+                  <div className="flex-grow border-t border-outline-variant/20"></div>
+                </div>
+
+                <div onDragOver={e => e.preventDefault()} onDrop={handleDrop}
+                  onClick={() => fileInputRef.current?.click()}
+                  className="border-2 border-dashed border-outline-variant/30 hover:border-primary/50 bg-surface-container/30 hover:bg-surface-container/60 rounded-2xl p-4 text-center cursor-pointer transition-all mb-4">
+                  <input ref={fileInputRef} type="file" accept="audio/*,.mp3,.wav,.m4a,.aac,.ogg,.webm,.flac" onChange={handleFileSelect} className="hidden" />
+                  <span className="material-symbols-outlined text-2xl text-primary mb-1">cloud_upload</span>
+                  <p className="text-xs font-semibold text-on-background mb-0.5">{t('voice.uploadPrompt')}</p>
+                  <p className="text-[10px] text-on-surface-variant">{t('voice.fileTypesHint')}</p>
+                </div>
+
+                {audioUrl && (
+                  <div className="bg-surface-container rounded-2xl p-3 border border-outline-variant/20 mb-4 animate-fade-in">
+                    <div className="flex items-center justify-between text-xs text-on-surface-variant mb-2">
+                      <span className="font-semibold text-on-background truncate max-w-[200px]">
+                        {sourceType === 'recording' ? `🎙️ ${t('voice.recordingLabel')}` : `📄 ${fileName}`}
+                      </span>
+                      <span className="text-[10px] uppercase font-bold text-primary px-2 py-0.5 bg-primary/10 rounded-full">{sourceType}</span>
+                    </div>
+                    <audio src={audioUrl} controls className="w-full h-8" />
+                  </div>
+                )}
+
+                {error && (
+                  <div className="bg-tertiary-container/30 border border-tertiary/20 rounded-xl p-3 text-xs text-tertiary font-semibold mb-4 animate-fade-in">
+                    {error}
+                  </div>
+                )}
+              </div>
+
+              <button onClick={handleAnalyze} disabled={loading || !audioBlob}
+                className="w-full btn-primary py-3 rounded-full font-semibold flex items-center justify-center gap-2 shadow-lg disabled:opacity-50 mt-2">
+                {loading ? (
+                  <><span className="material-symbols-outlined animate-spin text-lg">progress_activity</span>{t('voice.analyzing')}</>
+                ) : (
+                  <><span className="material-symbols-outlined text-lg">graphic_eq</span>{t('voice.analyzeBtn')}</>
+                )}
+              </button>
+            </div>
+
+            <div className="animate-fade-in-up delay-200">
+              <RiskResultCard result={result} loading={loading} />
             </div>
           </div>
         </div>

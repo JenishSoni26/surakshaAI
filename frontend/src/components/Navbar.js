@@ -2,20 +2,24 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useAuth } from '@/lib/auth';
+import { useLanguage } from '@/lib/i18n';
 import { useState } from 'react';
+import LanguageSelector from './LanguageSelector';
 
 export default function Navbar() {
   const pathname = usePathname();
   const { user, isAuthenticated, logout } = useAuth();
+  const { t } = useLanguage();
   const [mobileOpen, setMobileOpen] = useState(false);
 
   const links = [
-    { href: '/', label: 'Home' },
-    { href: '/scam-analyzer', label: 'Scam Analyzer' },
-    { href: '/upi-guardian', label: 'UPI Guardian' },
-    { href: '/learn', label: 'Learn' },
-    { href: '/dashboard', label: 'Dashboard' },
-    { href: '/emergency', label: 'Emergency' },
+    { href: '/', label: t('nav.home'), icon: null },
+    { href: '/scam-analyzer', label: t('nav.scamAnalyzer'), icon: null },
+    { href: '/upi-guardian', label: t('nav.upiGuardian'), icon: null },
+    { href: '/voice-detector', label: t('nav.voiceDetect'), icon: 'mic' },
+    { href: '/learn', label: t('nav.learn'), icon: null },
+    { href: '/dashboard', label: t('nav.dashboard'), icon: null },
+    { href: '/emergency', label: t('nav.emergency'), icon: null },
   ];
 
   const isActive = (href) => pathname === href;
@@ -30,19 +34,20 @@ export default function Navbar() {
         </Link>
 
         {/* Desktop Nav */}
-        <nav className="hidden md:flex items-center gap-6">
+        <nav className="hidden md:flex items-center gap-5">
           {links.map(link => (
             <Link
               key={link.href}
               href={link.href}
-              className={`text-sm font-semibold transition-colors ${
+              className={`text-sm font-semibold transition-colors flex items-center gap-1 ${
                 isActive(link.href)
                   ? 'text-primary border-b-2 border-primary pb-1'
-                  : link.label === 'Emergency'
+                  : link.label === t('nav.emergency')
                     ? 'text-error hover:text-error/80'
                     : 'text-on-surface-variant hover:text-primary'
               }`}
             >
+              {link.icon && <span className="material-symbols-outlined text-sm">{link.icon}</span>}
               {link.label}
             </Link>
           ))}
@@ -50,18 +55,19 @@ export default function Navbar() {
 
         {/* Right actions */}
         <div className="flex items-center gap-3">
+          <LanguageSelector />
           {isAuthenticated ? (
             <div className="flex items-center gap-3">
               <Link href="/profile" className="text-on-surface-variant hover:text-primary transition-colors">
                 <span className="material-symbols-outlined">person</span>
               </Link>
               <button onClick={logout} className="bg-error/10 text-error px-4 py-2 rounded-xl text-sm font-semibold hover:bg-error/20 transition-colors">
-                Logout
+                {t('nav.logout')}
               </button>
             </div>
           ) : (
             <Link href="/login" className="bg-primary-container text-on-primary-container px-6 py-2 rounded-xl text-sm font-semibold hover:opacity-90 transition-opacity shadow-md">
-              Login
+              {t('nav.login')}
             </Link>
           )}
 
@@ -81,10 +87,11 @@ export default function Navbar() {
                 key={link.href}
                 href={link.href}
                 onClick={() => setMobileOpen(false)}
-                className={`px-4 py-3 rounded-xl text-sm font-semibold transition-colors ${
+                className={`px-4 py-3 rounded-xl text-sm font-semibold transition-colors flex items-center gap-2 ${
                   isActive(link.href) ? 'bg-primary-container text-on-primary-container' : 'text-on-surface-variant hover:bg-surface-container'
                 }`}
               >
+                {link.icon && <span className="material-symbols-outlined text-sm">{link.icon}</span>}
                 {link.label}
               </Link>
             ))}

@@ -7,75 +7,123 @@ import FAB from '@/components/FAB';
 
 export default function EmergencyPage() {
   const [contacts, setContacts] = useState([]);
-  const [freezeResult, setFreezeResult] = useState(null);
-  const [freezeLoading, setFreezeLoading] = useState(false);
-  const [showConfirm, setShowConfirm] = useState(false);
+  const [tickerIndex, setTickerIndex] = useState(0);
 
   useEffect(() => { api.getContacts().then(d => setContacts(d.contacts)).catch(console.error); }, []);
 
-  const handleFreeze = async () => {
-    setShowConfirm(false);
-    setFreezeLoading(true);
-    try { const data = await api.freezeAccount('all', 'suspected fraud'); setFreezeResult(data); } catch (err) { console.error(err); } finally { setFreezeLoading(false); }
-  };
+  const safetyTips = [
+    '🔒 Never share your OTP, PIN, or CVV with anyone — not even your bank!',
+    '🚨 Report fraud within the first hour — the "golden window" for fund recovery.',
+    '📱 Government agencies NEVER ask for money transfers over calls.',
+    '🛡️ Always verify UPI IDs before sending money to unknown contacts.',
+    '⚠️ If a deal sounds too good to be true, it probably is — stay alert!',
+    '📞 National Cyber Crime Helpline: 1930 — Available 24/7',
+  ];
+
+  useEffect(() => {
+    const interval = setInterval(() => setTickerIndex(prev => (prev + 1) % safetyTips.length), 4000);
+    return () => clearInterval(interval);
+  }, [safetyTips.length]);
+
+  const quickActions = [
+    { icon: 'report', title: 'Report Fraud', desc: 'File a complaint at cybercrime.gov.in', gradient: 'from-red-500 to-orange-500', link: 'https://cybercrime.gov.in' },
+    { icon: 'call', title: 'Call Helpline', desc: 'Dial 1930 — Cyber Crime Helpline', gradient: 'from-blue-500 to-cyan-500', link: 'tel:1930' },
+    { icon: 'verified_user', title: 'Safety Guide', desc: 'Learn to protect yourself from scams', gradient: 'from-emerald-500 to-teal-500', link: '#fraud-guide' },
+  ];
 
   const iconColors = { shield: 'bg-primary/10 text-primary', account_balance: 'bg-secondary-container/30 text-secondary', local_police: 'bg-error-container/30 text-error', support: 'bg-tertiary-container/20 text-tertiary', security: 'bg-primary-fixed text-primary', credit_card: 'bg-surface-container-high text-on-surface-variant' };
 
   return (
     <div className="flex flex-col min-h-screen">
       <Navbar />
+      <style jsx>{`
+        @keyframes pulse-ring {
+          0% { transform: scale(0.9); opacity: 0.7; }
+          50% { transform: scale(1.1); opacity: 0.3; }
+          100% { transform: scale(0.9); opacity: 0.7; }
+        }
+        @keyframes float {
+          0%, 100% { transform: translateY(0px); }
+          50% { transform: translateY(-8px); }
+        }
+        @keyframes shimmer {
+          0% { background-position: -200% center; }
+          100% { background-position: 200% center; }
+        }
+        @keyframes slide-up {
+          0% { transform: translateY(12px); opacity: 0; }
+          15% { transform: translateY(0); opacity: 1; }
+          85% { transform: translateY(0); opacity: 1; }
+          100% { transform: translateY(-12px); opacity: 0; }
+        }
+        .pulse-ring { animation: pulse-ring 2s ease-in-out infinite; }
+        .float-anim { animation: float 3s ease-in-out infinite; }
+        .shimmer-text {
+          background: linear-gradient(90deg, currentColor 40%, rgba(255,255,255,0.8) 50%, currentColor 60%);
+          background-size: 200% auto;
+          -webkit-background-clip: text;
+          background-clip: text;
+          animation: shimmer 3s linear infinite;
+        }
+        .ticker-item { animation: slide-up 4s ease-in-out; }
+        .quick-card:hover .card-icon { transform: scale(1.15) rotate(-5deg); }
+        .quick-card:hover { transform: translateY(-6px) scale(1.02); box-shadow: 0 20px 40px rgba(0,0,0,0.15); }
+      `}</style>
+
       <main className="flex-grow pt-24 pb-12">
         <div className="max-w-4xl mx-auto px-4">
+
+          {/* Hero Section */}
           <div className="text-center mb-10 animate-fade-in-up">
-            <div className="w-16 h-16 rounded-full bg-error-container/30 mx-auto flex items-center justify-center mb-4">
-              <span className="material-symbols-outlined text-3xl text-error">emergency</span>
+            <div className="relative w-20 h-20 mx-auto mb-5">
+              <div className="absolute inset-0 rounded-full bg-error/20 pulse-ring"></div>
+              <div className="relative w-20 h-20 rounded-full bg-gradient-to-br from-error to-red-700 flex items-center justify-center shadow-lg shadow-error/30 float-anim">
+                <span className="material-symbols-outlined text-4xl text-white">emergency</span>
+              </div>
             </div>
             <h1 className="text-3xl font-bold mb-3">Emergency Help Center</h1>
-            <p className="text-on-surface-variant max-w-xl mx-auto">Quick access to emergency actions and helpline contacts. Act immediately if you suspect fraud.</p>
+            <p className="text-on-surface-variant max-w-xl mx-auto">Quick access to helpline contacts and safety resources. Act immediately if you suspect fraud.</p>
           </div>
 
-          {/* Emergency Freeze Button */}
-          <div className="bg-error/5 border-2 border-error/20 rounded-3xl p-6 mb-8 text-center animate-fade-in-up delay-100">
-            <span className="material-symbols-outlined text-5xl text-error mb-3 block">lock</span>
-            <h2 className="text-xl font-bold text-error mb-2">Emergency Account Freeze</h2>
-            <p className="text-sm text-on-surface-variant mb-4 max-w-md mx-auto">Immediately freeze all linked accounts to prevent unauthorized transactions. Use this only in genuine emergencies.</p>
-            {freezeResult ? (
-              <div className="bg-surface rounded-2xl p-4 text-left max-w-md mx-auto animate-fade-in">
-                <div className="flex items-center gap-2 mb-3 text-success font-semibold text-sm"><span className="material-symbols-outlined">check_circle</span>{freezeResult.message}</div>
-                <div className="text-xs text-on-surface-variant space-y-1">
-                  <p><strong>Reference:</strong> {freezeResult.freezeId}</p>
-                  <p><strong>Status:</strong> {freezeResult.details?.estimatedCompletion}</p>
-                  <p className="font-semibold text-on-surface mt-2">Next Steps:</p>
-                  {freezeResult.details?.nextSteps?.map((s, i) => <p key={i}>• {s}</p>)}
-                </div>
-              </div>
-            ) : (
-              <button onClick={() => setShowConfirm(true)} disabled={freezeLoading}
-                className="bg-error text-on-error px-8 py-3 rounded-xl text-sm font-bold shadow-lg hover:opacity-90 transition-all disabled:opacity-50 flex items-center justify-center gap-2 mx-auto">
-                {freezeLoading ? <><span className="material-symbols-outlined animate-spin">progress_activity</span>Processing...</> : <><span className="material-symbols-outlined">lock</span>Freeze All Accounts</>}
-              </button>
-            )}
-          </div>
-
-          {/* Confirmation Modal */}
-          {showConfirm && (
-            <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-[100] flex items-center justify-center p-4 animate-fade-in" role="dialog" aria-modal="true" aria-labelledby="freeze-confirm-title">
-              <div className="bg-surface-container-lowest rounded-3xl shadow-2xl p-6 max-w-sm w-full">
-                <div className="text-center">
-                  <span className="material-symbols-outlined text-5xl text-error mb-3">warning</span>
-                  <h3 id="freeze-confirm-title" className="text-lg font-bold text-error mb-2">Confirm Emergency Freeze</h3>
-                  <p className="text-sm text-on-surface-variant mb-6">This will freeze all linked bank accounts. Are you sure you want to proceed?</p>
-                  <div className="flex gap-3">
-                    <button onClick={() => setShowConfirm(false)} className="flex-1 bg-surface-container text-on-surface-variant py-2.5 rounded-xl text-sm font-semibold">Cancel</button>
-                    <button onClick={handleFreeze} className="flex-1 bg-error text-on-error py-2.5 rounded-xl text-sm font-bold">Yes, Freeze Now</button>
-                  </div>
-                </div>
+          {/* Live Safety Ticker */}
+          <div className="relative overflow-hidden bg-gradient-to-r from-primary/10 via-primary/5 to-primary/10 border border-primary/20 rounded-2xl px-5 py-3.5 mb-8 animate-fade-in-up delay-100">
+            <div className="flex items-center gap-3">
+              <span className="relative flex h-3 w-3 flex-shrink-0">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-3 w-3 bg-primary"></span>
+              </span>
+              <div className="overflow-hidden h-6 flex-1">
+                <p key={tickerIndex} className="text-sm font-medium text-on-surface ticker-item whitespace-nowrap">
+                  {safetyTips[tickerIndex]}
+                </p>
               </div>
             </div>
-          )}
+          </div>
+
+          {/* Quick Action Cards */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-10 animate-fade-in-up delay-100">
+            {quickActions.map((action, i) => (
+              <a key={i} href={action.link}
+                 target={action.link.startsWith('http') ? '_blank' : undefined}
+                 rel={action.link.startsWith('http') ? 'noopener noreferrer' : undefined}
+                 className="quick-card group relative overflow-hidden rounded-2xl p-5 text-white transition-all duration-300 cursor-pointer block no-underline"
+                 style={{ background: `linear-gradient(135deg, var(--tw-gradient-from, #ef4444), var(--tw-gradient-to, #f97316))` }}>
+                <div className={`absolute inset-0 bg-gradient-to-br ${action.gradient} opacity-100`}></div>
+                <div className="absolute top-0 right-0 w-24 h-24 bg-white/10 rounded-full -translate-x-4 -translate-y-8 group-hover:scale-150 transition-transform duration-500"></div>
+                <div className="relative z-10">
+                  <span className="card-icon material-symbols-outlined text-3xl mb-3 block transition-transform duration-300 drop-shadow-md">{action.icon}</span>
+                  <h3 className="text-base font-bold mb-1">{action.title}</h3>
+                  <p className="text-xs text-white/80 leading-relaxed">{action.desc}</p>
+                </div>
+              </a>
+            ))}
+          </div>
 
           {/* Emergency Contacts */}
-          <h2 className="text-xl font-bold mb-4 animate-fade-in-up delay-200">Emergency Helplines</h2>
+          <h2 className="text-xl font-bold mb-4 animate-fade-in-up delay-200 flex items-center gap-2">
+            <span className="material-symbols-outlined text-error">contact_phone</span>
+            Emergency Helplines
+          </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
             {contacts.map((c, i) => {
               const delays = ['delay-100', 'delay-200', 'delay-300', 'delay-400', 'delay-500'];
@@ -99,7 +147,7 @@ export default function EmergencyPage() {
           </div>
 
           {/* Fraud Reporting Guide */}
-          <div className="bg-surface-container-lowest rounded-3xl shadow-xl border border-outline-variant/10 p-6 animate-fade-in-up delay-400">
+          <div id="fraud-guide" className="bg-surface-container-lowest rounded-3xl shadow-xl border border-outline-variant/10 p-6 animate-fade-in-up delay-400">
             <h2 className="text-xl font-bold mb-4 flex items-center gap-2"><span className="material-symbols-outlined text-primary">description</span>Step-by-Step Fraud Reporting Guide</h2>
             <div className="space-y-4">
               {[
@@ -123,3 +171,4 @@ export default function EmergencyPage() {
     </div>
   );
 }
+

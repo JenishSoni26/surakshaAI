@@ -1,5 +1,7 @@
 import './globals.css';
 import { AuthProvider } from '@/lib/auth';
+import { LanguageProvider } from '@/lib/i18n';
+import { GoogleOAuthProvider } from '@react-oauth/google';
 
 export const metadata = {
   title: 'SurakshaPayAI - Protect Your Money with AI',
@@ -7,6 +9,8 @@ export const metadata = {
 };
 
 export default function RootLayout({ children }) {
+  const googleClientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID || '';
+
   return (
     <html lang="en">
       <head>
@@ -16,9 +20,13 @@ export default function RootLayout({ children }) {
         <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
       </head>
       <body className="bg-background text-on-background min-h-screen font-sans antialiased">
-        <AuthProvider>
-          {children}
-        </AuthProvider>
+        <GoogleOAuthProvider clientId={googleClientId}>
+          <LanguageProvider>
+            <AuthProvider>
+              {children}
+            </AuthProvider>
+          </LanguageProvider>
+        </GoogleOAuthProvider>
       </body>
     </html>
   );
