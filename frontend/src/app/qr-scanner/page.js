@@ -2,6 +2,7 @@
 import { useState } from 'react';
 import { api } from '@/lib/api';
 import { useLanguage } from '@/lib/i18n';
+import { useFeatureAuth } from '@/lib/featureAuth';
 import RiskResultCard from '@/components/RiskResultCard';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
@@ -12,12 +13,13 @@ export default function QRScannerPage() {
   const [result, setResult] = useState(null);
   const [loading, setLoading] = useState(false);
   const { t, lang } = useLanguage();
+  const { requireAuth } = useFeatureAuth();
 
-  const handleScan = async () => {
+  const handleScan = requireAuth(async () => {
     if (!url.trim()) return;
     setLoading(true); setResult(null);
     try { const data = await api.scanQR(url, lang); setResult(data); } catch (err) { setResult({ error: err.message }); } finally { setLoading(false); }
-  };
+  });
 
   const samples = ['http://free-recharge-offer.tk/claim', 'upi://pay?pa=verified-shop@paytm&pn=VerifiedShop&am=200', 'https://pay.suspicious-merchant.xyz/collect?amt=5000'];
 

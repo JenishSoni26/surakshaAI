@@ -3,6 +3,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { api } from '@/lib/api';
 import { useLanguage } from '@/lib/i18n';
+import { useFeatureAuth } from '@/lib/featureAuth';
 import { extractAudioFeatures } from '@/lib/audioAnalysis';
 import RiskResultCard from '@/components/RiskResultCard';
 import Navbar from '@/components/Navbar';
@@ -23,6 +24,7 @@ export default function VoiceDetectorPage() {
   const [result, setResult] = useState(null);
   const [error, setError] = useState('');
   const { t, lang } = useLanguage();
+  const { requireAuth } = useFeatureAuth();
 
   const mediaRecorderRef = useRef(null);
   const streamRef = useRef(null);
@@ -130,7 +132,7 @@ export default function VoiceDetectorPage() {
     setFileName(file.name);
   };
 
-  const handleAnalyze = async () => {
+  const handleAnalyze = requireAuth(async () => {
     if (!audioBlob) return;
     setLoading(true);
     setResult(null);
@@ -172,7 +174,7 @@ export default function VoiceDetectorPage() {
     } finally {
       setLoading(false);
     }
-  };
+  });
 
   const clearClip = () => {
     if (audioUrl) URL.revokeObjectURL(audioUrl);

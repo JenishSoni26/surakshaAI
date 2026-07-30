@@ -3,6 +3,7 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { api } from '@/lib/api';
 import { useLanguage } from '@/lib/i18n';
+import { useFeatureAuth } from '@/lib/featureAuth';
 import RiskResultCard from '@/components/RiskResultCard';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
@@ -13,8 +14,9 @@ export default function ScamAnalyzerPage() {
   const [result, setResult] = useState(null);
   const [loading, setLoading] = useState(false);
   const { t, lang } = useLanguage();
+  const { requireAuth } = useFeatureAuth();
 
-  const handleAnalyze = async () => {
+  const handleAnalyze = requireAuth(async () => {
     if (!text.trim()) return;
     setLoading(true);
     setResult(null);
@@ -26,7 +28,7 @@ export default function ScamAnalyzerPage() {
     } finally {
       setLoading(false);
     }
-  };
+  });
 
   const sampleMessages = [
     'Your SBI account has been blocked. Click here to verify: http://sbi-verify.xyz/login',

@@ -27,6 +27,7 @@ export const api = {
   // Auth
   login: (email, password) => apiFetch('/auth/login', { method: 'POST', body: JSON.stringify({ email, password }) }),
   register: (name, email, password, phone) => apiFetch('/auth/register', { method: 'POST', body: JSON.stringify({ name, email, password, phone }) }),
+  googleAuth: (credential) => apiFetch('/auth/google', { method: 'POST', body: JSON.stringify({ credential }) }),
   
   // Scans — all accept optional `lang` for localized responses
   scanMessage: (text, lang) => apiFetch('/scans/message', { method: 'POST', body: JSON.stringify({ text, lang }) }),

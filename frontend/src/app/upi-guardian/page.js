@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { api } from '@/lib/api';
 import { useLanguage } from '@/lib/i18n';
 import { getRiskTier } from '@/lib/riskStyles';
+import { useFeatureAuth } from '@/lib/featureAuth';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import FAB from '@/components/FAB';
@@ -13,8 +14,9 @@ export default function UPIGuardianPage() {
   const [loading, setLoading] = useState(false);
   const [history, setHistory] = useState([]);
   const { t, lang } = useLanguage();
+  const { requireAuth } = useFeatureAuth();
 
-  const handleVerify = async () => {
+  const handleVerify = requireAuth(async () => {
     if (!upiId.trim()) return;
     setLoading(true);
     try {
@@ -26,7 +28,7 @@ export default function UPIGuardianPage() {
     } finally {
       setLoading(false);
     }
-  };
+  });
 
   const sampleUPIs = ['flipkart@axl', 'merchant@ybl', 'random123@xyz'];
 
