@@ -5,6 +5,7 @@ import Navbar from '@/components/Navbar';
 import FAB from '@/components/FAB';
 import Link from 'next/link';
 import Script from 'next/script';
+import ProtectedRoute from '@/components/ProtectedRoute';
 
 const sideLinks = [
   { icon: 'dashboard', label: 'Overview', href: '/dashboard', active: true },
@@ -87,6 +88,7 @@ export default function DashboardPage() {
   );
 
   return (
+    <ProtectedRoute>
     <>
       <Script src="https://cdn.jsdelivr.net/npm/chart.js" onReady={() => setChartReady(true)} />
       <div className="bg-background text-on-background min-h-screen flex">
@@ -220,5 +222,6 @@ export default function DashboardPage() {
         <FAB />
       </div>
     </>
+    </ProtectedRoute>
   );
 }
