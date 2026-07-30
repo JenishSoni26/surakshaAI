@@ -1,6 +1,8 @@
+
 'use client';
 import { useState, useRef, useEffect } from 'react';
 import { api } from '@/lib/api';
+import { useLanguage } from '@/lib/i18n';
 import { extractAudioFeatures } from '@/lib/audioAnalysis';
 import RiskResultCard from '@/components/RiskResultCard';
 import Navbar from '@/components/Navbar';
@@ -20,6 +22,7 @@ export default function VoiceDetectorPage() {
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState(null);
   const [error, setError] = useState('');
+  const { t, lang } = useLanguage();
 
   const mediaRecorderRef = useRef(null);
   const streamRef = useRef(null);
@@ -99,7 +102,7 @@ export default function VoiceDetectorPage() {
       mediaRecorderRef.current = recorder;
       setIsRecording(true);
     } catch (err) {
-      setError('Microphone access was denied or unavailable. You can upload an audio file instead.');
+      setError(t('voice.micDenied'));
     }
   };
 
@@ -113,11 +116,11 @@ export default function VoiceDetectorPage() {
     if (!file) return;
     resetResult();
     if (!file.type.startsWith('audio/')) {
-      setError('Please choose an audio file (mp3, wav, m4a, ogg, webm...).');
+      setError(t('voice.audioTypeError'));
       return;
     }
     if (file.size > MAX_FILE_BYTES) {
-      setError('File is too large. Please choose an audio clip under 15MB.');
+      setError(t('voice.fileTooLarge'));
       return;
     }
     if (audioUrl) URL.revokeObjectURL(audioUrl);
@@ -134,7 +137,7 @@ export default function VoiceDetectorPage() {
     setError('');
     try {
       const features = await extractAudioFeatures(audioBlob);
-      const data = await api.scanVoice(features, sourceType, fileName || undefined);
+      const data = await api.scanVoice(features, sourceType, fileName || undefined, lang);
 
       // Build display metrics from extracted features
       const metrics = [
@@ -190,14 +193,14 @@ export default function VoiceDetectorPage() {
             <div className="w-16 h-16 rounded-full bg-primary/10 mx-auto flex items-center justify-center mb-4">
               <span className="material-symbols-outlined text-3xl text-primary">record_voice_over</span>
             </div>
-            <h1 className="text-3xl font-bold mb-3">Voice Scam Detector</h1>
-            <p className="text-on-surface-variant max-w-xl mx-auto">Record or upload a call clip. We analyze real signal characteristics — pause patterns, loudness variation, and pitch consistency — to flag audio that looks synthetic or heavily processed.</p>
+            <h1 className="text-3xl font-bold mb-3">{t('voice.title')}</h1>
+            <p className="text-on-surface-variant max-w-xl mx-auto">{t('voice.subtitle')}</p>
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {/* Capture Panel */}
             <div className="bg-surface-container-lowest rounded-3xl shadow-xl border border-outline-variant/10 p-6 animate-fade-in-up delay-100">
-              <h2 className="text-lg font-semibold mb-6 flex items-center gap-2"><span className="material-symbols-outlined text-primary">mic</span>Voice Analysis</h2>
+              <h2 className="text-lg font-semibold mb-6 flex items-center gap-2"><span className="material-symbols-outlined text-primary">mic</span>{t('voice.analysisTitle')}</h2>
 
               <div className="flex flex-col items-center justify-center py-6">
                 {supportsRecording && (
@@ -207,23 +210,23 @@ export default function VoiceDetectorPage() {
                       className={`w-32 h-32 rounded-full flex items-center justify-center transition-all duration-300 shadow-lg ${isRecording ? 'bg-error animate-pulse scale-110' : 'bg-primary hover:scale-105'} text-on-primary disabled:opacity-50`}>
                       <span className="material-symbols-outlined text-5xl">{isRecording ? 'stop' : 'mic'}</span>
                     </button>
-                    <p className="text-sm text-on-surface-variant mt-6">{isRecording ? 'Recording... tap to stop' : 'Tap to record from your microphone'}</p>
+                    <p className="text-sm text-on-surface-variant mt-6">{isRecording ? t('voice.recording') : t('voice.tapToRecord')}</p>
                     <div className="flex items-end gap-1 mt-4 h-14" aria-hidden="true">
                       {levels.map((h, i) => (
                         <div key={i} className={`w-1.5 rounded-full transition-all ${isRecording ? 'bg-error' : 'bg-outline-variant/40'}`} style={{ height: `${h}px` }}></div>
                       ))}
                     </div>
-                    <div className="text-xs text-on-surface-variant my-4">or</div>
+                    <div className="text-xs text-on-surface-variant my-4">{t('voice.or')}</div>
                   </>
                 )}
 
                 <button onClick={() => fileInputRef.current?.click()} disabled={loading || isRecording}
                   className="bg-surface-container hover:bg-surface-container-high text-on-surface px-5 py-2.5 rounded-xl text-sm font-semibold flex items-center gap-2 transition-colors disabled:opacity-50">
-                  <span className="material-symbols-outlined text-lg">upload_file</span>Upload Audio File
+                  <span className="material-symbols-outlined text-lg">upload_file</span>{t('voice.uploadBtn')}
                 </button>
                 <input ref={fileInputRef} type="file" accept="audio/*" onChange={handleFileSelect} className="hidden" />
                 {!supportsRecording && (
-                  <p className="text-xs text-on-surface-variant mt-3 text-center">Microphone recording isn&apos;t available in this browser — upload a call recording instead.</p>
+                  <p className="text-xs text-on-surface-variant mt-3 text-center">{t('voice.noMicMsg')}</p>
                 )}
               </div>
 
@@ -245,29 +248,29 @@ export default function VoiceDetectorPage() {
 
               <button onClick={handleAnalyze} disabled={!audioBlob || loading}
                 className="w-full bg-primary text-on-primary py-3 rounded-xl text-sm font-bold shadow-lg hover:opacity-90 transition-all disabled:opacity-50 flex items-center justify-center gap-2 mb-4">
-                {loading ? <><span className="material-symbols-outlined animate-spin">progress_activity</span>Analyzing audio...</> : <><span className="material-symbols-outlined">radar</span>Analyze Clip</>}
+                {loading ? <><span className="material-symbols-outlined animate-spin">progress_activity</span>{t('voice.analyzingBtn')}</> : <><span className="material-symbols-outlined">radar</span>{t('voice.analyzeBtn')}</>}
               </button>
 
               <div className="bg-surface-container rounded-2xl p-4 text-xs text-on-surface-variant space-y-2">
-                <p className="font-semibold text-on-surface">How it works:</p>
-                <p>• Records from your mic or accepts an uploaded audio file</p>
-                <p>• Decodes real PCM samples with the Web Audio API</p>
-                <p>• Extracts temporal features: pause ratio, loudness variance, clipping</p>
-                <p>• Computes spectral features: FFT, spectral flatness, centroid, rolloff</p>
-                <p>• Tracks pitch (F0) via autocorrelation to detect monotone TTS</p>
-                <p>• Calculates 13 MFCC coefficients to profile the spectral envelope</p>
-                <p>• Estimates formant spread from spectral peak spacing</p>
-                <p>• Scores all dimensions to flag AI-generated or cloned voices</p>
+                <p className="font-semibold text-on-surface">{t('voice.howItWorks')}</p>
+                <p>{t('voice.step1')}</p>
+                <p>{t('voice.step2')}</p>
+                <p>{t('voice.step3')}</p>
+                <p>{t('voice.step4')}</p>
+                <p>{t('voice.step5')}</p>
+                <p>{t('voice.step6')}</p>
+                <p>{t('voice.step7')}</p>
+                <p>{t('voice.step8')}</p>
               </div>
             </div>
 
             {/* Results Panel */}
             <div className="bg-surface-container-lowest rounded-3xl shadow-xl border border-outline-variant/10 p-6 animate-fade-in-up delay-200">
-              <h2 className="text-lg font-semibold mb-4 flex items-center gap-2"><span className="material-symbols-outlined text-primary">analytics</span>Detection Results</h2>
+              <h2 className="text-lg font-semibold mb-4 flex items-center gap-2"><span className="material-symbols-outlined text-primary">analytics</span>{t('voice.resultsTitle')}</h2>
               {!result && !loading && (
                 <div className="flex flex-col items-center justify-center h-64 text-on-surface-variant">
                   <span className="material-symbols-outlined text-5xl mb-3 opacity-30">graphic_eq</span>
-                  <p className="text-sm text-center">Record or upload a clip, then tap Analyze</p>
+                  <p className="text-sm text-center">{t('voice.resultsPlaceholder')}</p>
                 </div>
               )}
               {loading && (
@@ -275,7 +278,7 @@ export default function VoiceDetectorPage() {
                   <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mb-4 animate-pulse-glow">
                     <span className="material-symbols-outlined text-3xl text-primary animate-spin">progress_activity</span>
                   </div>
-                  <p className="text-sm text-on-surface-variant">Decoding and analyzing audio signal...</p>
+                  <p className="text-sm text-on-surface-variant">{t('voice.analyzing')}</p>
                 </div>
               )}
               {result && <RiskResultCard riskScore={result.risk_score} status={result.status} threatType={result.threat_type} aiExplanation={result.ai_explanation} metrics={result.metrics} />}

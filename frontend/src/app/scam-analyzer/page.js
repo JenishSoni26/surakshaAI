@@ -2,6 +2,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { api } from '@/lib/api';
+import { useLanguage } from '@/lib/i18n';
 import RiskResultCard from '@/components/RiskResultCard';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
@@ -11,13 +12,14 @@ export default function ScamAnalyzerPage() {
   const [text, setText] = useState('');
   const [result, setResult] = useState(null);
   const [loading, setLoading] = useState(false);
+  const { t, lang } = useLanguage();
 
   const handleAnalyze = async () => {
     if (!text.trim()) return;
     setLoading(true);
     setResult(null);
     try {
-      const data = await api.scanMessage(text);
+      const data = await api.scanMessage(text, lang);
       setResult(data);
     } catch (err) {
       setResult({ error: err.message });
@@ -41,18 +43,18 @@ export default function ScamAnalyzerPage() {
             <div className="w-16 h-16 rounded-full bg-primary/10 mx-auto flex items-center justify-center mb-4">
               <span className="material-symbols-outlined text-3xl text-primary">psychology</span>
             </div>
-            <h1 className="text-3xl font-bold text-on-background mb-3">AI Scam Analyzer</h1>
-            <p className="text-on-surface-variant max-w-xl mx-auto">Paste any suspicious SMS, email, or message and our AI will instantly analyze it for fraud patterns, phishing links, and scam indicators.</p>
+            <h1 className="text-3xl font-bold text-on-background mb-3">{t('scam.title')}</h1>
+            <p className="text-on-surface-variant max-w-xl mx-auto">{t('scam.subtitle')}</p>
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {/* Input Panel */}
             <div className="bg-surface-container-lowest rounded-3xl shadow-xl border border-outline-variant/10 p-6 animate-fade-in-up delay-100">
-              <h2 className="text-lg font-semibold mb-4 flex items-center gap-2"><span className="material-symbols-outlined text-primary">edit_note</span>Paste Suspicious Message</h2>
-              <textarea value={text} onChange={e => setText(e.target.value)} rows={8} placeholder="Paste the suspicious message here..."
+              <h2 className="text-lg font-semibold mb-4 flex items-center gap-2"><span className="material-symbols-outlined text-primary">edit_note</span>{t('scam.pasteLabel')}</h2>
+              <textarea value={text} onChange={e => setText(e.target.value)} rows={8} placeholder={t('scam.placeholder')}
                 className="w-full bg-surface-container rounded-2xl px-4 py-3 text-sm border border-outline-variant/20 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all resize-none mb-4" />
               <div className="flex flex-wrap gap-2 mb-4">
-                <span className="text-xs text-on-surface-variant font-semibold">Try samples:</span>
+                <span className="text-xs text-on-surface-variant font-semibold">{t('scam.trySamples')}</span>
                 {sampleMessages.map((msg, i) => (
                   <button key={i} onClick={() => setText(msg)}
                     className="text-xs bg-surface-container px-3 py-1.5 rounded-full text-on-surface-variant hover:bg-primary-fixed/30 hover:text-primary transition-colors truncate max-w-[200px]">
@@ -62,17 +64,17 @@ export default function ScamAnalyzerPage() {
               </div>
               <button onClick={handleAnalyze} disabled={loading || !text.trim()}
                 className="w-full bg-primary text-on-primary py-3 rounded-xl text-sm font-bold shadow-lg hover:opacity-90 transition-all disabled:opacity-50 flex items-center justify-center gap-2">
-                {loading ? <><span className="material-symbols-outlined animate-spin">progress_activity</span>Analyzing...</> : <><span className="material-symbols-outlined">radar</span>Analyze Message</>}
+                {loading ? <><span className="material-symbols-outlined animate-spin">progress_activity</span>{t('scam.analyzingBtn')}</> : <><span className="material-symbols-outlined">radar</span>{t('scam.analyzeBtn')}</>}
               </button>
             </div>
 
             {/* Results Panel */}
             <div className="bg-surface-container-lowest rounded-3xl shadow-xl border border-outline-variant/10 p-6 animate-fade-in-up delay-200">
-              <h2 className="text-lg font-semibold mb-4 flex items-center gap-2"><span className="material-symbols-outlined text-primary">analytics</span>Analysis Results</h2>
+              <h2 className="text-lg font-semibold mb-4 flex items-center gap-2"><span className="material-symbols-outlined text-primary">analytics</span>{t('scam.resultsTitle')}</h2>
               {!result && !loading && (
                 <div className="flex flex-col items-center justify-center h-64 text-on-surface-variant">
                   <span className="material-symbols-outlined text-5xl mb-3 opacity-30">shield_question</span>
-                  <p className="text-sm">Paste a message and click Analyze to see results</p>
+                  <p className="text-sm">{t('scam.resultsPlaceholder')}</p>
                 </div>
               )}
               {loading && (
@@ -80,7 +82,7 @@ export default function ScamAnalyzerPage() {
                   <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mb-4 animate-pulse-glow">
                     <span className="material-symbols-outlined text-3xl text-primary animate-spin">progress_activity</span>
                   </div>
-                  <p className="text-sm text-on-surface-variant">AI is analyzing the message...</p>
+                  <p className="text-sm text-on-surface-variant">{t('scam.aiAnalyzing')}</p>
                 </div>
               )}
               {result && !result.error && (
@@ -99,8 +101,8 @@ export default function ScamAnalyzerPage() {
                 <span className="material-symbols-outlined text-2xl text-primary icon-fill">record_voice_over</span>
               </div>
               <div className="flex-1 min-w-0">
-                <div className="text-sm font-bold text-on-surface mb-0.5">Got a suspicious call instead?</div>
-                <div className="text-xs text-on-surface-variant">Try our Voice Scam Detector — record or upload a call clip for AI-powered analysis</div>
+                <div className="text-sm font-bold text-on-surface mb-0.5">{t('scam.voiceBanner.title')}</div>
+                <div className="text-xs text-on-surface-variant">{t('scam.voiceBanner.desc')}</div>
               </div>
               <span className="material-symbols-outlined text-primary text-xl group-hover:translate-x-1 transition-transform shrink-0">arrow_forward</span>
             </div>
