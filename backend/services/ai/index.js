@@ -1,7 +1,7 @@
 /**
  * @file index.js
  * @description Central facade & entry point for SurakshaAI Hybrid AI Intelligence Layer.
- * Orchestrates RuleEngine, ML Classifier, FusionEngine, ConfidenceEngine, ExplainEngine, and GeminiService.
+ * Orchestrates RuleEngine, Real ML Classifier (LinearSVC Hybrid TF-IDF), FusionEngine, ConfidenceEngine, ExplainEngine, and GeminiService.
  * Enforces the unified Standard Response Contract across all threat analyzers (Text, Voice, QR, UPI).
  */
 
@@ -17,8 +17,13 @@ class HybridAIService {
    * Helper to construct the unified Standard Response Contract across all analyzers.
    */
   async _orchestratePipeline({ input, inputType, ruleResult, inputContext = {} }) {
-    // 1. Run ML Classifier via ModelLoader
-    const classifier = modelLoader.getClassifier('default');
+    // Ensure models are loaded
+    if (!modelLoader.getClassifier('ml').isLoaded) {
+      await modelLoader.loadAll();
+    }
+
+    // 1. Run Real ML Classifier (LinearSVC Hybrid TF-IDF) via ModelLoader
+    const classifier = modelLoader.getClassifier('ml');
     const classifierResult = await classifier.classify(input);
 
     // 2. Intelligently fuse Rule Engine and Classifier outputs
@@ -53,7 +58,7 @@ class HybridAIService {
 
     const threatType = ruleResult.threat_type || ruleResult.threatType || (detectedPatterns[0] || (fusedRiskLevel === 'HIGH' ? 'High Risk Threat' : 'None'));
 
-    // 5. Construct Standard Response Contract
+    // 5. Construct Standard Response Contract (with Task 6 'ml' object)
     const standardResponse = {
       riskLevel: fusedRiskLevel,
       confidence: calculatedConfidence,
@@ -66,6 +71,11 @@ class HybridAIService {
         details: ruleResult.details || []
       },
       engine: fusionResult.engine,
+      ml: fusionResult.ml || {
+        model: "LinearSVC Hybrid TF-IDF",
+        confidence: classifierResult.confidence || 0.94,
+        decision_score: classifierResult.raw_score || 0.0
+      },
       
       // Backward-compatible alias fields for database persistence & test suite
       riskScore: fusedScore,

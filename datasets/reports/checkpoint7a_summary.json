@@ -1,0 +1,220 @@
+{
+  "coldStartLatencyMs": 7840,
+  "avgWarmLatencyMs": 72.61,
+  "memoryUsageMB": 5.39,
+  "totalTests": 120,
+  "confusion_matrix": {
+    "tp": 59,
+    "fp": 17,
+    "tn": 43,
+    "fn": 1
+  },
+  "metrics": {
+    "accuracy": 0.85,
+    "precision": 0.7763,
+    "recall": 0.9833,
+    "f1_score": 0.8676
+  },
+  "falsePositivesCount": 17,
+  "falseNegativesCount": 1,
+  "falsePositives": [
+    {
+      "id": 1,
+      "category": "Legitimate Banking Messages",
+      "message": "948201 is your secret OTP for SBI Netbanking login. Never share your OTP with anyone, including bank staff.",
+      "riskLevel": "HIGH",
+      "fusedScore": 75,
+      "patterns": []
+    },
+    {
+      "id": 6,
+      "category": "Legitimate Banking Messages",
+      "message": "Dear SBI Customer, your balance for A/C XX5412 as of 27-JUL-26 18:00 is Rs. 18,420.50.",
+      "riskLevel": "HIGH",
+      "fusedScore": 75,
+      "patterns": []
+    },
+    {
+      "id": 8,
+      "category": "Legitimate Banking Messages",
+      "message": "Reminder: Auto-debit for Home Loan EMI of Rs. 15,400 due on 05-AUG-26 from HDFC Bank A/C XX8921.",
+      "riskLevel": "HIGH",
+      "fusedScore": 75,
+      "patterns": []
+    },
+    {
+      "id": 17,
+      "category": "Legitimate Banking Messages",
+      "message": "Rs. 199.00 debited for Netflix Subscription auto-pay from ICICI Bank Debit Card XX4102.",
+      "riskLevel": "HIGH",
+      "fusedScore": 75,
+      "patterns": []
+    },
+    {
+      "id": 20,
+      "category": "Legitimate Banking Messages",
+      "message": "As requested by you, your Debit Card XX7712 has been permanently blocked. Call 18002090000 for replacement.",
+      "riskLevel": "HIGH",
+      "fusedScore": 75,
+      "patterns": []
+    },
+    {
+      "id": 24,
+      "category": "Legitimate Ecommerce Messages",
+      "message": "Zomato: Order #891024 delivered. Enjoy your meal! Please rate your food and delivery experience.",
+      "riskLevel": "HIGH",
+      "fusedScore": 75,
+      "patterns": []
+    },
+    {
+      "id": 29,
+      "category": "Legitimate Ecommerce Messages",
+      "message": "Delhivery: Package AWB 1982401294 to be delivered today. Use Delivery OTP 8912 for receiving package.",
+      "riskLevel": "HIGH",
+      "fusedScore": 75,
+      "patterns": []
+    },
+    {
+      "id": 31,
+      "category": "Legitimate Ecommerce Messages",
+      "message": "Ola Auto ride started. Sharing ride tracking link with your emergency contacts: https://ola.app/track/12345",
+      "riskLevel": "HIGH",
+      "fusedScore": 75,
+      "patterns": []
+    },
+    {
+      "id": 37,
+      "category": "Legitimate Ecommerce Messages",
+      "message": "Ajio order #AJ-992104 delivered. Share your feedback and get 100 Ajio Points.",
+      "riskLevel": "HIGH",
+      "fusedScore": 75,
+      "patterns": []
+    },
+    {
+      "id": 38,
+      "category": "Legitimate Ecommerce Messages",
+      "message": "Tata CLiQ: Order dispatched! Track your shipment AWB 9012491 at https://tatacliq.com/track",
+      "riskLevel": "HIGH",
+      "fusedScore": 75,
+      "patterns": []
+    },
+    {
+      "id": 101,
+      "category": "Hard Cases",
+      "message": "Your DTDC shipment AWB D9012481 is out for delivery today. Tracking link: https://www.dtdc.in/tracking/D9012481",
+      "riskLevel": "HIGH",
+      "fusedScore": 75,
+      "patterns": []
+    },
+    {
+      "id": 106,
+      "category": "Hard Cases",
+      "message": "Welcome to HDFC NetBanking! Protect your account by visiting our official website https://www.hdfcbank.com. Never share passwords.",
+      "riskLevel": "HIGH",
+      "fusedScore": 75,
+      "patterns": []
+    },
+    {
+      "id": 107,
+      "category": "Hard Cases",
+      "message": "Your OTP for login is 591024. NEVER share this OTP with anyone, even if they claim to be calling from your bank.",
+      "riskLevel": "HIGH",
+      "fusedScore": 75,
+      "patterns": []
+    },
+    {
+      "id": 108,
+      "category": "Hard Cases",
+      "message": "Mahanagar Gas Bill Reminder: Bill of Rs 640.00 for Consumer No 901284 is due on 02-AUG. Pay online at https://www.mahanagargas.com",
+      "riskLevel": "HIGH",
+      "fusedScore": 75,
+      "patterns": []
+    },
+    {
+      "id": 109,
+      "category": "Hard Cases",
+      "message": "Thank you for visiting TATA Croma! Share your shopping experience survey: https://feedback.croma.com/survey/9012",
+      "riskLevel": "HIGH",
+      "fusedScore": 75,
+      "patterns": []
+    },
+    {
+      "id": 117,
+      "category": "Hard Cases",
+      "message": "SBI Card Alert: Based on your good repayment record, eligible for credit limit enhancement. SMS 'INCR 4419' to 5676791 to accept.",
+      "riskLevel": "HIGH",
+      "fusedScore": 75,
+      "patterns": []
+    },
+    {
+      "id": 119,
+      "category": "Hard Cases",
+      "message": "Maruti Service Reminder: Scheduled 3rd free service for Swift MH02AB1234 is due next week. Book appointment on Maruti Suzuki Rewards app.",
+      "riskLevel": "HIGH",
+      "fusedScore": 75,
+      "patterns": []
+    }
+  ],
+  "falseNegatives": [
+    {
+      "id": 93,
+      "category": "Social Engineering",
+      "message": "Power Supply Dept: Officer R.K. Verma here. Your power meter connection will be cut in 30 mins. Call me at 9876543210 immediately to pay bill.",
+      "riskLevel": "LOW",
+      "fusedScore": 28,
+      "patterns": [
+        "Urgency Coercion & Account Threat"
+      ]
+    }
+  ],
+  "categoryBreakdown": {
+    "Legitimate Banking Messages": {
+      "total": 20,
+      "safe_count": 20,
+      "scam_count": 0,
+      "correct": 15,
+      "accuracy_pct": "75.00",
+      "recall_pct": "100.00"
+    },
+    "Legitimate Ecommerce Messages": {
+      "total": 20,
+      "safe_count": 20,
+      "scam_count": 0,
+      "correct": 15,
+      "accuracy_pct": "75.00",
+      "recall_pct": "100.00"
+    },
+    "Phishing Scams": {
+      "total": 20,
+      "safe_count": 0,
+      "scam_count": 20,
+      "correct": 20,
+      "accuracy_pct": "100.00",
+      "recall_pct": "100.00"
+    },
+    "Financial Fraud": {
+      "total": 20,
+      "safe_count": 0,
+      "scam_count": 20,
+      "correct": 20,
+      "accuracy_pct": "100.00",
+      "recall_pct": "100.00"
+    },
+    "Social Engineering": {
+      "total": 20,
+      "safe_count": 0,
+      "scam_count": 20,
+      "correct": 19,
+      "accuracy_pct": "95.00",
+      "recall_pct": "95.00"
+    },
+    "Hard Cases": {
+      "total": 20,
+      "safe_count": 20,
+      "scam_count": 0,
+      "correct": 13,
+      "accuracy_pct": "65.00",
+      "recall_pct": "100.00"
+    }
+  }
+}

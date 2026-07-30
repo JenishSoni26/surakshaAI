@@ -1,16 +1,19 @@
 /**
  * @file modelLoader.js
  * @description Dynamic model loader & registry for SurakshaAI classifiers.
- * Manages instantiation and lifecycle of BaseClassifier implementations (ONNX, HF, TF, Heuristic Fallback).
+ * Manages instantiation and lifecycle of BaseClassifier implementations (LinearSVC ML, Heuristic Fallback).
  */
 
 const { HeuristicFallbackClassifier, BaseClassifier } = require('./baseClassifier');
+const realMLClassifier = require('./mlClassifier');
 
 class ModelLoader {
   constructor() {
     this.classifiers = new Map();
     // Default fallback classifier
-    this.classifiers.set('default', HeuristicFallbackClassifier);
+    this.classifiers.set('fallback', HeuristicFallbackClassifier);
+    this.classifiers.set('default', realMLClassifier);
+    this.classifiers.set('ml', realMLClassifier);
   }
 
   /**
@@ -34,7 +37,7 @@ class ModelLoader {
     const classifier = this.classifiers.get(name);
     if (!classifier) {
       console.warn(`Classifier '${name}' not found. Falling back to default HeuristicFallbackClassifier.`);
-      return this.classifiers.get('default');
+      return this.classifiers.get('fallback');
     }
     return classifier;
   }
@@ -45,7 +48,9 @@ class ModelLoader {
   async loadAll() {
     for (const [name, classifier] of this.classifiers.entries()) {
       try {
-        await classifier.loadModel();
+        if (!classifier.isLoaded) {
+          await classifier.loadModel();
+        }
       } catch (err) {
         console.error(`Failed to load model '${name}':`, err.message);
       }
@@ -53,4 +58,8 @@ class ModelLoader {
   }
 }
 
-module.exports = new ModelLoader();
+const instance = new ModelLoader();
+// Automatically trigger background loading
+instance.loadAll().catch(err => console.error('[ModelLoader] Initialization error:', err.message));
+
+module.exports = instance;
