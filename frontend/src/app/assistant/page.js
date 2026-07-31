@@ -1,5 +1,6 @@
 'use client';
 import { useState, useRef, useEffect } from 'react';
+import { useFeatureAuth } from '@/lib/featureAuth';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 
@@ -29,10 +30,11 @@ export default function AssistantPage() {
   const [input, setInput] = useState('');
   const [typing, setTyping] = useState(false);
   const messagesEndRef = useRef(null);
+  const { requireAuth } = useFeatureAuth();
 
   useEffect(() => { messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' }); }, [messages, typing]);
 
-  const sendMessage = async (text) => {
+  const sendMessage = requireAuth(async (text) => {
     if (!text.trim()) return;
     const userMsg = { role: 'user', content: text };
     setMessages(prev => [...prev, userMsg]);
@@ -42,7 +44,7 @@ export default function AssistantPage() {
     const response = getResponse(text);
     setMessages(prev => [...prev, { role: 'assistant', content: response }]);
     setTyping(false);
-  };
+  });
 
   return (
     <div className="flex flex-col min-h-screen">

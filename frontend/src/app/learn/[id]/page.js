@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { api } from '@/lib/api';
+import { useFeatureAuth } from '@/lib/featureAuth';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import FAB from '@/components/FAB';
@@ -10,6 +11,7 @@ import FAB from '@/components/FAB';
 export default function ModuleQuizPage() {
   const { id } = useParams();
   const router = useRouter();
+  const { requireAuth } = useFeatureAuth();
 
   const [module, setModule] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -51,7 +53,7 @@ export default function ModuleQuizPage() {
     setAnswers(prev => { const next = [...prev]; next[current] = optionIndex; return next; });
   };
 
-  const goNext = async () => {
+  const goNext = requireAuth(async () => {
     if (current < questions.length - 1) {
       setCurrent(c => c + 1);
       return;
@@ -66,7 +68,7 @@ export default function ModuleQuizPage() {
     } finally {
       setSubmitting(false);
     }
-  };
+  });
 
   const goBack = () => { if (current > 0) setCurrent(c => c - 1); };
 

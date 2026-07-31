@@ -5,6 +5,7 @@ import { useAuth } from '@/lib/auth';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import FAB from '@/components/FAB';
+import ProtectedRoute from '@/components/ProtectedRoute';
 
 export default function ProfilePage() {
   const { user, isAuthenticated } = useAuth();
@@ -71,6 +72,7 @@ export default function ProfilePage() {
   if (loading) return <div className="min-h-screen flex items-center justify-center"><span className="material-symbols-outlined text-5xl text-primary animate-spin">progress_activity</span></div>;
 
   return (
+    <ProtectedRoute>
     <div className="flex flex-col min-h-screen">
       <Navbar />
       <main className="flex-grow pt-24 pb-12">
@@ -135,5 +137,6 @@ export default function ProfilePage() {
       <Footer />
       <FAB />
     </div>
+    </ProtectedRoute>
   );
 }

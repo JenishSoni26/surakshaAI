@@ -1,0 +1,1019 @@
+{
+  "results": [
+    {
+      "exp_id": "LinearSVC (Hybrid_TFIDF)",
+      "model_name": "LinearSVC",
+      "feature_set": "Hybrid_TFIDF",
+      "accuracy": 0.9723,
+      "precision": 0.9459,
+      "recall": 0.9387,
+      "f1_score": 0.9423,
+      "roc_auc": 0.9952,
+      "pr_auc": 0.9873,
+      "confusion_matrix": [
+        [
+          807,
+          14
+        ],
+        [
+          16,
+          245
+        ]
+      ],
+      "train_time_ms": 348.04,
+      "inference_time_ms": 1.14
+    },
+    {
+      "exp_id": "LinearSVC (Char_TFIDF)",
+      "model_name": "LinearSVC",
+      "feature_set": "Char_TFIDF",
+      "accuracy": 0.9695,
+      "precision": 0.9286,
+      "recall": 0.9464,
+      "f1_score": 0.9374,
+      "roc_auc": 0.9946,
+      "pr_auc": 0.9864,
+      "confusion_matrix": [
+        [
+          802,
+          19
+        ],
+        [
+          14,
+          247
+        ]
+      ],
+      "train_time_ms": 257.43,
+      "inference_time_ms": 1.11
+    },
+    {
+      "exp_id": "LogisticRegression (Hybrid_TFIDF)",
+      "model_name": "LogisticRegression",
+      "feature_set": "Hybrid_TFIDF",
+      "accuracy": 0.9658,
+      "precision": 0.9242,
+      "recall": 0.9349,
+      "f1_score": 0.9295,
+      "roc_auc": 0.9933,
+      "pr_auc": 0.9809,
+      "confusion_matrix": [
+        [
+          801,
+          20
+        ],
+        [
+          17,
+          244
+        ]
+      ],
+      "train_time_ms": 325.8,
+      "inference_time_ms": 1.2
+    },
+    {
+      "exp_id": "LinearSVC (Word_TFIDF)",
+      "model_name": "LinearSVC",
+      "feature_set": "Word_TFIDF",
+      "accuracy": 0.9658,
+      "precision": 0.9409,
+      "recall": 0.9157,
+      "f1_score": 0.9282,
+      "roc_auc": 0.9813,
+      "pr_auc": 0.9686,
+      "confusion_matrix": [
+        [
+          806,
+          15
+        ],
+        [
+          22,
+          239
+        ]
+      ],
+      "train_time_ms": 72.2,
+      "inference_time_ms": 0.39
+    },
+    {
+      "exp_id": "LogisticRegression (Char_TFIDF)",
+      "model_name": "LogisticRegression",
+      "feature_set": "Char_TFIDF",
+      "accuracy": 0.9621,
+      "precision": 0.9074,
+      "recall": 0.9387,
+      "f1_score": 0.9228,
+      "roc_auc": 0.9916,
+      "pr_auc": 0.9769,
+      "confusion_matrix": [
+        [
+          796,
+          25
+        ],
+        [
+          16,
+          245
+        ]
+      ],
+      "train_time_ms": 257.83,
+      "inference_time_ms": 1.36
+    },
+    {
+      "exp_id": "LogisticRegression (Word_TFIDF)",
+      "model_name": "LogisticRegression",
+      "feature_set": "Word_TFIDF",
+      "accuracy": 0.9556,
+      "precision": 0.908,
+      "recall": 0.908,
+      "f1_score": 0.908,
+      "roc_auc": 0.9822,
+      "pr_auc": 0.9614,
+      "confusion_matrix": [
+        [
+          797,
+          24
+        ],
+        [
+          24,
+          237
+        ]
+      ],
+      "train_time_ms": 120.01,
+      "inference_time_ms": 0.73
+    },
+    {
+      "exp_id": "MultinomialNB (Hybrid_TFIDF)",
+      "model_name": "MultinomialNB",
+      "feature_set": "Hybrid_TFIDF",
+      "accuracy": 0.951,
+      "precision": 0.8881,
+      "recall": 0.9119,
+      "f1_score": 0.8998,
+      "roc_auc": 0.9822,
+      "pr_auc": 0.96,
+      "confusion_matrix": [
+        [
+          791,
+          30
+        ],
+        [
+          23,
+          238
+        ]
+      ],
+      "train_time_ms": 18.1,
+      "inference_time_ms": 1.98
+    },
+    {
+      "exp_id": "MultinomialNB (Word_TFIDF)",
+      "model_name": "MultinomialNB",
+      "feature_set": "Word_TFIDF",
+      "accuracy": 0.9455,
+      "precision": 0.9353,
+      "recall": 0.8314,
+      "f1_score": 0.8803,
+      "roc_auc": 0.9757,
+      "pr_auc": 0.9504,
+      "confusion_matrix": [
+        [
+          806,
+          15
+        ],
+        [
+          44,
+          217
+        ]
+      ],
+      "train_time_ms": 6.51,
+      "inference_time_ms": 1.68
+    },
+    {
+      "exp_id": "MultinomialNB (Char_TFIDF)",
+      "model_name": "MultinomialNB",
+      "feature_set": "Char_TFIDF",
+      "accuracy": 0.9381,
+      "precision": 0.8489,
+      "recall": 0.9042,
+      "f1_score": 0.8757,
+      "roc_auc": 0.9808,
+      "pr_auc": 0.9532,
+      "confusion_matrix": [
+        [
+          779,
+          42
+        ],
+        [
+          25,
+          236
+        ]
+      ],
+      "train_time_ms": 18.4,
+      "inference_time_ms": 2.45
+    }
+  ],
+  "top50_scam_lsvc": [
+    {
+      "feature": " ! ",
+      "coefficient": 1.5243
+    },
+    {
+      "feature": " . ",
+      "coefficient": 1.36
+    },
+    {
+      "feature": " , ",
+      "coefficient": 1.3565
+    },
+    {
+      "feature": "uk",
+      "coefficient": 1.2689
+    },
+    {
+      "feature": "re",
+      "coefficient": 1.2525
+    },
+    {
+      "feature": " ? ",
+      "coefficient": 1.1108
+    },
+    {
+      "feature": " % ",
+      "coefficient": 1.0125
+    },
+    {
+      "feature": "090",
+      "coefficient": 1.0122
+    },
+    {
+      "feature": " : ",
+      "coefficient": 0.9583
+    },
+    {
+      "feature": "your",
+      "coefficient": 0.9576
+    },
+    {
+      "feature": "text",
+      "coefficient": 0.9541
+    },
+    {
+      "feature": "50p",
+      "coefficient": 0.9433
+    },
+    {
+      "feature": "eur",
+      "coefficient": 0.9421
+    },
+    {
+      "feature": "150p",
+      "coefficient": 0.9108
+    },
+    {
+      "feature": " 090",
+      "coefficient": 0.9059
+    },
+    {
+      "feature": "alert",
+      "coefficient": 0.9003
+    },
+    {
+      "feature": "rolex",
+      "coefficient": 0.8972
+    },
+    {
+      "feature": "http",
+      "coefficient": 0.8944
+    },
+    {
+      "feature": "url_token",
+      "coefficient": 0.8899
+    },
+    {
+      "feature": " 08",
+      "coefficient": 0.8843
+    },
+    {
+      "feature": "voucher",
+      "coefficient": 0.8768
+    },
+    {
+      "feature": "150",
+      "coefficient": 0.872
+    },
+    {
+      "feature": "free",
+      "coefficient": 0.8555
+    },
+    {
+      "feature": "mob",
+      "coefficient": 0.854
+    },
+    {
+      "feature": "txt",
+      "coefficient": 0.8526
+    },
+    {
+      "feature": "died",
+      "coefficient": 0.8439
+    },
+    {
+      "feature": " 087",
+      "coefficient": 0.842
+    },
+    {
+      "feature": "087",
+      "coefficient": 0.8363
+    },
+    {
+      "feature": "bar",
+      "coefficient": 0.8325
+    },
+    {
+      "feature": "here to",
+      "coefficient": 0.8322
+    },
+    {
+      "feature": " ' ",
+      "coefficient": 0.8292
+    },
+    {
+      "feature": "sex",
+      "coefficient": 0.8265
+    },
+    {
+      "feature": "50",
+      "coefficient": 0.8189
+    },
+    {
+      "feature": "note",
+      "coefficient": 0.8111
+    },
+    {
+      "feature": "anderson",
+      "coefficient": 0.8069
+    },
+    {
+      "feature": "what you",
+      "coefficient": 0.8062
+    },
+    {
+      "feature": "win",
+      "coefficient": 0.8022
+    },
+    {
+      "feature": "top",
+      "coefficient": 0.7952
+    },
+    {
+      "feature": "women",
+      "coefficient": 0.789
+    },
+    {
+      "feature": "sex",
+      "coefficient": 0.7791
+    },
+    {
+      "feature": "loading",
+      "coefficient": 0.7714
+    },
+    {
+      "feature": "fw",
+      "coefficient": 0.77
+    },
+    {
+      "feature": "150p",
+      "coefficient": 0.7634
+    },
+    {
+      "feature": "sky",
+      "coefficient": 0.7618
+    },
+    {
+      "feature": "0p ",
+      "coefficient": 0.7595
+    },
+    {
+      "feature": "dating",
+      "coefficient": 0.7584
+    },
+    {
+      "feature": " ??",
+      "coefficient": 0.7578
+    },
+    {
+      "feature": "13",
+      "coefficient": 0.7508
+    },
+    {
+      "feature": "ac",
+      "coefficient": 0.7497
+    },
+    {
+      "feature": "invited",
+      "coefficient": 0.7404
+    }
+  ],
+  "top50_safe_lsvc": [
+    {
+      "feature": " i ",
+      "coefficient": -1.5658
+    },
+    {
+      "feature": ".. ",
+      "coefficient": -1.1608
+    },
+    {
+      "feature": ":) ",
+      "coefficient": -1.1172
+    },
+    {
+      "feature": "enron",
+      "coefficient": -1.054
+    },
+    {
+      "feature": "for the",
+      "coefficient": -0.8523
+    },
+    {
+      "feature": "in",
+      "coefficient": -0.8158
+    },
+    {
+      "feature": "...",
+      "coefficient": -0.808
+    },
+    {
+      "feature": " \" ",
+      "coefficient": -0.805
+    },
+    {
+      "feature": "your call",
+      "coefficient": -0.7596
+    },
+    {
+      "feature": "listbot",
+      "coefficient": -0.733
+    },
+    {
+      "feature": "can call",
+      "coefficient": -0.685
+    },
+    {
+      "feature": "id",
+      "coefficient": -0.6846
+    },
+    {
+      "feature": "if",
+      "coefficient": -0.6711
+    },
+    {
+      "feature": "l. ",
+      "coefficient": -0.6655
+    },
+    {
+      "feature": "e, ",
+      "coefficient": -0.6633
+    },
+    {
+      "feature": "your new",
+      "coefficient": -0.6461
+    },
+    {
+      "feature": "daren",
+      "coefficient": -0.6425
+    },
+    {
+      "feature": "ok",
+      "coefficient": -0.6328
+    },
+    {
+      "feature": "... ",
+      "coefficient": -0.6315
+    },
+    {
+      "feature": "2001",
+      "coefficient": -0.6289
+    },
+    {
+      "feature": "my",
+      "coefficient": -0.6242
+    },
+    {
+      "feature": "lol",
+      "coefficient": -0.6212
+    },
+    {
+      "feature": "you get",
+      "coefficient": -0.6093
+    },
+    {
+      "feature": "ram",
+      "coefficient": -0.6087
+    },
+    {
+      "feature": "gas",
+      "coefficient": -0.6047
+    },
+    {
+      "feature": "2023",
+      "coefficient": -0.5988
+    },
+    {
+      "feature": "me",
+      "coefficient": -0.5934
+    },
+    {
+      "feature": "need to",
+      "coefficient": -0.5924
+    },
+    {
+      "feature": "clickathome",
+      "coefficient": -0.5916
+    },
+    {
+      "feature": "any",
+      "coefficient": -0.5848
+    },
+    {
+      "feature": "how",
+      "coefficient": -0.5793
+    },
+    {
+      "feature": "thats",
+      "coefficient": -0.5778
+    },
+    {
+      "feature": "coupon",
+      "coefficient": -0.5763
+    },
+    {
+      "feature": "at http",
+      "coefficient": -0.5748
+    },
+    {
+      "feature": "wen",
+      "coefficient": -0.5714
+    },
+    {
+      "feature": "yup",
+      "coefficient": -0.5707
+    },
+    {
+      "feature": "from your",
+      "coefficient": -0.555
+    },
+    {
+      "feature": "pm",
+      "coefficient": -0.5536
+    },
+    {
+      "feature": "thanks",
+      "coefficient": -0.5463
+    },
+    {
+      "feature": "meter",
+      "coefficient": -0.5441
+    },
+    {
+      "feature": "list",
+      "coefficient": -0.5391
+    },
+    {
+      "feature": "dis",
+      "coefficient": -0.5385
+    },
+    {
+      "feature": "enr",
+      "coefficient": -0.538
+    },
+    {
+      "feature": "hotmail",
+      "coefficient": -0.5376
+    },
+    {
+      "feature": "doc",
+      "coefficient": -0.5348
+    },
+    {
+      "feature": "2000",
+      "coefficient": -0.5326
+    },
+    {
+      "feature": "view",
+      "coefficient": -0.5311
+    },
+    {
+      "feature": "want to",
+      "coefficient": -0.5309
+    },
+    {
+      "feature": "hotmail com",
+      "coefficient": -0.5306
+    },
+    {
+      "feature": "nro",
+      "coefficient": -0.5306
+    }
+  ],
+  "top50_scam_lr": [
+    {
+      "feature": " ! ",
+      "coefficient": 2.8887
+    },
+    {
+      "feature": "re",
+      "coefficient": 2.3487
+    },
+    {
+      "feature": "http",
+      "coefficient": 2.1458
+    },
+    {
+      "feature": "your",
+      "coefficient": 2.0497
+    },
+    {
+      "feature": "txt",
+      "coefficient": 2.0299
+    },
+    {
+      "feature": " . ",
+      "coefficient": 1.9794
+    },
+    {
+      "feature": "free",
+      "coefficient": 1.9124
+    },
+    {
+      "feature": "url_token",
+      "coefficient": 1.791
+    },
+    {
+      "feature": "text",
+      "coefficient": 1.7568
+    },
+    {
+      "feature": "our",
+      "coefficient": 1.6898
+    },
+    {
+      "feature": "uk",
+      "coefficient": 1.6618
+    },
+    {
+      "feature": "call",
+      "coefficient": 1.6537
+    },
+    {
+      "feature": " ? ",
+      "coefficient": 1.5738
+    },
+    {
+      "feature": "win",
+      "coefficient": 1.5538
+    },
+    {
+      "feature": "www",
+      "coefficient": 1.5524
+    },
+    {
+      "feature": " , ",
+      "coefficient": 1.5405
+    },
+    {
+      "feature": "087",
+      "coefficient": 1.5236
+    },
+    {
+      "feature": " % ",
+      "coefficient": 1.5029
+    },
+    {
+      "feature": "new",
+      "coefficient": 1.4981
+    },
+    {
+      "feature": "claim",
+      "coefficient": 1.4915
+    },
+    {
+      "feature": "here",
+      "coefficient": 1.4782
+    },
+    {
+      "feature": "50",
+      "coefficient": 1.4707
+    },
+    {
+      "feature": "50p",
+      "coefficient": 1.4214
+    },
+    {
+      "feature": "090",
+      "coefficient": 1.4117
+    },
+    {
+      "feature": " 087",
+      "coefficient": 1.408
+    },
+    {
+      "feature": "now",
+      "coefficient": 1.4067
+    },
+    {
+      "feature": " : ",
+      "coefficient": 1.3997
+    },
+    {
+      "feature": "at url_token",
+      "coefficient": 1.3904
+    },
+    {
+      "feature": "minutes at",
+      "coefficient": 1.3904
+    },
+    {
+      "feature": "minutes at url_token",
+      "coefficient": 1.3904
+    },
+    {
+      "feature": "within",
+      "coefficient": 1.3829
+    },
+    {
+      "feature": "op ",
+      "coefficient": 1.3755
+    },
+    {
+      "feature": " 08",
+      "coefficient": 1.3627
+    },
+    {
+      "feature": "150",
+      "coefficient": 1.3571
+    },
+    {
+      "feature": "150p",
+      "coefficient": 1.357
+    },
+    {
+      "feature": "rolex",
+      "coefficient": 1.3566
+    },
+    {
+      "feature": " re",
+      "coefficient": 1.3433
+    },
+    {
+      "feature": "150p",
+      "coefficient": 1.3036
+    },
+    {
+      "feature": " ' ",
+      "coefficient": 1.2916
+    },
+    {
+      "feature": " 090",
+      "coefficient": 1.2852
+    },
+    {
+      "feature": "sex",
+      "coefficient": 1.2683
+    },
+    {
+      "feature": "stop",
+      "coefficient": 1.2656
+    },
+    {
+      "feature": "info",
+      "coefficient": 1.2534
+    },
+    {
+      "feature": "mob",
+      "coefficient": 1.2381
+    },
+    {
+      "feature": "english",
+      "coefficient": 1.2369
+    },
+    {
+      "feature": "here to",
+      "coefficient": 1.2273
+    },
+    {
+      "feature": "sex",
+      "coefficient": 1.2248
+    },
+    {
+      "feature": "won",
+      "coefficient": 1.2244
+    },
+    {
+      "feature": "prize",
+      "coefficient": 1.1968
+    },
+    {
+      "feature": "mobile",
+      "coefficient": 1.183
+    }
+  ],
+  "top50_safe_lr": [
+    {
+      "feature": " i ",
+      "coefficient": -2.7226
+    },
+    {
+      "feature": ".. ",
+      "coefficient": -2.5061
+    },
+    {
+      "feature": "...",
+      "coefficient": -2.0475
+    },
+    {
+      "feature": "enron",
+      "coefficient": -1.7384
+    },
+    {
+      "feature": "... ",
+      "coefficient": -1.7037
+    },
+    {
+      "feature": "me",
+      "coefficient": -1.5573
+    },
+    {
+      "feature": "in",
+      "coefficient": -1.4542
+    },
+    {
+      "feature": "my",
+      "coefficient": -1.4006
+    },
+    {
+      "feature": ":) ",
+      "coefficient": -1.389
+    },
+    {
+      "feature": "ok",
+      "coefficient": -1.3587
+    },
+    {
+      "feature": "if",
+      "coefficient": -1.2601
+    },
+    {
+      "feature": "gas",
+      "coefficient": -1.1543
+    },
+    {
+      "feature": "2000",
+      "coefficient": -1.147
+    },
+    {
+      "feature": "thanks",
+      "coefficient": -1.1362
+    },
+    {
+      "feature": " i'",
+      "coefficient": -1.1157
+    },
+    {
+      "feature": "daren",
+      "coefficient": -1.1021
+    },
+    {
+      "feature": "for the",
+      "coefficient": -1.0863
+    },
+    {
+      "feature": "any",
+      "coefficient": -1.0764
+    },
+    {
+      "feature": "meter",
+      "coefficient": -1.073
+    },
+    {
+      "feature": "2001",
+      "coefficient": -1.0697
+    },
+    {
+      "feature": "credited to",
+      "coefficient": -1.0646
+    },
+    {
+      "feature": "credited to your",
+      "coefficient": -1.0646
+    },
+    {
+      "feature": "account ending",
+      "coefficient": -1.0646
+    },
+    {
+      "feature": "your account ending",
+      "coefficient": -1.0646
+    },
+    {
+      "feature": "will",
+      "coefficient": -1.0298
+    },
+    {
+      "feature": "its",
+      "coefficient": -1.0295
+    },
+    {
+      "feature": "to your account",
+      "coefficient": -1.0246
+    },
+    {
+      "feature": "am",
+      "coefficient": -1.0197
+    },
+    {
+      "feature": " u ",
+      "coefficient": -1.0106
+    },
+    {
+      "feature": "da",
+      "coefficient": -1.0091
+    },
+    {
+      "feature": "lol",
+      "coefficient": -0.9601
+    },
+    {
+      "feature": " th",
+      "coefficient": -0.9549
+    },
+    {
+      "feature": "hpl",
+      "coefficient": -0.9545
+    },
+    {
+      "feature": "nro",
+      "coefficient": -0.94
+    },
+    {
+      "feature": "credited",
+      "coefficient": -0.9397
+    },
+    {
+      "feature": " enro",
+      "coefficient": -0.9356
+    },
+    {
+      "feature": "enro",
+      "coefficient": -0.9347
+    },
+    {
+      "feature": " enr",
+      "coefficient": -0.9344
+    },
+    {
+      "feature": "l. ",
+      "coefficient": -0.9289
+    },
+    {
+      "feature": "enr",
+      "coefficient": -0.9259
+    },
+    {
+      "feature": "enron",
+      "coefficient": -0.9255
+    },
+    {
+      "feature": "nron",
+      "coefficient": -0.9255
+    },
+    {
+      "feature": " in ",
+      "coefficient": -0.8986
+    },
+    {
+      "feature": "deal",
+      "coefficient": -0.892
+    },
+    {
+      "feature": "how",
+      "coefficient": -0.8876
+    },
+    {
+      "feature": "nron ",
+      "coefficient": -0.8757
+    },
+    {
+      "feature": "need to",
+      "coefficient": -0.866
+    },
+    {
+      "feature": "he",
+      "coefficient": -0.8576
+    },
+    {
+      "feature": "enron com",
+      "coefficient": -0.8488
+    },
+    {
+      "feature": "tha",
+      "coefficient": -0.8479
+    }
+  ]
+}
