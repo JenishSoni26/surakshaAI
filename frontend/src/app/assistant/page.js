@@ -40,7 +40,7 @@ export default function AssistantPage() {
       const data = await api.chat(text, lang);
       setMessages(prev => [...prev, { role: 'assistant', content: data.reply }]);
     } catch (err) {
-      setMessages(prev => [...prev, { role: 'assistant', content: t('asst.welcome') }]);
+      setMessages(prev => [...prev, { role: 'assistant', content: `⚠️ ${err.message || 'Sorry, I encountered an issue processing your request. Please try again.'}` }]);
     } finally {
       setTyping(false);
     }

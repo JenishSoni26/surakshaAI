@@ -50,12 +50,27 @@ class HeuristicFallbackClassifier extends BaseClassifier {
 
   async classify(input) {
     const text = typeof input === 'string' ? input : JSON.stringify(input);
-    const hasUrgency = /urgent|immediately|action required|blocked|suspended/i.test(text);
-    const hasFinancial = /money|bank|lakh|crore|fee|transfer|cash|upi|account/i.test(text);
+    const lower = text.toLowerCase();
+
+    // Whitelist check for official transactional and OTP security notices
+    const isOfficialNotice = /never share|do not share|don't share|secret otp for|available balance|debited from|credited to|out for delivery|order #|ticket booked|appointment confirmed|pnr \d+/i.test(lower);
+    if (isOfficialNotice && !/share.*otp.*(to|with)|tell.*otp|click.*link|verify.*account|entering.*card|claim.*cashback/i.test(lower)) {
+      return {
+        label: 'BENIGN',
+        probability: 0.05,
+        logits: [0.95, 0.05],
+        provider: 'HeuristicFallbackClassifier'
+      };
+    }
+
+    const hasUrgency = /urgent|immediately|action required|blocked|suspended|expires|deactivated|hurry|today|tonight|within \d+/i.test(text);
+    const hasFinancial = /money|bank|lakh|crore|fee|transfer|cash|upi|account|cashback|reward|fine|premium|challan|card|pin|otp|claim/i.test(text);
+    const hasCredsOrLink = /pin|otp|cvv|password|click|link|verify|update|http|\.click|\.cf|\.top|\.review|\.xyz/i.test(text);
     
     let prob = 0.1;
-    if (hasUrgency && hasFinancial) prob = 0.85;
-    else if (hasUrgency || hasFinancial) prob = 0.45;
+    if (hasUrgency && hasFinancial && hasCredsOrLink) prob = 0.92;
+    else if (hasUrgency && hasFinancial) prob = 0.80;
+    else if (hasUrgency || hasFinancial) prob = 0.35;
 
     return {
       label: prob >= 0.7 ? 'SCAM' : prob >= 0.4 ? 'SUSPICIOUS' : 'BENIGN',

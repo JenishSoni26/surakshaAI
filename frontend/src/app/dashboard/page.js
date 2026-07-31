@@ -67,7 +67,8 @@ export default function DashboardPage() {
   }, [charts]);
 
   useEffect(() => {
-    if (chartReady && charts && !chartsRendered.current) {
+    const isChartReady = chartReady || (typeof window !== 'undefined' && !!window.Chart);
+    if (isChartReady && charts && !chartsRendered.current) {
       chartsRendered.current = true;
       renderCharts();
     }
@@ -99,7 +100,7 @@ export default function DashboardPage() {
   return (
     <ProtectedRoute>
     <>
-      <Script src="https://cdn.jsdelivr.net/npm/chart.js" onReady={() => setChartReady(true)} />
+      <Script src="https://cdn.jsdelivr.net/npm/chart.js" onLoad={() => setChartReady(true)} onReady={() => setChartReady(true)} />
       <div className="bg-background text-on-background min-h-screen flex">
         {/* Sidebar */}
         <nav className="bg-surface-container h-screen w-64 fixed left-0 top-0 shadow-lg hidden md:flex flex-col gap-1 p-4 z-40">

@@ -5,6 +5,14 @@ import { useLanguage } from '@/lib/i18n';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import FAB from '@/components/FAB';
+const SAFETY_TIPS = [
+  '🔒 Never share your OTP, PIN, or CVV with anyone — not even your bank!',
+  '🚨 Report fraud within the first hour — the "golden window" for fund recovery.',
+  '📱 Government agencies NEVER ask for money transfers over calls.',
+  '🛡️ Always verify UPI IDs before sending money to unknown contacts.',
+  '⚠️ If a deal sounds too good to be true, it probably is — stay alert!',
+  '📞 National Cyber Crime Helpline: 1930 — Available 24/7',
+];
 
 export default function EmergencyPage() {
   const { t, lang } = useLanguage();
@@ -16,19 +24,10 @@ export default function EmergencyPage() {
     api.getContacts().then(d => setContacts(d.contacts)).catch(console.error);
   }, []);
 
-  const safetyTips = [
-    '🔒 Never share your OTP, PIN, or CVV with anyone — not even your bank!',
-    '🚨 Report fraud within the first hour — the "golden window" for fund recovery.',
-    '📱 Government agencies NEVER ask for money transfers over calls.',
-    '🛡️ Always verify UPI IDs before sending money to unknown contacts.',
-    '⚠️ If a deal sounds too good to be true, it probably is — stay alert!',
-    '📞 National Cyber Crime Helpline: 1930 — Available 24/7',
-  ];
-
   useEffect(() => {
-    const interval = setInterval(() => setTickerIndex(prev => (prev + 1) % safetyTips.length), 4000);
+    const interval = setInterval(() => setTickerIndex(prev => (prev + 1) % SAFETY_TIPS.length), 4000);
     return () => clearInterval(interval);
-  }, [safetyTips.length]);
+  }, []);
 
   const copyToClipboard = (text, id) => {
     if (typeof navigator !== 'undefined' && navigator.clipboard) {
@@ -56,7 +55,7 @@ export default function EmergencyPage() {
   return (
     <div className="flex flex-col min-h-screen">
       <Navbar />
-      <style jsx>{`
+      <style>{`
         @keyframes pulse-ring {
           0% { transform: scale(0.9); opacity: 0.7; }
           50% { transform: scale(1.1); opacity: 0.3; }
@@ -102,7 +101,7 @@ export default function EmergencyPage() {
               </span>
               <div className="overflow-hidden h-6 flex-1">
                 <p key={tickerIndex} className="text-sm font-medium text-on-surface ticker-item whitespace-nowrap">
-                  {safetyTips[tickerIndex]}
+                  {SAFETY_TIPS[tickerIndex]}
                 </p>
               </div>
             </div>
@@ -112,10 +111,10 @@ export default function EmergencyPage() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-10 animate-fade-in-up delay-100">
             {quickActions.map((action, i) => (
               <a key={i} href={action.link}
-                 target={action.link.startsWith('http') ? '_blank' : undefined}
-                 rel={action.link.startsWith('http') ? 'noopener noreferrer' : undefined}
-                 className="quick-card group relative overflow-hidden rounded-2xl p-5 text-white transition-all duration-300 cursor-pointer block no-underline"
-                 style={{ background: `linear-gradient(135deg, var(--tw-gradient-from, #ef4444), var(--tw-gradient-to, #f97316))` }}>
+                target={action.link.startsWith('http') ? '_blank' : undefined}
+                rel={action.link.startsWith('http') ? 'noopener noreferrer' : undefined}
+                className="quick-card group relative overflow-hidden rounded-2xl p-5 text-white transition-all duration-300 cursor-pointer block no-underline"
+                style={{ background: `linear-gradient(135deg, var(--tw-gradient-from, #ef4444), var(--tw-gradient-to, #f97316))` }}>
                 <div className={`absolute inset-0 bg-gradient-to-br ${action.gradient} opacity-100`} />
                 <div className="relative z-10">
                   <span className="material-symbols-outlined text-3xl mb-3 block drop-shadow-md">{action.icon}</span>

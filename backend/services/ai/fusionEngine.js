@@ -46,9 +46,13 @@ class FusionEngine {
     } else if (ruleRiskLevel !== 'HIGH' && classifierRiskLevel === 'HIGH') {
       // Scenario 3: Rule Low + ML High -> ML Alert (Medium/High)
       fusedScore = Math.max(75, Math.round(classifierProb * 100));
+    } else if (ruleRiskLevel === 'MEDIUM') {
+      // Scenario 4: Rule Medium -> Flagged
+      fusedScore = Math.max(ruleScore, Math.round(classifierProb * 100));
     } else {
-      // Scenario 4: Rule Low + ML Low -> Safe
-      fusedScore = Math.min(ruleScore, Math.round(classifierProb * 100));
+      // Scenario 5: Rule Low + ML Low/Medium -> Safe unless ML probability is strongly HIGH or rules detected patterns
+      const hasDetectedPatterns = Array.isArray(ruleResult?.detectedPatterns) && ruleResult.detectedPatterns.length > 0;
+      fusedScore = hasDetectedPatterns ? Math.max(ruleScore, Math.round(classifierProb * 100)) : 0;
     }
 
     fusedScore = Math.min(Math.max(fusedScore, 0), 100);

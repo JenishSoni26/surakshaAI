@@ -123,24 +123,32 @@ class RuleEngine {
       reasons.push('Simulates emergency distress or changed payment handles to request urgent fund transfer');
     }
 
-    // --- Step 4: OTP & Credential Harvesting ---
-    if (!hasNeverShareWarning && /share.*otp|tell.*otp|tell me the otp|send.*otp|give me the otp|share 6-digit code|tell card number and cvv|enter debit card pin/i.test(text)) {
-      score += 80;
+    // --- Step 4: OTP & Credential Harvesting & Malware Downloads ---
+    if (!hasNeverShareWarning && (
+      /share.*otp|tell.*otp|tell me the otp|send.*otp|give me the otp|share 6-digit code|tell card number and cvv|enter debit card pin/i.test(text) ||
+      /enter(ing)? (your |the )?(atm|debit|credit|bank)? ?card (number)?/i.test(text) ||
+      /enter(ing)? (your |the )?(pin|otp|cvv|password)/i.test(text) ||
+      /(share|tell|send|give|provide|enter|entering|input) (your |the )?(atm|debit|credit|bank)? ?(card|pin|otp|cvv|password|credentials|netbanking)/i.test(text) ||
+      /card number.*pin|pin.*otp|atm card.*pin/i.test(text) ||
+      /verify (your )?account.*(entering|pin|otp|card)/i.test(text) ||
+      /ઓટીપી મોકલો|otp મોકલો|ஒடிபி பகிரவும்|ஒடிபி|ఒటిపి|ಒಟಿಪಿ ಹಂಚಿಕೊಳ್ಳಿ|ओडीपी/i.test(text)
+    )) {
+      score += 85;
       detectedPatterns.push('Credential / OTP Extraction Request');
-      reasons.push('Requests sharing of OTP or confidential banking credentials');
+      reasons.push('Requests or prompts user to share confidential banking credentials (ATM card number, PIN, OTP, CVV)');
     }
 
-    if (/download anydesk|install teamviewer|quicksupport|share 9-digit code|remote manager role/i.test(text)) {
+    if (/download anydesk|install teamviewer|quicksupport|share 9-digit code|remote manager role|\.apk|download and install|install.*\.apk/i.test(text)) {
       score += 80;
-      detectedPatterns.push('Remote Desktop App Request');
-      reasons.push('Instructs user to install remote desktop control applications (AnyDesk/TeamViewer)');
+      detectedPatterns.push('Remote App & APK Malware Request');
+      reasons.push('Instructs user to download unauthorized APK files or remote desktop control apps');
     }
 
-    // --- Step 5: Advance Fee Fraud & Financial Scams ---
-    if (/won rs|kbc lucky draw|lottery|spin the wheel|won an iphone|tata harrier car|processing fee to claim|\brto\b tax fee|clearance tax to release|customs dept alert|seized at airport|customs duty tax|tower installation|registration fee for site survey|dealership allotted|security deposit for allotment|visa approved without ielts|medical processing fee|parcel address is incomplete|re-delivery charge/i.test(text)) {
+    // --- Step 5: Advance Fee Fraud, Financial Scams & Cashback Phishing ---
+    if (/won rs|kbc lucky draw|lottery|spin the wheel|won an iphone|tata harrier car|processing fee to claim|\brto\b tax fee|clearance tax to release|customs dept alert|seized at airport|customs duty tax|tower installation|registration fee for site survey|dealership allotted|security deposit for allotment|visa approved without ielts|medical processing fee|parcel address is incomplete|re-delivery charge|cashback|cash back|selected to receive|selected for|eligible for cashback|claim (it|your|now|cashback|reward)|অভিনন্দন.*লটারি|લটারি/i.test(text)) {
       score += 75;
-      detectedPatterns.push('Advance Fee & Impersonation Scam');
-      reasons.push('Demands upfront fees, deposits, or taxes for fake prizes, parcels, jobs, or deals');
+      detectedPatterns.push('Advance Fee & Cashback / Reward Scam');
+      reasons.push('Promotes unverified cashback, rewards, or prizes requiring advance action or link verification');
     }
 
     if (/like youtube videos|telegram task|hotel review task|prepaid task deposit|typing captchas|captcha job|earn rs 3000-8000|part-time job offer|contact hr on whatsapp|rating google products|like & earn|usdt free every hour/i.test(text)) {
@@ -156,10 +164,22 @@ class RuleEngine {
     }
 
     // --- Step 6: Account Deactivation / Impersonation Threats & Refund Tricks ---
-    if (/\bkyc\b expired|account blocked|\bpan\b card is not linked|electricity connection will be disconnected|power meter connection|fastag balance is negative|aadhaar biometric locked|netbanking suspended/i.test(text)) {
-      score += 65;
+    if (/\bkyc\b expired|\bkyc\b verification|account blocked|\bpan\b card is not linked|electricity connection will be disconnected|power meter connection|fastag balance is negative|aadhaar biometric locked|netbanking suspended|sim card will be deactivated|card will expire|fine of rs|over-speeding fine|e-challan|policy.*will lapse|discount at http|बिजली कनेक्शन|वीज बिल|વીજ બીલ|વ્યવસાય|ವಿದ್ಯುತ್|విద్యుత్|பவர்|પાર્સલ અટકી|ડિલિવરી ચાર્જ|વંકી|தடுக்கப்பட்டது|வங்கி|కరెంట్ బిల్లు|నిలిపివేత|थकबाकी|तोडले जाईल|aapka account block/i.test(text)) {
+      score += 75;
       detectedPatterns.push('Urgency Coercion & Account Threat');
-      reasons.push('Threatens imminent account suspension or utility cutoff to coerce panic response');
+      reasons.push('Threatens imminent account suspension, fee penalties, or service cutoff to coerce panic response');
+    }
+
+    if (/hurry.*offer expires|offer expires today|valid today|limited time offer|expires in \d+|deactivated within \d+/i.test(text)) {
+      score += 35;
+      detectedPatterns.push('Artificial Urgency Coercion');
+      reasons.push('Employs artificial time pressure and expiration warnings to induce immediate compliance');
+    }
+
+    if (/click (this|the|below)? link|visit (this|the|below)? link|verify (your )?account/i.test(text) && !hasLegitDomain) {
+      score += 30;
+      detectedPatterns.push('Unverified Call-to-Action Link Prompt');
+      reasons.push('Prompts user to click an unverified link or perform account verification');
     }
 
     if (/accidentally transferred rs|refunded to your bank account by mistake|refund rs \d+ back to|transfer rs \d+ back immediately|scan this qr code to pay|enter your upi pin to claim|token money/i.test(text)) {

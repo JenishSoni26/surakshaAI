@@ -61,6 +61,16 @@ class RealMLClassifier extends BaseClassifier {
           console.error('[MLClassifier Daemon Stderr]:', data.toString());
         });
 
+        this.pythonProcess.on('error', (err) => {
+          console.warn(`[MLClassifier] Python daemon error: ${err.message}. Falling back to Heuristics.`);
+          this.isLoaded = false;
+          this.pythonProcess = null;
+          if (!initialized) {
+            initialized = true;
+            resolve(false);
+          }
+        });
+
         this.pythonProcess.on('exit', (code) => {
           console.warn(`[MLClassifier] Python daemon exited with code ${code}. Falling back to Heuristics.`);
           this.isLoaded = false;

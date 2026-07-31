@@ -1,24 +1,24 @@
 {
   "engine": "Rule-Based",
-  "timestamp": "2026-07-30T14:51:21.766Z",
-  "executionTimeSeconds": 1.812,
+  "timestamp": "2026-07-31T11:01:42.062Z",
+  "executionTimeSeconds": 1.052,
   "summary": {
     "total": 120,
-    "passed": 102,
-    "failed": 18,
-    "accuracy": 85,
-    "precision": 77.63,
-    "recall": 98.33,
-    "f1Score": 86.76,
-    "avgRiskScore": 53.59,
-    "falsePositivesCount": 17,
-    "falseNegativesCount": 1
+    "passed": 117,
+    "failed": 3,
+    "accuracy": 97.5,
+    "precision": 95.24,
+    "recall": 100,
+    "f1Score": 97.56,
+    "avgRiskScore": 45.7,
+    "falsePositivesCount": 3,
+    "falseNegativesCount": 0
   },
   "confusionMatrix": {
     "SAFE": {
-      "SAFE": 43,
+      "SAFE": 57,
       "MEDIUM": 0,
-      "HIGH": 17
+      "HIGH": 3
     },
     "MEDIUM": {
       "SAFE": 0,
@@ -26,37 +26,37 @@
       "HIGH": 0
     },
     "HIGH": {
-      "SAFE": 1,
-      "MEDIUM": 1,
-      "HIGH": 58
+      "SAFE": 0,
+      "MEDIUM": 5,
+      "HIGH": 55
     }
   },
   "categoryBreakdown": {
     "Legitimate Banking Messages": {
       "total": 20,
-      "passed": 15,
-      "failed": 5,
+      "passed": 19,
+      "failed": 1,
       "tp": 0,
-      "tn": 15,
-      "fp": 5,
+      "tn": 19,
+      "fp": 1,
       "fn": 0,
-      "avgRisk": 18.75,
-      "totalRisk": 375,
-      "accuracy": 75,
+      "avgRisk": 4,
+      "totalRisk": 80,
+      "accuracy": 95,
       "precision": 0,
       "recall": 0
     },
     "Legitimate Ecommerce Messages": {
       "total": 20,
-      "passed": 15,
-      "failed": 5,
+      "passed": 18,
+      "failed": 2,
       "tp": 0,
-      "tn": 15,
-      "fp": 5,
+      "tn": 18,
+      "fp": 2,
       "fn": 0,
-      "avgRisk": 18.75,
-      "totalRisk": 375,
-      "accuracy": 75,
+      "avgRisk": 8.85,
+      "totalRisk": 177,
+      "accuracy": 90,
       "precision": 0,
       "recall": 0
     },
@@ -68,8 +68,8 @@
       "tn": 0,
       "fp": 0,
       "fn": 0,
-      "avgRisk": 78.65,
-      "totalRisk": 1573,
+      "avgRisk": 87.85,
+      "totalRisk": 1757,
       "accuracy": 100,
       "precision": 100,
       "recall": 100
@@ -82,37 +82,37 @@
       "tn": 0,
       "fp": 0,
       "fn": 0,
-      "avgRisk": 92.5,
-      "totalRisk": 1850,
+      "avgRisk": 84.25,
+      "totalRisk": 1685,
       "accuracy": 100,
       "precision": 100,
       "recall": 100
     },
     "Social Engineering": {
       "total": 20,
-      "passed": 19,
-      "failed": 1,
-      "tp": 19,
+      "passed": 20,
+      "failed": 0,
+      "tp": 20,
       "tn": 0,
       "fp": 0,
-      "fn": 1,
-      "avgRisk": 86.65,
-      "totalRisk": 1733,
-      "accuracy": 95,
+      "fn": 0,
+      "avgRisk": 89.25,
+      "totalRisk": 1785,
+      "accuracy": 100,
       "precision": 100,
-      "recall": 95
+      "recall": 100
     },
     "Hard Cases": {
       "total": 20,
-      "passed": 13,
-      "failed": 7,
+      "passed": 20,
+      "failed": 0,
       "tp": 0,
-      "tn": 13,
-      "fp": 7,
+      "tn": 20,
+      "fp": 0,
       "fn": 0,
-      "avgRisk": 26.25,
-      "totalRisk": 525,
-      "accuracy": 65,
+      "avgRisk": 0,
+      "totalRisk": 0,
+      "accuracy": 100,
       "precision": 0,
       "recall": 0
     }
@@ -120,27 +120,23 @@
   "topKeywords": [
     {
       "keyword": "bank",
-      "count": 22
-    },
-    {
-      "keyword": "account",
       "count": 17
     },
     {
-      "keyword": "fee",
-      "count": 11
-    },
-    {
-      "keyword": "claim",
-      "count": 10
+      "keyword": "account",
+      "count": 16
     },
     {
       "keyword": "transfer",
       "count": 10
     },
     {
-      "keyword": "otp",
-      "count": 7
+      "keyword": "claim",
+      "count": 9
+    },
+    {
+      "keyword": "fee",
+      "count": 9
     },
     {
       "keyword": "upi",
@@ -151,11 +147,15 @@
       "count": 6
     },
     {
-      "keyword": "free",
+      "keyword": "otp",
       "count": 5
     },
     {
       "keyword": "click",
+      "count": 4
+    },
+    {
+      "keyword": "free",
       "count": 4
     },
     {
@@ -164,10 +164,6 @@
     },
     {
       "keyword": "urgent",
-      "count": 3
-    },
-    {
-      "keyword": "payment",
       "count": 3
     },
     {
@@ -180,6 +176,10 @@
     },
     {
       "keyword": "suspended",
+      "count": 2
+    },
+    {
+      "keyword": "payment",
       "count": 2
     },
     {
@@ -196,60 +196,9 @@
     }
   ],
   "recommendations": [
-    "Reduce false positives (17 detected): Refine rule sensitivity for legitimate transactional messages containing financial terms.",
-    "Improve scam detection coverage (1 missed scams): Enhance heuristics for novel social engineering and impersonation patterns.",
-    "Improve contextual understanding: Hard Cases category accuracy is 65.0%. Transition to Gemini AI LLM reasoning to evaluate context beyond exact keyword triggers.",
-    "Integrate Gemini AI Model: Transition from rule-based regex patterns to LLM zero-shot prompt evaluation for semantic understanding of scam intent."
+    "Reduce false positives (3 detected): Refine rule sensitivity for legitimate transactional messages containing financial terms."
   ],
   "falsePositives": [
-    {
-      "id": 1,
-      "category": "Legitimate Banking Messages",
-      "subcategory": "OTP",
-      "message": "948201 is your secret OTP for SBI Netbanking login. Never share your OTP with anyone, including bank staff.",
-      "expected": "SAFE",
-      "actualClass": "HIGH",
-      "actualRiskScore": 75,
-      "actualStatus": "blocked",
-      "actualThreat": "None",
-      "aiExplanation": "High risk detected! AI security engine flagged content with severe fraud probability."
-    },
-    {
-      "id": 6,
-      "category": "Legitimate Banking Messages",
-      "subcategory": "Balance Alert",
-      "message": "Dear SBI Customer, your balance for A/C XX5412 as of 27-JUL-26 18:00 is Rs. 18,420.50.",
-      "expected": "SAFE",
-      "actualClass": "HIGH",
-      "actualRiskScore": 75,
-      "actualStatus": "blocked",
-      "actualThreat": "None",
-      "aiExplanation": "High risk detected! AI security engine flagged content with severe fraud probability."
-    },
-    {
-      "id": 8,
-      "category": "Legitimate Banking Messages",
-      "subcategory": "EMI Reminder",
-      "message": "Reminder: Auto-debit for Home Loan EMI of Rs. 15,400 due on 05-AUG-26 from HDFC Bank A/C XX8921.",
-      "expected": "SAFE",
-      "actualClass": "HIGH",
-      "actualRiskScore": 75,
-      "actualStatus": "blocked",
-      "actualThreat": "None",
-      "aiExplanation": "High risk detected! AI security engine flagged content with severe fraud probability."
-    },
-    {
-      "id": 17,
-      "category": "Legitimate Banking Messages",
-      "subcategory": "Auto Debit",
-      "message": "Rs. 199.00 debited for Netflix Subscription auto-pay from ICICI Bank Debit Card XX4102.",
-      "expected": "SAFE",
-      "actualClass": "HIGH",
-      "actualRiskScore": 75,
-      "actualStatus": "blocked",
-      "actualThreat": "None",
-      "aiExplanation": "High risk detected! AI security engine flagged content with severe fraud probability."
-    },
     {
       "id": 20,
       "category": "Legitimate Banking Messages",
@@ -257,22 +206,22 @@
       "message": "As requested by you, your Debit Card XX7712 has been permanently blocked. Call 18002090000 for replacement.",
       "expected": "SAFE",
       "actualClass": "HIGH",
-      "actualRiskScore": 75,
+      "actualRiskScore": 80,
       "actualStatus": "blocked",
       "actualThreat": "None",
       "aiExplanation": "High risk detected! AI security engine flagged content with severe fraud probability."
     },
     {
-      "id": 24,
+      "id": 22,
       "category": "Legitimate Ecommerce Messages",
-      "subcategory": "Zomato",
-      "message": "Zomato: Order #891024 delivered. Enjoy your meal! Please rate your food and delivery experience.",
+      "subcategory": "Flipkart",
+      "message": "Out for Delivery: Your Flipkart item 'Puma Running Shoes' is out for delivery. Share PIN 4812 with delivery agent.",
       "expected": "SAFE",
       "actualClass": "HIGH",
-      "actualRiskScore": 75,
+      "actualRiskScore": 85,
       "actualStatus": "blocked",
-      "actualThreat": "None",
-      "aiExplanation": "High risk detected! AI security engine flagged content with severe fraud probability."
+      "actualThreat": "Credential / OTP Extraction Request",
+      "aiExplanation": "High risk detected! Threat indicators found: Credential / OTP Extraction Request. Message contains malicious phishing or fraud coercion patterns."
     },
     {
       "id": 29,
@@ -281,146 +230,13 @@
       "message": "Delhivery: Package AWB 1982401294 to be delivered today. Use Delivery OTP 8912 for receiving package.",
       "expected": "SAFE",
       "actualClass": "HIGH",
-      "actualRiskScore": 75,
-      "actualStatus": "blocked",
-      "actualThreat": "None",
-      "aiExplanation": "High risk detected! AI security engine flagged content with severe fraud probability."
-    },
-    {
-      "id": 31,
-      "category": "Legitimate Ecommerce Messages",
-      "subcategory": "Ola",
-      "message": "Ola Auto ride started. Sharing ride tracking link with your emergency contacts: https://ola.app/track/12345",
-      "expected": "SAFE",
-      "actualClass": "HIGH",
-      "actualRiskScore": 75,
-      "actualStatus": "blocked",
-      "actualThreat": "None",
-      "aiExplanation": "High risk detected! AI security engine flagged content with severe fraud probability."
-    },
-    {
-      "id": 37,
-      "category": "Legitimate Ecommerce Messages",
-      "subcategory": "Ajio",
-      "message": "Ajio order #AJ-992104 delivered. Share your feedback and get 100 Ajio Points.",
-      "expected": "SAFE",
-      "actualClass": "HIGH",
-      "actualRiskScore": 75,
-      "actualStatus": "blocked",
-      "actualThreat": "None",
-      "aiExplanation": "High risk detected! AI security engine flagged content with severe fraud probability."
-    },
-    {
-      "id": 38,
-      "category": "Legitimate Ecommerce Messages",
-      "subcategory": "Tata CLiQ",
-      "message": "Tata CLiQ: Order dispatched! Track your shipment AWB 9012491 at https://tatacliq.com/track",
-      "expected": "SAFE",
-      "actualClass": "HIGH",
-      "actualRiskScore": 75,
-      "actualStatus": "blocked",
-      "actualThreat": "None",
-      "aiExplanation": "High risk detected! AI security engine flagged content with severe fraud probability."
-    },
-    {
-      "id": 101,
-      "category": "Hard Cases",
-      "subcategory": "Courier Confirmation",
-      "message": "Your DTDC shipment AWB D9012481 is out for delivery today. Tracking link: https://www.dtdc.in/tracking/D9012481",
-      "expected": "SAFE",
-      "actualClass": "HIGH",
-      "actualRiskScore": 75,
-      "actualStatus": "blocked",
-      "actualThreat": "None",
-      "aiExplanation": "High risk detected! AI security engine flagged content with severe fraud probability."
-    },
-    {
-      "id": 106,
-      "category": "Hard Cases",
-      "subcategory": "Bank Official Portal",
-      "message": "Welcome to HDFC NetBanking! Protect your account by visiting our official website https://www.hdfcbank.com. Never share passwords.",
-      "expected": "SAFE",
-      "actualClass": "HIGH",
-      "actualRiskScore": 75,
-      "actualStatus": "blocked",
-      "actualThreat": "None",
-      "aiExplanation": "High risk detected! AI security engine flagged content with severe fraud probability."
-    },
-    {
-      "id": 107,
-      "category": "Hard Cases",
-      "subcategory": "OTP Warning Notice",
-      "message": "Your OTP for login is 591024. NEVER share this OTP with anyone, even if they claim to be calling from your bank.",
-      "expected": "SAFE",
-      "actualClass": "HIGH",
-      "actualRiskScore": 75,
-      "actualStatus": "blocked",
-      "actualThreat": "None",
-      "aiExplanation": "High risk detected! AI security engine flagged content with severe fraud probability."
-    },
-    {
-      "id": 108,
-      "category": "Hard Cases",
-      "subcategory": "Utility Due Reminder",
-      "message": "Mahanagar Gas Bill Reminder: Bill of Rs 640.00 for Consumer No 901284 is due on 02-AUG. Pay online at https://www.mahanagargas.com",
-      "expected": "SAFE",
-      "actualClass": "HIGH",
-      "actualRiskScore": 75,
-      "actualStatus": "blocked",
-      "actualThreat": "None",
-      "aiExplanation": "High risk detected! AI security engine flagged content with severe fraud probability."
-    },
-    {
-      "id": 109,
-      "category": "Hard Cases",
-      "subcategory": "Survey Link",
-      "message": "Thank you for visiting TATA Croma! Share your shopping experience survey: https://feedback.croma.com/survey/9012",
-      "expected": "SAFE",
-      "actualClass": "HIGH",
-      "actualRiskScore": 75,
-      "actualStatus": "blocked",
-      "actualThreat": "None",
-      "aiExplanation": "High risk detected! AI security engine flagged content with severe fraud probability."
-    },
-    {
-      "id": 117,
-      "category": "Hard Cases",
-      "subcategory": "Credit Card Limit Increase Legitimate",
-      "message": "SBI Card Alert: Based on your good repayment record, eligible for credit limit enhancement. SMS 'INCR 4419' to 5676791 to accept.",
-      "expected": "SAFE",
-      "actualClass": "HIGH",
-      "actualRiskScore": 75,
-      "actualStatus": "blocked",
-      "actualThreat": "None",
-      "aiExplanation": "High risk detected! AI security engine flagged content with severe fraud probability."
-    },
-    {
-      "id": 119,
-      "category": "Hard Cases",
-      "subcategory": "Car Service Reminder",
-      "message": "Maruti Service Reminder: Scheduled 3rd free service for Swift MH02AB1234 is due next week. Book appointment on Maruti Suzuki Rewards app.",
-      "expected": "SAFE",
-      "actualClass": "HIGH",
-      "actualRiskScore": 75,
+      "actualRiskScore": 92,
       "actualStatus": "blocked",
       "actualThreat": "None",
       "aiExplanation": "High risk detected! AI security engine flagged content with severe fraud probability."
     }
   ],
-  "falseNegatives": [
-    {
-      "id": 93,
-      "category": "Social Engineering",
-      "subcategory": "Fake Electricity Officer",
-      "message": "Power Supply Dept: Officer R.K. Verma here. Your power meter connection will be cut in 30 mins. Call me at 9876543210 immediately to pay bill.",
-      "expected": "HIGH",
-      "actualClass": "SAFE",
-      "actualRiskScore": 28,
-      "actualStatus": "safe",
-      "actualThreat": "Urgency Coercion & Account Threat",
-      "aiExplanation": "Analysis detected 1 risk factor(s):\n• Threatens imminent account suspension or utility cutoff to coerce panic response"
-    }
-  ],
+  "falseNegatives": [],
   "results": [
     {
       "id": 1,
@@ -428,11 +244,11 @@
       "subcategory": "OTP",
       "message": "948201 is your secret OTP for SBI Netbanking login. Never share your OTP with anyone, including bank staff.",
       "expected": "SAFE",
-      "actualClass": "HIGH",
-      "actualRiskScore": 75,
-      "actualStatus": "blocked",
+      "actualClass": "SAFE",
+      "actualRiskScore": 0,
+      "actualStatus": "safe",
       "actualThreat": "None",
-      "aiExplanation": "High risk detected! AI security engine flagged content with severe fraud probability."
+      "aiExplanation": "No suspicious scam indicators found. Content matches standard legitimate communication patterns."
     },
     {
       "id": 2,
@@ -488,11 +304,11 @@
       "subcategory": "Balance Alert",
       "message": "Dear SBI Customer, your balance for A/C XX5412 as of 27-JUL-26 18:00 is Rs. 18,420.50.",
       "expected": "SAFE",
-      "actualClass": "HIGH",
-      "actualRiskScore": 75,
-      "actualStatus": "blocked",
+      "actualClass": "SAFE",
+      "actualRiskScore": 0,
+      "actualStatus": "safe",
       "actualThreat": "None",
-      "aiExplanation": "High risk detected! AI security engine flagged content with severe fraud probability."
+      "aiExplanation": "No suspicious scam indicators found. Content matches standard legitimate communication patterns."
     },
     {
       "id": 7,
@@ -512,11 +328,11 @@
       "subcategory": "EMI Reminder",
       "message": "Reminder: Auto-debit for Home Loan EMI of Rs. 15,400 due on 05-AUG-26 from HDFC Bank A/C XX8921.",
       "expected": "SAFE",
-      "actualClass": "HIGH",
-      "actualRiskScore": 75,
-      "actualStatus": "blocked",
+      "actualClass": "SAFE",
+      "actualRiskScore": 0,
+      "actualStatus": "safe",
       "actualThreat": "None",
-      "aiExplanation": "High risk detected! AI security engine flagged content with severe fraud probability."
+      "aiExplanation": "No suspicious scam indicators found. Content matches standard legitimate communication patterns."
     },
     {
       "id": 9,
@@ -620,11 +436,11 @@
       "subcategory": "Auto Debit",
       "message": "Rs. 199.00 debited for Netflix Subscription auto-pay from ICICI Bank Debit Card XX4102.",
       "expected": "SAFE",
-      "actualClass": "HIGH",
-      "actualRiskScore": 75,
-      "actualStatus": "blocked",
+      "actualClass": "SAFE",
+      "actualRiskScore": 0,
+      "actualStatus": "safe",
       "actualThreat": "None",
-      "aiExplanation": "High risk detected! AI security engine flagged content with severe fraud probability."
+      "aiExplanation": "No suspicious scam indicators found. Content matches standard legitimate communication patterns."
     },
     {
       "id": 18,
@@ -657,7 +473,7 @@
       "message": "As requested by you, your Debit Card XX7712 has been permanently blocked. Call 18002090000 for replacement.",
       "expected": "SAFE",
       "actualClass": "HIGH",
-      "actualRiskScore": 75,
+      "actualRiskScore": 80,
       "actualStatus": "blocked",
       "actualThreat": "None",
       "aiExplanation": "High risk detected! AI security engine flagged content with severe fraud probability."
@@ -680,11 +496,11 @@
       "subcategory": "Flipkart",
       "message": "Out for Delivery: Your Flipkart item 'Puma Running Shoes' is out for delivery. Share PIN 4812 with delivery agent.",
       "expected": "SAFE",
-      "actualClass": "SAFE",
-      "actualRiskScore": 0,
-      "actualStatus": "safe",
-      "actualThreat": "None",
-      "aiExplanation": "No suspicious scam indicators found. Content matches standard legitimate communication patterns."
+      "actualClass": "HIGH",
+      "actualRiskScore": 85,
+      "actualStatus": "blocked",
+      "actualThreat": "Credential / OTP Extraction Request",
+      "aiExplanation": "High risk detected! Threat indicators found: Credential / OTP Extraction Request. Message contains malicious phishing or fraud coercion patterns."
     },
     {
       "id": 23,
@@ -704,11 +520,11 @@
       "subcategory": "Zomato",
       "message": "Zomato: Order #891024 delivered. Enjoy your meal! Please rate your food and delivery experience.",
       "expected": "SAFE",
-      "actualClass": "HIGH",
-      "actualRiskScore": 75,
-      "actualStatus": "blocked",
+      "actualClass": "SAFE",
+      "actualRiskScore": 0,
+      "actualStatus": "safe",
       "actualThreat": "None",
-      "aiExplanation": "High risk detected! AI security engine flagged content with severe fraud probability."
+      "aiExplanation": "No suspicious scam indicators found. Content matches standard legitimate communication patterns."
     },
     {
       "id": 25,
@@ -765,7 +581,7 @@
       "message": "Delhivery: Package AWB 1982401294 to be delivered today. Use Delivery OTP 8912 for receiving package.",
       "expected": "SAFE",
       "actualClass": "HIGH",
-      "actualRiskScore": 75,
+      "actualRiskScore": 92,
       "actualStatus": "blocked",
       "actualThreat": "None",
       "aiExplanation": "High risk detected! AI security engine flagged content with severe fraud probability."
@@ -788,11 +604,11 @@
       "subcategory": "Ola",
       "message": "Ola Auto ride started. Sharing ride tracking link with your emergency contacts: https://ola.app/track/12345",
       "expected": "SAFE",
-      "actualClass": "HIGH",
-      "actualRiskScore": 75,
-      "actualStatus": "blocked",
+      "actualClass": "SAFE",
+      "actualRiskScore": 0,
+      "actualStatus": "safe",
       "actualThreat": "None",
-      "aiExplanation": "High risk detected! AI security engine flagged content with severe fraud probability."
+      "aiExplanation": "No suspicious scam indicators found. Content matches standard legitimate communication patterns."
     },
     {
       "id": 32,
@@ -860,11 +676,11 @@
       "subcategory": "Ajio",
       "message": "Ajio order #AJ-992104 delivered. Share your feedback and get 100 Ajio Points.",
       "expected": "SAFE",
-      "actualClass": "HIGH",
-      "actualRiskScore": 75,
-      "actualStatus": "blocked",
+      "actualClass": "SAFE",
+      "actualRiskScore": 0,
+      "actualStatus": "safe",
       "actualThreat": "None",
-      "aiExplanation": "High risk detected! AI security engine flagged content with severe fraud probability."
+      "aiExplanation": "No suspicious scam indicators found. Content matches standard legitimate communication patterns."
     },
     {
       "id": 38,
@@ -872,11 +688,11 @@
       "subcategory": "Tata CLiQ",
       "message": "Tata CLiQ: Order dispatched! Track your shipment AWB 9012491 at https://tatacliq.com/track",
       "expected": "SAFE",
-      "actualClass": "HIGH",
-      "actualRiskScore": 75,
-      "actualStatus": "blocked",
+      "actualClass": "SAFE",
+      "actualRiskScore": 0,
+      "actualStatus": "safe",
       "actualThreat": "None",
-      "aiExplanation": "High risk detected! AI security engine flagged content with severe fraud probability."
+      "aiExplanation": "No suspicious scam indicators found. Content matches standard legitimate communication patterns."
     },
     {
       "id": 39,
@@ -909,10 +725,10 @@
       "message": "Dear Customer, your SBI netbanking account has been BLOCKED due to suspicious activity. Verify immediately at http://sbi-verify.xyz/login to unblock.",
       "expected": "HIGH",
       "actualClass": "HIGH",
-      "actualRiskScore": 75,
+      "actualRiskScore": 92,
       "actualStatus": "blocked",
       "actualThreat": "Suspicious Phishing TLD Link",
-      "aiExplanation": "High risk detected! Threat indicators found: Suspicious Phishing TLD Link. Analysis detected 1 risk factor(s):\n• URL uses high-risk untrusted TLD (http://sbi-verify.xyz/login)"
+      "aiExplanation": "High risk detected! Threat indicators found: Suspicious Phishing TLD Link. Message contains malicious phishing or fraud coercion patterns."
     },
     {
       "id": 42,
@@ -921,10 +737,10 @@
       "message": "IMPORTANT: Your HDFC Bank KYC has expired today. Your card will be deactivated in 24 hours. Update KYC now at http://hdfc-kyc-update.tk",
       "expected": "HIGH",
       "actualClass": "HIGH",
-      "actualRiskScore": 75,
+      "actualRiskScore": 92,
       "actualStatus": "blocked",
       "actualThreat": "Suspicious Phishing TLD Link",
-      "aiExplanation": "High risk detected! Threat indicators found: Suspicious Phishing TLD Link. Analysis detected 1 risk factor(s):\n• URL uses high-risk untrusted TLD (http://hdfc-kyc-update.tk)"
+      "aiExplanation": "High risk detected! Threat indicators found: Suspicious Phishing TLD Link. Message contains malicious phishing or fraud coercion patterns."
     },
     {
       "id": 43,
@@ -933,10 +749,10 @@
       "message": "Dear user, your PAN card is not linked with Income Tax account. Update PAN immediately to avoid penalty: http://pan-link.in/update",
       "expected": "HIGH",
       "actualClass": "HIGH",
-      "actualRiskScore": 95,
+      "actualRiskScore": 97,
       "actualStatus": "blocked",
       "actualThreat": "Unencrypted HTTP Link",
-      "aiExplanation": "High risk detected! Threat indicators found: Unencrypted HTTP Link, Urgency Coercion & Account Threat. Analysis detected 2 risk factor(s):\n• Message contains non-secure HTTP link\n• Threatens imminent account suspension or utility cutoff to coerce panic response"
+      "aiExplanation": "High risk detected! Threat indicators found: Unencrypted HTTP Link, Urgency Coercion & Account Threat. Message contains malicious phishing or fraud coercion patterns."
     },
     {
       "id": 44,
@@ -945,10 +761,10 @@
       "message": "Urgent Alert: Electricity connection will be disconnected tonight at 9:30 PM due to unpaid bill of Rs 480. Pay bill via http://power-pay.gq",
       "expected": "HIGH",
       "actualClass": "HIGH",
-      "actualRiskScore": 95,
+      "actualRiskScore": 100,
       "actualStatus": "blocked",
       "actualThreat": "Suspicious Phishing TLD Link",
-      "aiExplanation": "High risk detected! Threat indicators found: Suspicious Phishing TLD Link, Urgency Coercion & Account Threat. Analysis detected 2 risk factor(s):\n• URL uses high-risk untrusted TLD (http://power-pay.gq)\n• Threatens imminent account suspension or utility cutoff to coerce panic response"
+      "aiExplanation": "High risk detected! Threat indicators found: Suspicious Phishing TLD Link, Urgency Coercion & Account Threat. Message contains malicious phishing or fraud coercion patterns."
     },
     {
       "id": 45,
@@ -957,10 +773,10 @@
       "message": "Your ICICI Bank account accessed from new IP 192.168.1.1. If this was not you, lock your account immediately at http://icici-secure-login.buzz",
       "expected": "HIGH",
       "actualClass": "HIGH",
-      "actualRiskScore": 75,
+      "actualRiskScore": 92,
       "actualStatus": "blocked",
       "actualThreat": "Suspicious Phishing TLD Link",
-      "aiExplanation": "High risk detected! Threat indicators found: Suspicious Phishing TLD Link. Analysis detected 1 risk factor(s):\n• URL uses high-risk untrusted TLD (http://icici-secure-login.buzz)"
+      "aiExplanation": "High risk detected! Threat indicators found: Suspicious Phishing TLD Link. Message contains malicious phishing or fraud coercion patterns."
     },
     {
       "id": 46,
@@ -969,10 +785,10 @@
       "message": "Govt of India Notice: You are eligible for Rs. 5,000 Income Tax refund. Claim your refund directly to bank account at http://tax-refund.top",
       "expected": "HIGH",
       "actualClass": "HIGH",
-      "actualRiskScore": 75,
+      "actualRiskScore": 100,
       "actualStatus": "blocked",
       "actualThreat": "Suspicious Phishing TLD Link",
-      "aiExplanation": "High risk detected! Threat indicators found: Suspicious Phishing TLD Link. Analysis detected 1 risk factor(s):\n• URL uses high-risk untrusted TLD (http://tax-refund.top)"
+      "aiExplanation": "High risk detected! Threat indicators found: Suspicious Phishing TLD Link, Advance Fee & Cashback / Reward Scam. Message contains malicious phishing or fraud coercion patterns."
     },
     {
       "id": 47,
@@ -981,10 +797,10 @@
       "message": "Jio Alert: Your SIM card will be deactivated within 2 hours due to pending KYC verification. Update documents at http://jio-kyc-verify.click",
       "expected": "HIGH",
       "actualClass": "HIGH",
-      "actualRiskScore": 75,
+      "actualRiskScore": 97,
       "actualStatus": "blocked",
       "actualThreat": "Suspicious Phishing TLD Link",
-      "aiExplanation": "High risk detected! Threat indicators found: Suspicious Phishing TLD Link. Analysis detected 1 risk factor(s):\n• URL uses high-risk untrusted TLD (http://jio-kyc-verify.click)"
+      "aiExplanation": "High risk detected! Threat indicators found: Suspicious Phishing TLD Link, Urgency Coercion & Account Threat, Artificial Urgency Coercion. Message contains malicious phishing or fraud coercion patterns."
     },
     {
       "id": 48,
@@ -993,10 +809,10 @@
       "message": "You have 4,850 unclaimed SBI Reward Points expiring today worth Rs. 9,700! Redeem points for cash in bank at http://sbi-reward-claim.link",
       "expected": "HIGH",
       "actualClass": "HIGH",
-      "actualRiskScore": 75,
+      "actualRiskScore": 92,
       "actualStatus": "blocked",
       "actualThreat": "Suspicious Phishing TLD Link",
-      "aiExplanation": "High risk detected! Threat indicators found: Suspicious Phishing TLD Link. Analysis detected 1 risk factor(s):\n• URL uses high-risk untrusted TLD (http://sbi-reward-claim.link)"
+      "aiExplanation": "High risk detected! Threat indicators found: Suspicious Phishing TLD Link. Message contains malicious phishing or fraud coercion patterns."
     },
     {
       "id": 49,
@@ -1005,10 +821,10 @@
       "message": "Congratulations! Axis Bank approved Credit Limit increase to Rs. 5,00,000. Accept offer immediately at http://axis-limit-upgrade.work",
       "expected": "HIGH",
       "actualClass": "HIGH",
-      "actualRiskScore": 76,
+      "actualRiskScore": 92,
       "actualStatus": "blocked",
       "actualThreat": "Suspicious Phishing TLD Link",
-      "aiExplanation": "High risk detected! Threat indicators found: Suspicious Phishing TLD Link. Analysis detected 1 risk factor(s):\n• URL uses high-risk untrusted TLD (http://axis-limit-upgrade.work)"
+      "aiExplanation": "High risk detected! Threat indicators found: Suspicious Phishing TLD Link. Message contains malicious phishing or fraud coercion patterns."
     },
     {
       "id": 50,
@@ -1017,10 +833,10 @@
       "message": "IndiaPost: Parcel #IN9012481 cannot be delivered due to wrong house address. Update address & pay Rs 25 fee at http://indiapost-redelivery.date",
       "expected": "HIGH",
       "actualClass": "MEDIUM",
-      "actualRiskScore": 44,
+      "actualRiskScore": 55,
       "actualStatus": "flagged",
       "actualThreat": "Suspicious Phishing TLD Link",
-      "aiExplanation": "Suspicious patterns flagged: Suspicious Phishing TLD Link. Analysis detected 1 risk factor(s):\n• URL uses high-risk untrusted TLD (http://indiapost-redelivery.date)"
+      "aiExplanation": "Suspicious patterns flagged: Suspicious Phishing TLD Link. Content exhibits characteristics commonly associated with scam attempts."
     },
     {
       "id": 51,
@@ -1028,11 +844,11 @@
       "subcategory": "WhatsApp Block",
       "message": "WhatsApp Warning: Your account is scheduled for deletion due to violation of TOS. Verify phone number now at http://whatsapp-verify.racing",
       "expected": "HIGH",
-      "actualClass": "HIGH",
-      "actualRiskScore": 75,
-      "actualStatus": "blocked",
+      "actualClass": "MEDIUM",
+      "actualRiskScore": 55,
+      "actualStatus": "flagged",
       "actualThreat": "Suspicious Phishing TLD Link",
-      "aiExplanation": "High risk detected! Threat indicators found: Suspicious Phishing TLD Link. Analysis detected 1 risk factor(s):\n• URL uses high-risk untrusted TLD (http://whatsapp-verify.racing)"
+      "aiExplanation": "Suspicious patterns flagged: Suspicious Phishing TLD Link. Content exhibits characteristics commonly associated with scam attempts."
     },
     {
       "id": 52,
@@ -1041,10 +857,10 @@
       "message": "ATM Alert: Your ATM Debit Card will expire tonight. Request new chip card free of cost by filling form at http://atm-card-renew.review",
       "expected": "HIGH",
       "actualClass": "HIGH",
-      "actualRiskScore": 76,
+      "actualRiskScore": 97,
       "actualStatus": "blocked",
       "actualThreat": "Suspicious Phishing TLD Link",
-      "aiExplanation": "High risk detected! Threat indicators found: Suspicious Phishing TLD Link. Analysis detected 1 risk factor(s):\n• URL uses high-risk untrusted TLD (http://atm-card-renew.review)"
+      "aiExplanation": "High risk detected! Threat indicators found: Suspicious Phishing TLD Link, Urgency Coercion & Account Threat. Message contains malicious phishing or fraud coercion patterns."
     },
     {
       "id": 53,
@@ -1052,11 +868,11 @@
       "subcategory": "Aadhaar Update",
       "message": "UIDAI Notice: Your Aadhaar biometric is locked. Unlock Aadhaar to avoid bank account suspension at http://uidai-aadhaar-update.ml",
       "expected": "HIGH",
-      "actualClass": "HIGH",
-      "actualRiskScore": 78,
-      "actualStatus": "blocked",
+      "actualClass": "MEDIUM",
+      "actualRiskScore": 55,
+      "actualStatus": "flagged",
       "actualThreat": "Suspicious Phishing TLD Link",
-      "aiExplanation": "High risk detected! Threat indicators found: Suspicious Phishing TLD Link. Analysis detected 1 risk factor(s):\n• URL uses high-risk untrusted TLD (http://uidai-aadhaar-update.ml)"
+      "aiExplanation": "Suspicious patterns flagged: Suspicious Phishing TLD Link. Content exhibits characteristics commonly associated with scam attempts."
     },
     {
       "id": 54,
@@ -1065,10 +881,10 @@
       "message": "Traffic Police E-Challan: Over-speeding fine of Rs. 1,000 generated for vehicle MH02AB1234. Pay fine before court action at http://echallan-pay.cf",
       "expected": "HIGH",
       "actualClass": "HIGH",
-      "actualRiskScore": 75,
+      "actualRiskScore": 100,
       "actualStatus": "blocked",
       "actualThreat": "Suspicious Phishing TLD Link",
-      "aiExplanation": "High risk detected! Threat indicators found: Suspicious Phishing TLD Link. Analysis detected 1 risk factor(s):\n• URL uses high-risk untrusted TLD (http://echallan-pay.cf)"
+      "aiExplanation": "High risk detected! Threat indicators found: Suspicious Phishing TLD Link, Urgency Coercion & Account Threat. Message contains malicious phishing or fraud coercion patterns."
     },
     {
       "id": 55,
@@ -1077,10 +893,10 @@
       "message": "NHAI Alert: Your FASTag balance is negative and blacklisted. Re-activate FASTag to avoid 2x toll fee at http://fastag-recharge.buzz",
       "expected": "HIGH",
       "actualClass": "HIGH",
-      "actualRiskScore": 95,
+      "actualRiskScore": 100,
       "actualStatus": "blocked",
       "actualThreat": "Suspicious Phishing TLD Link",
-      "aiExplanation": "High risk detected! Threat indicators found: Suspicious Phishing TLD Link, Urgency Coercion & Account Threat. Analysis detected 2 risk factor(s):\n• URL uses high-risk untrusted TLD (http://fastag-recharge.buzz)\n• Threatens imminent account suspension or utility cutoff to coerce panic response"
+      "aiExplanation": "High risk detected! Threat indicators found: Suspicious Phishing TLD Link, Urgency Coercion & Account Threat. Message contains malicious phishing or fraud coercion patterns."
     },
     {
       "id": 56,
@@ -1088,11 +904,11 @@
       "subcategory": "EPFO Claim",
       "message": "EPFO Notice: Your Provident Fund interest of Rs 34,200 is approved. Submit bank account details to claim at http://epfo-claim-portal.online",
       "expected": "HIGH",
-      "actualClass": "HIGH",
-      "actualRiskScore": 84,
-      "actualStatus": "blocked",
+      "actualClass": "MEDIUM",
+      "actualRiskScore": 55,
+      "actualStatus": "flagged",
       "actualThreat": "Suspicious Phishing TLD Link",
-      "aiExplanation": "High risk detected! Threat indicators found: Suspicious Phishing TLD Link. Analysis detected 1 risk factor(s):\n• URL uses high-risk untrusted TLD (http://epfo-claim-portal.online)"
+      "aiExplanation": "Suspicious patterns flagged: Suspicious Phishing TLD Link. Content exhibits characteristics commonly associated with scam attempts."
     },
     {
       "id": 57,
@@ -1101,10 +917,10 @@
       "message": "Paytm Offer: You received Rs. 2,999 cashback in Paytm Wallet! Click here to transfer cashback to bank: http://paytm-cashback-claim.xyz",
       "expected": "HIGH",
       "actualClass": "HIGH",
-      "actualRiskScore": 83,
+      "actualRiskScore": 100,
       "actualStatus": "blocked",
       "actualThreat": "Suspicious Phishing TLD Link",
-      "aiExplanation": "High risk detected! Threat indicators found: Suspicious Phishing TLD Link. Analysis detected 1 risk factor(s):\n• URL uses high-risk untrusted TLD (http://paytm-cashback-claim.xyz)"
+      "aiExplanation": "High risk detected! Threat indicators found: Suspicious Phishing TLD Link, Advance Fee & Cashback / Reward Scam. Message contains malicious phishing or fraud coercion patterns."
     },
     {
       "id": 58,
@@ -1113,10 +929,10 @@
       "message": "LIC Insurance Notice: Policy #8920194 will lapse today. Pay renewal premium with 50% discount at http://lic-premium-pay.top",
       "expected": "HIGH",
       "actualClass": "HIGH",
-      "actualRiskScore": 75,
+      "actualRiskScore": 97,
       "actualStatus": "blocked",
       "actualThreat": "Suspicious Phishing TLD Link",
-      "aiExplanation": "High risk detected! Threat indicators found: Suspicious Phishing TLD Link. Analysis detected 1 risk factor(s):\n• URL uses high-risk untrusted TLD (http://lic-premium-pay.top)"
+      "aiExplanation": "High risk detected! Threat indicators found: Suspicious Phishing TLD Link, Urgency Coercion & Account Threat. Message contains malicious phishing or fraud coercion patterns."
     },
     {
       "id": 59,
@@ -1125,10 +941,10 @@
       "message": "Kotak Bank: Netbanking suspended due to invalid OTP attempts. Click link to re-activate account: http://kotak-netbank-reset.click",
       "expected": "HIGH",
       "actualClass": "HIGH",
-      "actualRiskScore": 95,
+      "actualRiskScore": 97,
       "actualStatus": "blocked",
       "actualThreat": "Suspicious Phishing TLD Link",
-      "aiExplanation": "High risk detected! Threat indicators found: Suspicious Phishing TLD Link, Urgency Coercion & Account Threat. Analysis detected 2 risk factor(s):\n• URL uses high-risk untrusted TLD (http://kotak-netbank-reset.click)\n• Threatens imminent account suspension or utility cutoff to coerce panic response"
+      "aiExplanation": "High risk detected! Threat indicators found: Suspicious Phishing TLD Link, Urgency Coercion & Account Threat. Message contains malicious phishing or fraud coercion patterns."
     },
     {
       "id": 60,
@@ -1137,10 +953,10 @@
       "message": "Netflix Payment Failed: Your subscription is suspended. Update credit card details immediately to continue watching: http://netflix-billing-fix.link",
       "expected": "HIGH",
       "actualClass": "HIGH",
-      "actualRiskScore": 77,
+      "actualRiskScore": 92,
       "actualStatus": "blocked",
       "actualThreat": "Suspicious Phishing TLD Link",
-      "aiExplanation": "High risk detected! Threat indicators found: Suspicious Phishing TLD Link. Analysis detected 1 risk factor(s):\n• URL uses high-risk untrusted TLD (http://netflix-billing-fix.link)"
+      "aiExplanation": "High risk detected! Threat indicators found: Suspicious Phishing TLD Link. Message contains malicious phishing or fraud coercion patterns."
     },
     {
       "id": 61,
@@ -1149,10 +965,10 @@
       "message": "Congratulations! You won Rs.25,00,000 in KBC Lucky Draw 2026! Send Rs.5,000 processing fee to Manager SBI Bank to claim prize money.",
       "expected": "HIGH",
       "actualClass": "HIGH",
-      "actualRiskScore": 95,
+      "actualRiskScore": 85,
       "actualStatus": "blocked",
-      "actualThreat": "Advance Fee & Impersonation Scam",
-      "aiExplanation": "High risk detected! Threat indicators found: Advance Fee & Impersonation Scam. Analysis detected 1 risk factor(s):\n• Demands upfront fees, deposits, or taxes for fake prizes, parcels, jobs, or deals"
+      "actualThreat": "Advance Fee & Cashback / Reward Scam",
+      "aiExplanation": "High risk detected! Threat indicators found: Advance Fee & Cashback / Reward Scam. Message contains malicious phishing or fraud coercion patterns."
     },
     {
       "id": 62,
@@ -1161,10 +977,10 @@
       "message": "Earn Rs 5,000 daily from home! Guaranteed 100% daily profit on crypto trading. Minimum investment Rs 1,000. Join WhatsApp group: bit.ly/crypto-earn",
       "expected": "HIGH",
       "actualClass": "HIGH",
-      "actualRiskScore": 95,
+      "actualRiskScore": 85,
       "actualStatus": "blocked",
       "actualThreat": "Fake Investment / Instant Loan Scam",
-      "aiExplanation": "High risk detected! Threat indicators found: Fake Investment / Instant Loan Scam. Analysis detected 1 risk factor(s):\n• Guarantees unrealistic financial returns or instant loans with advance processing fees"
+      "aiExplanation": "High risk detected! Threat indicators found: Fake Investment / Instant Loan Scam. Message contains malicious phishing or fraud coercion patterns."
     },
     {
       "id": 63,
@@ -1173,10 +989,10 @@
       "message": "Special Bitcoin promo! Deposit 0.05 BTC and get 0.10 BTC back instantly (2x return). Send funds to wallet address now.",
       "expected": "HIGH",
       "actualClass": "HIGH",
-      "actualRiskScore": 95,
+      "actualRiskScore": 85,
       "actualStatus": "blocked",
       "actualThreat": "Fake Investment / Instant Loan Scam",
-      "aiExplanation": "High risk detected! Threat indicators found: Fake Investment / Instant Loan Scam. Analysis detected 1 risk factor(s):\n• Guarantees unrealistic financial returns or instant loans with advance processing fees"
+      "aiExplanation": "High risk detected! Threat indicators found: Fake Investment / Instant Loan Scam. Message contains malicious phishing or fraud coercion patterns."
     },
     {
       "id": 64,
@@ -1188,7 +1004,7 @@
       "actualRiskScore": 85,
       "actualStatus": "blocked",
       "actualThreat": "Task / Work-From-Home Job Scam",
-      "aiExplanation": "High risk detected! Threat indicators found: Task / Work-From-Home Job Scam. Analysis detected 1 risk factor(s):\n• Promotes suspicious task-based income schemes requiring prepaid deposits or WhatsApp contact"
+      "aiExplanation": "High risk detected! Threat indicators found: Task / Work-From-Home Job Scam. Message contains malicious phishing or fraud coercion patterns."
     },
     {
       "id": 65,
@@ -1197,10 +1013,10 @@
       "message": "PM Mudra Scheme: Pre-approved loan of Rs. 5,00,000 at 2% interest rate. No CIBIL score required. Pay Rs. 2,500 file processing fee to disburse.",
       "expected": "HIGH",
       "actualClass": "HIGH",
-      "actualRiskScore": 95,
+      "actualRiskScore": 85,
       "actualStatus": "blocked",
       "actualThreat": "Fake Investment / Instant Loan Scam",
-      "aiExplanation": "High risk detected! Threat indicators found: Fake Investment / Instant Loan Scam. Analysis detected 1 risk factor(s):\n• Guarantees unrealistic financial returns or instant loans with advance processing fees"
+      "aiExplanation": "High risk detected! Threat indicators found: Fake Investment / Instant Loan Scam. Message contains malicious phishing or fraud coercion patterns."
     },
     {
       "id": 66,
@@ -1209,10 +1025,10 @@
       "message": "Unclaimed LIC Bonus: Rs 4,50,000 bonus pending on your old policy. Pay Rs 12,000 clearance tax to release funds to your bank account.",
       "expected": "HIGH",
       "actualClass": "HIGH",
-      "actualRiskScore": 95,
+      "actualRiskScore": 85,
       "actualStatus": "blocked",
-      "actualThreat": "Advance Fee & Impersonation Scam",
-      "aiExplanation": "High risk detected! Threat indicators found: Advance Fee & Impersonation Scam. Analysis detected 1 risk factor(s):\n• Demands upfront fees, deposits, or taxes for fake prizes, parcels, jobs, or deals"
+      "actualThreat": "Advance Fee & Cashback / Reward Scam",
+      "aiExplanation": "High risk detected! Threat indicators found: Advance Fee & Cashback / Reward Scam. Message contains malicious phishing or fraud coercion patterns."
     },
     {
       "id": 67,
@@ -1221,10 +1037,10 @@
       "message": "Guaranteed 500% returns in Stock Market! Get insider Jackpot stock tips daily with 100% accuracy. Deposit Rs 10,000 for VIP membership.",
       "expected": "HIGH",
       "actualClass": "HIGH",
-      "actualRiskScore": 95,
+      "actualRiskScore": 85,
       "actualStatus": "blocked",
       "actualThreat": "Fake Investment / Instant Loan Scam",
-      "aiExplanation": "High risk detected! Threat indicators found: Fake Investment / Instant Loan Scam. Analysis detected 1 risk factor(s):\n• Guarantees unrealistic financial returns or instant loans with advance processing fees"
+      "aiExplanation": "High risk detected! Threat indicators found: Fake Investment / Instant Loan Scam. Message contains malicious phishing or fraud coercion patterns."
     },
     {
       "id": 68,
@@ -1233,10 +1049,10 @@
       "message": "Customs Dept Alert: Package with expensive foreign gifts seized at Delhi Airport. Pay Rs 28,500 customs duty tax to release parcel.",
       "expected": "HIGH",
       "actualClass": "HIGH",
-      "actualRiskScore": 95,
+      "actualRiskScore": 85,
       "actualStatus": "blocked",
-      "actualThreat": "Advance Fee & Impersonation Scam",
-      "aiExplanation": "High risk detected! Threat indicators found: Advance Fee & Impersonation Scam. Analysis detected 1 risk factor(s):\n• Demands upfront fees, deposits, or taxes for fake prizes, parcels, jobs, or deals"
+      "actualThreat": "Advance Fee & Cashback / Reward Scam",
+      "aiExplanation": "High risk detected! Threat indicators found: Advance Fee & Cashback / Reward Scam. Message contains malicious phishing or fraud coercion patterns."
     },
     {
       "id": 69,
@@ -1245,10 +1061,10 @@
       "message": "Complete 3 hotel review tasks and earn Rs 1,500 instantly in UPI wallet! Prepaid task deposit required to unlock level 2 commission.",
       "expected": "HIGH",
       "actualClass": "HIGH",
-      "actualRiskScore": 95,
+      "actualRiskScore": 85,
       "actualStatus": "blocked",
       "actualThreat": "Task / Work-From-Home Job Scam",
-      "aiExplanation": "High risk detected! Threat indicators found: Task / Work-From-Home Job Scam. Analysis detected 1 risk factor(s):\n• Promotes suspicious task-based income schemes requiring prepaid deposits or WhatsApp contact"
+      "aiExplanation": "High risk detected! Threat indicators found: Task / Work-From-Home Job Scam. Message contains malicious phishing or fraud coercion patterns."
     },
     {
       "id": 70,
@@ -1260,7 +1076,7 @@
       "actualRiskScore": 95,
       "actualStatus": "blocked",
       "actualThreat": "Task / Work-From-Home Job Scam",
-      "aiExplanation": "High risk detected! Threat indicators found: Task / Work-From-Home Job Scam. Analysis detected 1 risk factor(s):\n• Promotes suspicious task-based income schemes requiring prepaid deposits or WhatsApp contact"
+      "aiExplanation": "High risk detected! Threat indicators found: Task / Work-From-Home Job Scam. Message contains malicious phishing or fraud coercion patterns."
     },
     {
       "id": 71,
@@ -1269,10 +1085,10 @@
       "message": "You spun the wheel & won an iPhone 15 Pro Max! Pay Rs 499 shipping delivery charges to claim your free gift: http://shorturl.at/win-iphone",
       "expected": "HIGH",
       "actualClass": "HIGH",
-      "actualRiskScore": 95,
+      "actualRiskScore": 100,
       "actualStatus": "blocked",
       "actualThreat": "Shortened Destination URL",
-      "aiExplanation": "High risk detected! Threat indicators found: Shortened Destination URL, Advance Fee & Impersonation Scam. Analysis detected 2 risk factor(s):\n• URL shortener hides actual domain destination (http://shorturl.at/win-iphone)\n• Demands upfront fees, deposits, or taxes for fake prizes, parcels, jobs, or deals"
+      "aiExplanation": "High risk detected! Threat indicators found: Shortened Destination URL, Advance Fee & Cashback / Reward Scam. Message contains malicious phishing or fraud coercion patterns."
     },
     {
       "id": 72,
@@ -1281,10 +1097,10 @@
       "message": "Digital Gold Trading: Double your money in 15 days! Government approved gold investment scheme with 100% money back guarantee.",
       "expected": "HIGH",
       "actualClass": "HIGH",
-      "actualRiskScore": 95,
+      "actualRiskScore": 85,
       "actualStatus": "blocked",
       "actualThreat": "Fake Investment / Instant Loan Scam",
-      "aiExplanation": "High risk detected! Threat indicators found: Fake Investment / Instant Loan Scam. Analysis detected 1 risk factor(s):\n• Guarantees unrealistic financial returns or instant loans with advance processing fees"
+      "aiExplanation": "High risk detected! Threat indicators found: Fake Investment / Instant Loan Scam. Message contains malicious phishing or fraud coercion patterns."
     },
     {
       "id": 73,
@@ -1293,10 +1109,10 @@
       "message": "Auto Forex Trading Robot: 99% win rate! Earn $500 daily on autopilot. Deposit $100 via UPI now to activate trading bot.",
       "expected": "HIGH",
       "actualClass": "HIGH",
-      "actualRiskScore": 95,
+      "actualRiskScore": 85,
       "actualStatus": "blocked",
       "actualThreat": "Fake Investment / Instant Loan Scam",
-      "aiExplanation": "High risk detected! Threat indicators found: Fake Investment / Instant Loan Scam. Analysis detected 1 risk factor(s):\n• Guarantees unrealistic financial returns or instant loans with advance processing fees"
+      "aiExplanation": "High risk detected! Threat indicators found: Fake Investment / Instant Loan Scam. Message contains malicious phishing or fraud coercion patterns."
     },
     {
       "id": 74,
@@ -1305,10 +1121,10 @@
       "message": "Airtel 5G Tower Installation: Earn Rs 45,000 monthly rent + Rs 25 Lakh advance! Pay Rs 5,500 registration fee for site survey.",
       "expected": "HIGH",
       "actualClass": "HIGH",
-      "actualRiskScore": 95,
+      "actualRiskScore": 85,
       "actualStatus": "blocked",
-      "actualThreat": "Advance Fee & Impersonation Scam",
-      "aiExplanation": "High risk detected! Threat indicators found: Advance Fee & Impersonation Scam. Analysis detected 1 risk factor(s):\n• Demands upfront fees, deposits, or taxes for fake prizes, parcels, jobs, or deals"
+      "actualThreat": "Advance Fee & Cashback / Reward Scam",
+      "aiExplanation": "High risk detected! Threat indicators found: Advance Fee & Cashback / Reward Scam. Message contains malicious phishing or fraud coercion patterns."
     },
     {
       "id": 75,
@@ -1319,8 +1135,8 @@
       "actualClass": "HIGH",
       "actualRiskScore": 85,
       "actualStatus": "blocked",
-      "actualThreat": "Advance Fee & Impersonation Scam",
-      "aiExplanation": "High risk detected! Threat indicators found: Advance Fee & Impersonation Scam. Analysis detected 1 risk factor(s):\n• Demands upfront fees, deposits, or taxes for fake prizes, parcels, jobs, or deals"
+      "actualThreat": "Advance Fee & Cashback / Reward Scam",
+      "aiExplanation": "High risk detected! Threat indicators found: Advance Fee & Cashback / Reward Scam. Message contains malicious phishing or fraud coercion patterns."
     },
     {
       "id": 76,
@@ -1331,8 +1147,8 @@
       "actualClass": "HIGH",
       "actualRiskScore": 85,
       "actualStatus": "blocked",
-      "actualThreat": "Advance Fee & Impersonation Scam",
-      "aiExplanation": "High risk detected! Threat indicators found: Advance Fee & Impersonation Scam. Analysis detected 1 risk factor(s):\n• Demands upfront fees, deposits, or taxes for fake prizes, parcels, jobs, or deals"
+      "actualThreat": "Advance Fee & Cashback / Reward Scam",
+      "aiExplanation": "High risk detected! Threat indicators found: Advance Fee & Cashback / Reward Scam. Message contains malicious phishing or fraud coercion patterns."
     },
     {
       "id": 77,
@@ -1340,11 +1156,11 @@
       "subcategory": "Rummy/Casino Scam",
       "message": "Deposit Rs 100 and get Rs 10,000 bonus cash in Rummy app! 100% winning trick hack unlocked. Download app now: http://cutt.ly/win-rummy",
       "expected": "HIGH",
-      "actualClass": "HIGH",
-      "actualRiskScore": 75,
-      "actualStatus": "blocked",
+      "actualClass": "MEDIUM",
+      "actualRiskScore": 45,
+      "actualStatus": "flagged",
       "actualThreat": "Shortened Destination URL",
-      "aiExplanation": "High risk detected! Threat indicators found: Shortened Destination URL. Analysis detected 1 risk factor(s):\n• URL shortener hides actual domain destination (http://cutt.ly/win-rummy)"
+      "aiExplanation": "Suspicious patterns flagged: Shortened Destination URL. Content exhibits characteristics commonly associated with scam attempts."
     },
     {
       "id": 78,
@@ -1353,10 +1169,10 @@
       "message": "Earn USDT free every hour! Join Telegram bot & invite 5 friends to withdraw $100 directly to Binance account.",
       "expected": "HIGH",
       "actualClass": "HIGH",
-      "actualRiskScore": 95,
+      "actualRiskScore": 85,
       "actualStatus": "blocked",
       "actualThreat": "Task / Work-From-Home Job Scam",
-      "aiExplanation": "High risk detected! Threat indicators found: Task / Work-From-Home Job Scam. Analysis detected 1 risk factor(s):\n• Promotes suspicious task-based income schemes requiring prepaid deposits or WhatsApp contact"
+      "aiExplanation": "High risk detected! Threat indicators found: Task / Work-From-Home Job Scam. Message contains malicious phishing or fraud coercion patterns."
     },
     {
       "id": 79,
@@ -1365,10 +1181,10 @@
       "message": "Congratulations! Your mobile number won Tata Harrier car in Shoppers Stop Lucky Draw! Transfer Rs 12,500 RTO tax fee to claim.",
       "expected": "HIGH",
       "actualClass": "HIGH",
-      "actualRiskScore": 95,
+      "actualRiskScore": 85,
       "actualStatus": "blocked",
-      "actualThreat": "Advance Fee & Impersonation Scam",
-      "aiExplanation": "High risk detected! Threat indicators found: Advance Fee & Impersonation Scam. Analysis detected 1 risk factor(s):\n• Demands upfront fees, deposits, or taxes for fake prizes, parcels, jobs, or deals"
+      "actualThreat": "Advance Fee & Cashback / Reward Scam",
+      "aiExplanation": "High risk detected! Threat indicators found: Advance Fee & Cashback / Reward Scam. Message contains malicious phishing or fraud coercion patterns."
     },
     {
       "id": 80,
@@ -1377,10 +1193,10 @@
       "message": "Instant Loan of Rs. 2,00,000 approved in 5 minutes! No documents needed. Transfer Rs 1,999 processing charge to get money in bank.",
       "expected": "HIGH",
       "actualClass": "HIGH",
-      "actualRiskScore": 95,
+      "actualRiskScore": 85,
       "actualStatus": "blocked",
       "actualThreat": "Fake Investment / Instant Loan Scam",
-      "aiExplanation": "High risk detected! Threat indicators found: Fake Investment / Instant Loan Scam. Analysis detected 1 risk factor(s):\n• Guarantees unrealistic financial returns or instant loans with advance processing fees"
+      "aiExplanation": "High risk detected! Threat indicators found: Fake Investment / Instant Loan Scam. Message contains malicious phishing or fraud coercion patterns."
     },
     {
       "id": 81,
@@ -1392,7 +1208,7 @@
       "actualRiskScore": 85,
       "actualStatus": "blocked",
       "actualThreat": "Relative / Landlord Emergency Fraud",
-      "aiExplanation": "High risk detected! Threat indicators found: Relative / Landlord Emergency Fraud. Analysis detected 1 risk factor(s):\n• Simulates emergency distress or changed payment handles to request urgent fund transfer"
+      "aiExplanation": "High risk detected! Threat indicators found: Relative / Landlord Emergency Fraud. Message contains malicious phishing or fraud coercion patterns."
     },
     {
       "id": 82,
@@ -1404,7 +1220,7 @@
       "actualRiskScore": 95,
       "actualStatus": "blocked",
       "actualThreat": "Digital Arrest & Police / Govt Coercion",
-      "aiExplanation": "High risk detected! Threat indicators found: Digital Arrest & Police / Govt Coercion. Analysis detected 1 risk factor(s):\n• Impersonates law enforcement or government authorities demanding compliance under threat of legal action"
+      "aiExplanation": "High risk detected! Threat indicators found: Digital Arrest & Police / Govt Coercion. Message contains malicious phishing or fraud coercion patterns."
     },
     {
       "id": 83,
@@ -1413,10 +1229,10 @@
       "message": "RBI Security Officer: Your bank account is flagged for illegal foreign transaction. Share your OTP now with officer over call to prevent permanent account seizure.",
       "expected": "HIGH",
       "actualClass": "HIGH",
-      "actualRiskScore": 95,
+      "actualRiskScore": 85,
       "actualStatus": "blocked",
       "actualThreat": "Credential / OTP Extraction Request",
-      "aiExplanation": "High risk detected! Threat indicators found: Credential / OTP Extraction Request. Analysis detected 1 risk factor(s):\n• Requests sharing of OTP or confidential banking credentials"
+      "aiExplanation": "High risk detected! Threat indicators found: Credential / OTP Extraction Request. Message contains malicious phishing or fraud coercion patterns."
     },
     {
       "id": 84,
@@ -1427,8 +1243,8 @@
       "actualClass": "HIGH",
       "actualRiskScore": 85,
       "actualStatus": "blocked",
-      "actualThreat": "Remote Desktop App Request",
-      "aiExplanation": "High risk detected! Threat indicators found: Remote Desktop App Request. Analysis detected 1 risk factor(s):\n• Instructs user to install remote desktop control applications (AnyDesk/TeamViewer)"
+      "actualThreat": "Remote App & APK Malware Request",
+      "aiExplanation": "High risk detected! Threat indicators found: Remote App & APK Malware Request. Message contains malicious phishing or fraud coercion patterns."
     },
     {
       "id": 85,
@@ -1439,8 +1255,8 @@
       "actualClass": "HIGH",
       "actualRiskScore": 85,
       "actualStatus": "blocked",
-      "actualThreat": "Remote Desktop App Request",
-      "aiExplanation": "High risk detected! Threat indicators found: Remote Desktop App Request. Analysis detected 1 risk factor(s):\n• Instructs user to install remote desktop control applications (AnyDesk/TeamViewer)"
+      "actualThreat": "Remote App & APK Malware Request",
+      "aiExplanation": "High risk detected! Threat indicators found: Remote App & APK Malware Request. Message contains malicious phishing or fraud coercion patterns."
     },
     {
       "id": 86,
@@ -1452,7 +1268,7 @@
       "actualRiskScore": 85,
       "actualStatus": "blocked",
       "actualThreat": "Credential / OTP Extraction Request",
-      "aiExplanation": "High risk detected! Threat indicators found: Credential / OTP Extraction Request. Analysis detected 1 risk factor(s):\n• Requests sharing of OTP or confidential banking credentials"
+      "aiExplanation": "High risk detected! Threat indicators found: Credential / OTP Extraction Request. Message contains malicious phishing or fraud coercion patterns."
     },
     {
       "id": 87,
@@ -1461,10 +1277,10 @@
       "message": "I am Army Officer posted at Cantonment. Selling my Royal Enfield bike for Rs 45,000 due to urgent transfer. Scan this QR code to pay Rs 5,000 booking token money.",
       "expected": "HIGH",
       "actualClass": "HIGH",
-      "actualRiskScore": 85,
+      "actualRiskScore": 95,
       "actualStatus": "blocked",
       "actualThreat": "Payment Manipulation / Over-Refund Trick",
-      "aiExplanation": "High risk detected! Threat indicators found: Payment Manipulation / Over-Refund Trick. Analysis detected 1 risk factor(s):\n• Uses accidental credit claims, refund tricks, or QR PIN traps to initiate unauthorized transfers"
+      "aiExplanation": "High risk detected! Threat indicators found: Payment Manipulation / Over-Refund Trick. Message contains malicious phishing or fraud coercion patterns."
     },
     {
       "id": 88,
@@ -1473,10 +1289,10 @@
       "message": "To receive Rs 10,000 refund from Flipkart into your GPay account, open GPay, scan this QR code and enter your UPI PIN to claim money.",
       "expected": "HIGH",
       "actualClass": "HIGH",
-      "actualRiskScore": 95,
+      "actualRiskScore": 85,
       "actualStatus": "blocked",
       "actualThreat": "Payment Manipulation / Over-Refund Trick",
-      "aiExplanation": "High risk detected! Threat indicators found: Payment Manipulation / Over-Refund Trick. Analysis detected 1 risk factor(s):\n• Uses accidental credit claims, refund tricks, or QR PIN traps to initiate unauthorized transfers"
+      "aiExplanation": "High risk detected! Threat indicators found: Payment Manipulation / Over-Refund Trick. Message contains malicious phishing or fraud coercion patterns."
     },
     {
       "id": 89,
@@ -1488,7 +1304,7 @@
       "actualRiskScore": 85,
       "actualStatus": "blocked",
       "actualThreat": "Relative / Landlord Emergency Fraud",
-      "aiExplanation": "High risk detected! Threat indicators found: Relative / Landlord Emergency Fraud. Analysis detected 1 risk factor(s):\n• Simulates emergency distress or changed payment handles to request urgent fund transfer"
+      "aiExplanation": "High risk detected! Threat indicators found: Relative / Landlord Emergency Fraud. Message contains malicious phishing or fraud coercion patterns."
     },
     {
       "id": 90,
@@ -1497,10 +1313,10 @@
       "message": "CBI Digital Arrest Warning: A parcel containing narcotics was intercepted at Mumbai Customs with your Aadhaar details. Stay on video call or face immediate arrest.",
       "expected": "HIGH",
       "actualClass": "HIGH",
-      "actualRiskScore": 95,
+      "actualRiskScore": 85,
       "actualStatus": "blocked",
       "actualThreat": "Digital Arrest & Police / Govt Coercion",
-      "aiExplanation": "High risk detected! Threat indicators found: Digital Arrest & Police / Govt Coercion. Analysis detected 1 risk factor(s):\n• Impersonates law enforcement or government authorities demanding compliance under threat of legal action"
+      "aiExplanation": "High risk detected! Threat indicators found: Digital Arrest & Police / Govt Coercion. Message contains malicious phishing or fraud coercion patterns."
     },
     {
       "id": 91,
@@ -1509,10 +1325,10 @@
       "message": "Uncle, Uncle! Uncle's son Rahul had a serious road accident. Admitted to ICU emergency. Urgent need of Rs 25,000 for operation. Transfer money immediately to hospital UPI.",
       "expected": "HIGH",
       "actualClass": "HIGH",
-      "actualRiskScore": 85,
+      "actualRiskScore": 95,
       "actualStatus": "blocked",
       "actualThreat": "Relative / Landlord Emergency Fraud",
-      "aiExplanation": "High risk detected! Threat indicators found: Relative / Landlord Emergency Fraud. Analysis detected 1 risk factor(s):\n• Simulates emergency distress or changed payment handles to request urgent fund transfer"
+      "aiExplanation": "High risk detected! Threat indicators found: Relative / Landlord Emergency Fraud. Message contains malicious phishing or fraud coercion patterns."
     },
     {
       "id": 92,
@@ -1521,10 +1337,10 @@
       "message": "Sir, I accidentally transferred Rs 25,000 to your GPay number instead of my brother. Please refund Rs 25,000 back to 9876509876 immediately.",
       "expected": "HIGH",
       "actualClass": "HIGH",
-      "actualRiskScore": 85,
+      "actualRiskScore": 95,
       "actualStatus": "blocked",
       "actualThreat": "Payment Manipulation / Over-Refund Trick",
-      "aiExplanation": "High risk detected! Threat indicators found: Payment Manipulation / Over-Refund Trick. Analysis detected 1 risk factor(s):\n• Uses accidental credit claims, refund tricks, or QR PIN traps to initiate unauthorized transfers"
+      "aiExplanation": "High risk detected! Threat indicators found: Payment Manipulation / Over-Refund Trick. Message contains malicious phishing or fraud coercion patterns."
     },
     {
       "id": 93,
@@ -1532,11 +1348,11 @@
       "subcategory": "Fake Electricity Officer",
       "message": "Power Supply Dept: Officer R.K. Verma here. Your power meter connection will be cut in 30 mins. Call me at 9876543210 immediately to pay bill.",
       "expected": "HIGH",
-      "actualClass": "SAFE",
-      "actualRiskScore": 28,
-      "actualStatus": "safe",
+      "actualClass": "HIGH",
+      "actualRiskScore": 85,
+      "actualStatus": "blocked",
       "actualThreat": "Urgency Coercion & Account Threat",
-      "aiExplanation": "Analysis detected 1 risk factor(s):\n• Threatens imminent account suspension or utility cutoff to coerce panic response"
+      "aiExplanation": "High risk detected! Threat indicators found: Urgency Coercion & Account Threat. Message contains malicious phishing or fraud coercion patterns."
     },
     {
       "id": 94,
@@ -1548,7 +1364,7 @@
       "actualRiskScore": 95,
       "actualStatus": "blocked",
       "actualThreat": "Credential / OTP Extraction Request",
-      "aiExplanation": "High risk detected! Threat indicators found: Credential / OTP Extraction Request. Analysis detected 1 risk factor(s):\n• Requests sharing of OTP or confidential banking credentials"
+      "aiExplanation": "High risk detected! Threat indicators found: Credential / OTP Extraction Request. Message contains malicious phishing or fraud coercion patterns."
     },
     {
       "id": 95,
@@ -1557,10 +1373,10 @@
       "message": "Indane Gas Service: Your LPG gas subsidy of Rs 380 failed. Click link & enter debit card PIN to receive subsidy directly in bank account.",
       "expected": "HIGH",
       "actualClass": "HIGH",
-      "actualRiskScore": 95,
+      "actualRiskScore": 100,
       "actualStatus": "blocked",
       "actualThreat": "Credential / OTP Extraction Request",
-      "aiExplanation": "High risk detected! Threat indicators found: Credential / OTP Extraction Request, Fake Investment / Instant Loan Scam. Analysis detected 2 risk factor(s):\n• Requests sharing of OTP or confidential banking credentials\n• Guarantees unrealistic financial returns or instant loans with advance processing fees"
+      "aiExplanation": "High risk detected! Threat indicators found: Credential / OTP Extraction Request, Fake Investment / Instant Loan Scam. Message contains malicious phishing or fraud coercion patterns."
     },
     {
       "id": 96,
@@ -1571,8 +1387,8 @@
       "actualClass": "HIGH",
       "actualRiskScore": 85,
       "actualStatus": "blocked",
-      "actualThreat": "Advance Fee & Impersonation Scam",
-      "aiExplanation": "High risk detected! Threat indicators found: Advance Fee & Impersonation Scam. Analysis detected 1 risk factor(s):\n• Demands upfront fees, deposits, or taxes for fake prizes, parcels, jobs, or deals"
+      "actualThreat": "Advance Fee & Cashback / Reward Scam",
+      "aiExplanation": "High risk detected! Threat indicators found: Advance Fee & Cashback / Reward Scam. Message contains malicious phishing or fraud coercion patterns."
     },
     {
       "id": 97,
@@ -1584,7 +1400,7 @@
       "actualRiskScore": 95,
       "actualStatus": "blocked",
       "actualThreat": "Credential / OTP Extraction Request",
-      "aiExplanation": "High risk detected! Threat indicators found: Credential / OTP Extraction Request. Analysis detected 1 risk factor(s):\n• Requests sharing of OTP or confidential banking credentials"
+      "aiExplanation": "High risk detected! Threat indicators found: Credential / OTP Extraction Request. Message contains malicious phishing or fraud coercion patterns."
     },
     {
       "id": 98,
@@ -1593,10 +1409,10 @@
       "message": "Airtel Customer Care: Upgrade your 4G SIM to 5G free of cost! Share 6-digit code received on SMS to activate 5G unlimited data.",
       "expected": "HIGH",
       "actualClass": "HIGH",
-      "actualRiskScore": 95,
+      "actualRiskScore": 85,
       "actualStatus": "blocked",
       "actualThreat": "Credential / OTP Extraction Request",
-      "aiExplanation": "High risk detected! Threat indicators found: Credential / OTP Extraction Request. Analysis detected 1 risk factor(s):\n• Requests sharing of OTP or confidential banking credentials"
+      "aiExplanation": "High risk detected! Threat indicators found: Credential / OTP Extraction Request. Message contains malicious phishing or fraud coercion patterns."
     },
     {
       "id": 99,
@@ -1605,10 +1421,10 @@
       "message": "Amazon Refund Desk: An extra payment of Rs 15,000 was refunded to your bank account by mistake. Please transfer Rs 15,000 back immediately.",
       "expected": "HIGH",
       "actualClass": "HIGH",
-      "actualRiskScore": 85,
+      "actualRiskScore": 95,
       "actualStatus": "blocked",
       "actualThreat": "Payment Manipulation / Over-Refund Trick",
-      "aiExplanation": "High risk detected! Threat indicators found: Payment Manipulation / Over-Refund Trick. Analysis detected 1 risk factor(s):\n• Uses accidental credit claims, refund tricks, or QR PIN traps to initiate unauthorized transfers"
+      "aiExplanation": "High risk detected! Threat indicators found: Payment Manipulation / Over-Refund Trick. Message contains malicious phishing or fraud coercion patterns."
     },
     {
       "id": 100,
@@ -1617,10 +1433,10 @@
       "message": "Income Tax Dept Notice: Discrepancy found in your ITR filing. Penalty of Rs 50,000 levied. Call Officer Gujral at 9876511111 to avoid tax raid.",
       "expected": "HIGH",
       "actualClass": "HIGH",
-      "actualRiskScore": 95,
+      "actualRiskScore": 85,
       "actualStatus": "blocked",
       "actualThreat": "Digital Arrest & Police / Govt Coercion",
-      "aiExplanation": "High risk detected! Threat indicators found: Digital Arrest & Police / Govt Coercion. Analysis detected 1 risk factor(s):\n• Impersonates law enforcement or government authorities demanding compliance under threat of legal action"
+      "aiExplanation": "High risk detected! Threat indicators found: Digital Arrest & Police / Govt Coercion. Message contains malicious phishing or fraud coercion patterns."
     },
     {
       "id": 101,
@@ -1628,11 +1444,11 @@
       "subcategory": "Courier Confirmation",
       "message": "Your DTDC shipment AWB D9012481 is out for delivery today. Tracking link: https://www.dtdc.in/tracking/D9012481",
       "expected": "SAFE",
-      "actualClass": "HIGH",
-      "actualRiskScore": 75,
-      "actualStatus": "blocked",
+      "actualClass": "SAFE",
+      "actualRiskScore": 0,
+      "actualStatus": "safe",
       "actualThreat": "None",
-      "aiExplanation": "High risk detected! AI security engine flagged content with severe fraud probability."
+      "aiExplanation": "No suspicious scam indicators found. Content matches standard legitimate communication patterns."
     },
     {
       "id": 102,
@@ -1688,11 +1504,11 @@
       "subcategory": "Bank Official Portal",
       "message": "Welcome to HDFC NetBanking! Protect your account by visiting our official website https://www.hdfcbank.com. Never share passwords.",
       "expected": "SAFE",
-      "actualClass": "HIGH",
-      "actualRiskScore": 75,
-      "actualStatus": "blocked",
+      "actualClass": "SAFE",
+      "actualRiskScore": 0,
+      "actualStatus": "safe",
       "actualThreat": "None",
-      "aiExplanation": "High risk detected! AI security engine flagged content with severe fraud probability."
+      "aiExplanation": "No suspicious scam indicators found. Content matches standard legitimate communication patterns."
     },
     {
       "id": 107,
@@ -1700,11 +1516,11 @@
       "subcategory": "OTP Warning Notice",
       "message": "Your OTP for login is 591024. NEVER share this OTP with anyone, even if they claim to be calling from your bank.",
       "expected": "SAFE",
-      "actualClass": "HIGH",
-      "actualRiskScore": 75,
-      "actualStatus": "blocked",
+      "actualClass": "SAFE",
+      "actualRiskScore": 0,
+      "actualStatus": "safe",
       "actualThreat": "None",
-      "aiExplanation": "High risk detected! AI security engine flagged content with severe fraud probability."
+      "aiExplanation": "No suspicious scam indicators found. Content matches standard legitimate communication patterns."
     },
     {
       "id": 108,
@@ -1712,11 +1528,11 @@
       "subcategory": "Utility Due Reminder",
       "message": "Mahanagar Gas Bill Reminder: Bill of Rs 640.00 for Consumer No 901284 is due on 02-AUG. Pay online at https://www.mahanagargas.com",
       "expected": "SAFE",
-      "actualClass": "HIGH",
-      "actualRiskScore": 75,
-      "actualStatus": "blocked",
+      "actualClass": "SAFE",
+      "actualRiskScore": 0,
+      "actualStatus": "safe",
       "actualThreat": "None",
-      "aiExplanation": "High risk detected! AI security engine flagged content with severe fraud probability."
+      "aiExplanation": "No suspicious scam indicators found. Content matches standard legitimate communication patterns."
     },
     {
       "id": 109,
@@ -1724,11 +1540,11 @@
       "subcategory": "Survey Link",
       "message": "Thank you for visiting TATA Croma! Share your shopping experience survey: https://feedback.croma.com/survey/9012",
       "expected": "SAFE",
-      "actualClass": "HIGH",
-      "actualRiskScore": 75,
-      "actualStatus": "blocked",
+      "actualClass": "SAFE",
+      "actualRiskScore": 0,
+      "actualStatus": "safe",
       "actualThreat": "None",
-      "aiExplanation": "High risk detected! AI security engine flagged content with severe fraud probability."
+      "aiExplanation": "No suspicious scam indicators found. Content matches standard legitimate communication patterns."
     },
     {
       "id": 110,
@@ -1820,11 +1636,11 @@
       "subcategory": "Credit Card Limit Increase Legitimate",
       "message": "SBI Card Alert: Based on your good repayment record, eligible for credit limit enhancement. SMS 'INCR 4419' to 5676791 to accept.",
       "expected": "SAFE",
-      "actualClass": "HIGH",
-      "actualRiskScore": 75,
-      "actualStatus": "blocked",
+      "actualClass": "SAFE",
+      "actualRiskScore": 0,
+      "actualStatus": "safe",
       "actualThreat": "None",
-      "aiExplanation": "High risk detected! AI security engine flagged content with severe fraud probability."
+      "aiExplanation": "No suspicious scam indicators found. Content matches standard legitimate communication patterns."
     },
     {
       "id": 118,
@@ -1844,11 +1660,11 @@
       "subcategory": "Car Service Reminder",
       "message": "Maruti Service Reminder: Scheduled 3rd free service for Swift MH02AB1234 is due next week. Book appointment on Maruti Suzuki Rewards app.",
       "expected": "SAFE",
-      "actualClass": "HIGH",
-      "actualRiskScore": 75,
-      "actualStatus": "blocked",
+      "actualClass": "SAFE",
+      "actualRiskScore": 0,
+      "actualStatus": "safe",
       "actualThreat": "None",
-      "aiExplanation": "High risk detected! AI security engine flagged content with severe fraud probability."
+      "aiExplanation": "No suspicious scam indicators found. Content matches standard legitimate communication patterns."
     },
     {
       "id": 120,
