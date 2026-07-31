@@ -9,29 +9,33 @@ function setCookie(name, value, days = 7) {
   const expires = new Date(Date.now() + days * 864e5).toUTCString();
   document.cookie = `${name}=${encodeURIComponent(value)}; expires=${expires}; path=/; SameSite=Lax`;
 }
+
 function deleteCookie(name) {
   document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`;
 }
 
 export function AuthProvider({ children }) {
-  const [token, setToken] = useState(() => {
-    if (typeof window !== 'undefined') {
-      return localStorage.getItem('suraksha_token');
-    }
-    return null;
-  });
+  const [token, setToken] = useState(null);
+  const [user, setUser] = useState(null);
+  const [mounted, setMounted] = useState(false);
 
-  const [user, setUser] = useState(() => {
+  useEffect(() => {
     if (typeof window !== 'undefined') {
+      const savedToken = localStorage.getItem('suraksha_token');
       const savedUser = localStorage.getItem('suraksha_user');
-      if (savedUser) {
-        try { return JSON.parse(savedUser); } catch {}
-      }
+      queueMicrotask(() => {
+        if (savedToken) {
+          setToken(savedToken);
+        }
+        if (savedUser) {
+          try {
+            setUser(JSON.parse(savedUser));
+          } catch {}
+        }
+        setMounted(true);
+      });
     }
-    return null;
-  });
-
-  const [loading, setLoading] = useState(false);
+  }, []);
 
   useEffect(() => {
     if (token) {
@@ -42,21 +46,25 @@ export function AuthProvider({ children }) {
   const login = (userData, authToken) => {
     setUser(userData);
     setToken(authToken);
-    localStorage.setItem('suraksha_token', authToken);
-    localStorage.setItem('suraksha_user', JSON.stringify(userData));
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('suraksha_token', authToken);
+      localStorage.setItem('suraksha_user', JSON.stringify(userData));
+    }
     setCookie('suraksha_token', authToken);
   };
 
   const logout = () => {
     setUser(null);
     setToken(null);
-    localStorage.removeItem('suraksha_token');
-    localStorage.removeItem('suraksha_user');
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem('suraksha_token');
+      localStorage.removeItem('suraksha_user');
+    }
     deleteCookie('suraksha_token');
   };
 
   return (
-    <AuthContext.Provider value={{ user, token, loading, login, logout, isAuthenticated: !!token }}>
+    <AuthContext.Provider value={{ user, token, loading: !mounted, login, logout, isAuthenticated: !!token && mounted, mounted }}>
       {children}
     </AuthContext.Provider>
   );

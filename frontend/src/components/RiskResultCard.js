@@ -5,12 +5,39 @@ import Link from 'next/link';
 
 export default function RiskResultCard(props) {
   const { t, translateThreatPattern, translateModuleTitle } = useLanguage();
+  const { loading, result } = props;
 
-  // Support both object wrapper <RiskResultCard result={data} /> and direct props
-  const res = props.result || props;
+  // Render pulsing skeleton loading card during analysis
+  if (loading) {
+    return (
+      <div className="bg-surface-container-lowest border border-outline-variant/10 rounded-3xl p-8 text-center shadow-lg animate-pulse space-y-4">
+        <div className="w-16 h-16 rounded-2xl bg-primary/10 text-primary flex items-center justify-center mx-auto shadow-inner">
+          <span className="material-symbols-outlined text-3xl animate-spin">progress_activity</span>
+        </div>
+        <div className="text-sm font-bold text-on-surface">{t('scam.analyzing')}</div>
+        <div className="text-xs text-on-surface-variant">SurakshaAI Hybrid Model Engine</div>
+      </div>
+    );
+  }
 
-  if (!res || (typeof res === 'object' && Object.keys(res).length === 0)) {
-    return null;
+  // Extract result object
+  const res = result && typeof result === 'object' && Object.keys(result).length > 0
+    ? result
+    : (props.riskLevel || props.riskScore || props.risk_score || props.error)
+      ? props
+      : null;
+
+  if (!res) {
+    return (
+      <div className="bg-surface-container-lowest/50 border border-dashed border-outline-variant/30 rounded-3xl p-8 text-center">
+        <div className="w-14 h-14 rounded-2xl bg-surface-container text-on-surface-variant/60 flex items-center justify-center mx-auto mb-3">
+          <span className="material-symbols-outlined text-3xl">radar</span>
+        </div>
+        <div className="text-xs font-semibold text-on-surface-variant">
+          {t('qr.resultsPlaceholder')}
+        </div>
+      </div>
+    );
   }
 
   if (res.error) {
