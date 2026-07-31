@@ -27,7 +27,9 @@ export const api = {
   // Auth
   login: (email, password) => apiFetch('/auth/login', { method: 'POST', body: JSON.stringify({ email, password }) }),
   register: (name, email, password, phone) => apiFetch('/auth/register', { method: 'POST', body: JSON.stringify({ name, email, password, phone }) }),
+  getMe: () => apiFetch('/auth/me'),
   googleAuth: (credential) => apiFetch('/auth/google', { method: 'POST', body: JSON.stringify({ credential }) }),
+  chat: (message, lang) => apiFetch('/assistant/chat', { method: 'POST', body: JSON.stringify({ message, lang }) }),
   
   // Scans — all accept optional `lang` for localized responses
   scanMessage: (text, lang) => apiFetch('/scans/message', { method: 'POST', body: JSON.stringify({ text, lang }) }),
@@ -44,10 +46,16 @@ export const api = {
   getCharts: () => apiFetch('/dashboard/charts'),
 
   // Learn
-  getModules: (category) => apiFetch(`/learn/modules${category ? `?category=${category}` : ''}`),
-  getModule: (id) => apiFetch(`/learn/modules/${id}`),
-  getQuiz: (id) => apiFetch(`/learn/modules/${id}/quiz`),
-  submitQuiz: (id, answers) => apiFetch(`/learn/modules/${id}/quiz/submit`, { method: 'POST', body: JSON.stringify({ answers }) }),
+  getModules: (category, lang) => {
+    const params = new URLSearchParams();
+    if (category) params.append('category', category);
+    if (lang) params.append('lang', lang);
+    const q = params.toString();
+    return apiFetch(`/learn/modules${q ? `?${q}` : ''}`);
+  },
+  getModule: (id, lang) => apiFetch(`/learn/modules/${id}${lang ? `?lang=${lang}` : ''}`),
+  getQuiz: (id, lang) => apiFetch(`/learn/modules/${id}/quiz${lang ? `?lang=${lang}` : ''}`),
+  submitQuiz: (id, answers, lang) => apiFetch(`/learn/modules/${id}/quiz/submit`, { method: 'POST', body: JSON.stringify({ answers, lang }) }),
   updateProgress: (moduleId, score) => apiFetch('/learn/progress', { method: 'POST', body: JSON.stringify({ moduleId, score }) }),
   
   // Emergency

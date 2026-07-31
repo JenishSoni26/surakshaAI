@@ -12,7 +12,9 @@ import FAB from '@/components/FAB';
 const MAX_FILE_BYTES = 15 * 1024 * 1024; // 15MB
 
 export default function VoiceDetectorPage() {
-  const [supportsRecording, setSupportsRecording] = useState(false);
+  const [supportsRecording] = useState(() => (
+    typeof window !== 'undefined' && !!navigator.mediaDevices?.getUserMedia && !!window.MediaRecorder
+  ));
   const [isRecording, setIsRecording] = useState(false);
   const [audioBlob, setAudioBlob] = useState(null);
   const [audioUrl, setAudioUrl] = useState(null);
@@ -71,14 +73,11 @@ export default function VoiceDetectorPage() {
   }
 
   useEffect(() => {
-    if (typeof window !== 'undefined' && navigator.mediaDevices?.getUserMedia && window.MediaRecorder) {
-      setSupportsRecording(true);
-    }
     return () => {
       stopVisualizer();
       if (audioUrl) URL.revokeObjectURL(audioUrl);
     };
-  }, []);
+  }, [audioUrl]);
 
   const startRecording = async () => {
     resetResult();

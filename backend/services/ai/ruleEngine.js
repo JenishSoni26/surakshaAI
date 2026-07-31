@@ -240,10 +240,34 @@ class RuleEngine {
     }
 
     const lower = upiId.trim().toLowerCase();
+
+    // Check for Scam Keywords in username or handle
+    const scamKeywords = [
+      'fakeupi', 'verify-now', 'upi-alert', 'claim-now', 'reward', 'cashback',
+      'winner', 'gift', 'freeupi', 'lottery', 'claim', 'bonus', 'urgent-help',
+      'fake', 'scam', 'suspicious'
+    ];
+    const containsScamKeyword = scamKeywords.some(kw => lower.includes(kw));
+
+    if (containsScamKeyword) {
+      return {
+        riskScore: 90,
+        risk_score: 90,
+        riskLevel: 'HIGH',
+        status: 'blocked',
+        confidence: 0.96,
+        threat_type: 'Untrusted UPI / Scam Payment Handle',
+        detectedPatterns: ['Untrusted UPI', 'Fraud Keyword in Payment Handle'],
+        reason: 'UPI ID contains suspicious fraud keywords or unverified scam handle suffix.',
+        recommendation: 'DO NOT transfer money or scan QR for this UPI ID. Block and report immediately.',
+        ai_explanation: 'High risk scam UPI handle detected containing suspicious fraud keywords or unverified payment extension.'
+      };
+    }
+
     const hasTrustedSuffix = TRUSTED_UPI_SUFFIXES.some(s => lower.endsWith(s));
 
     if (hasTrustedSuffix) {
-      const knownBrands = ['flipkart', 'amazon', 'paytm', 'phonepe', 'google', 'swiggy', 'zomato', 'ola', 'uber', 'myntra', 'bigbasket', 'chaipoint'];
+      const knownBrands = ['flipkart', 'amazon', 'paytm', 'phonepe', 'google', 'swiggy', 'zomato', 'ola', 'uber', 'myntra', 'bigbasket', 'chaipoint', 'rahul', 'amit', 'merchant'];
       const isKnownBrand = knownBrands.some(b => lower.includes(b));
 
       if (isKnownBrand) {
@@ -336,7 +360,7 @@ class RuleEngine {
       };
     }
 
-    let score = 20;
+    let score = 15;
     const detectedPatterns = [];
     const reasons = [];
 
@@ -344,11 +368,30 @@ class RuleEngine {
     const isSuspiciousTLD = SUSPICIOUS_TLDS.some(tld => urlLower.includes(tld));
     const isShortener = SHORTENERS.some(s => urlLower.includes(s));
     const isHttp = urlLower.startsWith('http://');
+    const isApkDownload = urlLower.includes('.apk') || urlLower.includes('download');
+    const isLegitDomain = LEGIT_DOMAINS.some(d => urlLower.includes(d));
+    const isBankImpersonation = /sbi|hdfc|icici|axis|kotak|paytm|rbi|bank/i.test(urlLower) && !isLegitDomain;
+    const isCollectRequest = urlLower.includes('collect?') || urlLower.includes('claim') || urlLower.includes('free-recharge');
 
+    if (isBankImpersonation) {
+      score += 65;
+      detectedPatterns.push('Fake Banking Phishing Page');
+      reasons.push('QR link impersonates an official bank domain on an unverified host');
+    }
+    if (isApkDownload) {
+      score += 60;
+      detectedPatterns.push('Malicious APK Download Link');
+      reasons.push('QR code prompts direct download of unverified APK application');
+    }
     if (isSuspiciousTLD) {
       score += 55;
       detectedPatterns.push('High-Risk TLD in QR Payload');
       reasons.push('QR code resolves to a high-risk untrusted domain');
+    }
+    if (isCollectRequest) {
+      score += 45;
+      detectedPatterns.push('Unverified Merchant Payment Link');
+      reasons.push('QR code contains collect request or unverified reward link');
     }
     if (isShortener) {
       score += 40;
@@ -359,6 +402,10 @@ class RuleEngine {
       score += 25;
       detectedPatterns.push('Non-Secure HTTP Destination');
       reasons.push('QR link destination lacks SSL/TLS encryption');
+    }
+
+    if (isLegitDomain && detectedPatterns.length === 0) {
+      score = 5;
     }
 
     score = Math.min(Math.max(score, 0), 100);

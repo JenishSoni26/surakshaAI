@@ -1,5 +1,5 @@
 'use client';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { api } from '@/lib/api';
 import { useAuth } from '@/lib/auth';
 import { useRouter, useSearchParams } from 'next/navigation';
@@ -88,7 +88,8 @@ function AuthBackground() {
   );
 }
 
-export default function LoginPage() {
+function LoginContent() {
+
   const [tab, setTab] = useState('login'); // 'login' | 'signup'
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -522,3 +523,12 @@ function GoogleSignInButton({ onCredential }) {
     </div>
   );
 }
+
+export default function LoginPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-[#0a0f2e]" />}>
+      <LoginContent />
+    </Suspense>
+  );
+}
+

@@ -3,15 +3,18 @@ import { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { api } from '@/lib/api';
+import { useLanguage } from '@/lib/i18n';
 import { useFeatureAuth } from '@/lib/featureAuth';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import FAB from '@/components/FAB';
+import MarkdownMessage from '@/components/MarkdownMessage';
 
 export default function ModuleQuizPage() {
   const { id } = useParams();
   const router = useRouter();
   const { requireAuth } = useFeatureAuth();
+  const { t, lang } = useLanguage();
 
   const [module, setModule] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -27,17 +30,17 @@ export default function ModuleQuizPage() {
 
   useEffect(() => {
     if (!id) return;
-    api.getModule(id)
+    api.getModule(id, lang)
       .then(data => setModule(data.module))
       .catch(err => setLoadError(err.message))
       .finally(() => setLoading(false));
-  }, [id]);
+  }, [id, lang]);
 
   const startQuiz = async () => {
     setQuizLoading(true);
     setLoadError('');
     try {
-      const data = await api.getQuiz(id);
+      const data = await api.getQuiz(id, lang);
       setQuestions(data.questions);
       setAnswers(new Array(data.questions.length).fill(null));
       setCurrent(0);
@@ -60,7 +63,7 @@ export default function ModuleQuizPage() {
     }
     setSubmitting(true);
     try {
-      const data = await api.submitQuiz(id, answers);
+      const data = await api.submitQuiz(id, answers, lang);
       setResults(data);
       setPhase('results');
     } catch (err) {
@@ -94,7 +97,7 @@ export default function ModuleQuizPage() {
         <main className="flex-grow pt-24 pb-12 flex items-center justify-center px-4">
           <div className="text-center">
             <p className="text-error font-semibold mb-4">{loadError}</p>
-            <Link href="/learn" className="text-primary font-semibold hover:underline">Back to Learning Hub</Link>
+            <Link href="/learn" className="text-primary font-semibold hover:underline">{t('learn.back')}</Link>
           </div>
         </main>
         <Footer />
@@ -108,10 +111,11 @@ export default function ModuleQuizPage() {
       <main className="flex-grow pt-24 pb-12">
         <div className="max-w-3xl mx-auto px-4">
           <Link href="/learn" className="text-xs text-on-surface-variant hover:text-primary flex items-center gap-1 mb-6 w-fit">
-            <span className="material-symbols-outlined text-sm">arrow_back</span>Learning Hub
+            <span className="material-symbols-outlined text-sm">arrow_back</span>
+            {t('learn.hub')}
           </Link>
 
-          {phase === 'lesson' && (
+          {phase === 'lesson' && module && (
             <div className="bg-surface-container-lowest rounded-3xl shadow-xl border border-outline-variant/10 p-6 md:p-8 animate-fade-in-up">
               <div className="flex items-center gap-4 mb-6">
                 <div className="w-14 h-14 rounded-2xl bg-primary/10 flex items-center justify-center shrink-0">
@@ -119,27 +123,29 @@ export default function ModuleQuizPage() {
                 </div>
                 <div>
                   <h1 className="text-2xl font-bold text-on-surface">{module.title}</h1>
-                  <p className="text-sm text-on-surface-variant">{module.category} · {module.difficulty} · {module.duration_minutes} min</p>
+                  <p className="text-sm text-on-surface-variant">{module.category} · {module.difficulty} · {module.duration_minutes} {t('learn.min')}</p>
                 </div>
               </div>
               <p className="text-sm text-on-surface-variant mb-6">{module.description}</p>
               {module.content && (
-                <div className="bg-surface-container rounded-2xl p-5 mb-6 space-y-2">
-                  {module.content.split('\n').map((line, i) => (
-                    <p key={i} className="text-sm text-on-surface-variant leading-relaxed">{line}</p>
-                  ))}
+                <div className="bg-surface-container rounded-2xl p-5 mb-6">
+                  <MarkdownMessage content={module.content} />
                 </div>
               )}
               {module.userProgress?.completed && (
                 <div className="bg-success/10 text-success rounded-xl p-3 text-sm font-semibold mb-6 flex items-center gap-2">
                   <span className="material-symbols-outlined text-lg icon-fill">emoji_events</span>
-                  Previously completed — Score: {module.userProgress.score}%
+                  {t('learn.prevCompleted')} {module.userProgress.score}%
                 </div>
               )}
               {loadError && <div className="bg-error-container/20 text-error rounded-xl p-3 text-xs mb-4">{loadError}</div>}
               <button onClick={startQuiz} disabled={quizLoading}
                 className="w-full bg-primary text-on-primary py-3 rounded-xl text-sm font-bold shadow-lg hover:opacity-90 transition-all disabled:opacity-50 flex items-center justify-center gap-2">
-                {quizLoading ? <><span className="material-symbols-outlined animate-spin">progress_activity</span>Loading quiz...</> : <><span className="material-symbols-outlined">quiz</span>{module.userProgress?.completed ? 'Retake Quiz' : 'Start Quiz'}</>}
+                {quizLoading ? (
+                  <><span className="material-symbols-outlined animate-spin">progress_activity</span>{t('learn.loadingQuiz')}</>
+                ) : (
+                  <><span className="material-symbols-outlined">quiz</span>{module.userProgress?.completed ? t('learn.retakeQuiz') : t('learn.startQuiz')}</>
+                )}
               </button>
             </div>
           )}
@@ -147,7 +153,9 @@ export default function ModuleQuizPage() {
           {phase === 'quiz' && questions.length > 0 && (
             <div className="bg-surface-container-lowest rounded-3xl shadow-xl border border-outline-variant/10 p-6 md:p-8 animate-fade-in-up">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-xs font-semibold text-on-surface-variant">Question {current + 1} of {questions.length}</span>
+                <span className="text-xs font-semibold text-on-surface-variant">
+                  {t('learn.question')} {current + 1} {t('learn.of')} {questions.length}
+                </span>
                 <span className="text-xs font-semibold text-primary">{Math.round(((current) / questions.length) * 100)}%</span>
               </div>
               <div className="w-full bg-surface-container-high h-2 rounded-full mb-6 overflow-hidden">
@@ -172,11 +180,19 @@ export default function ModuleQuizPage() {
 
               <div className="flex gap-3">
                 {current > 0 && (
-                  <button onClick={goBack} className="px-5 py-3 rounded-xl text-sm font-bold border border-outline-variant/30 text-on-surface-variant hover:bg-surface-container transition-colors">Back</button>
+                  <button onClick={goBack} className="px-5 py-3 rounded-xl text-sm font-bold border border-outline-variant/30 text-on-surface-variant hover:bg-surface-container transition-colors">
+                    {t('learn.backBtn')}
+                  </button>
                 )}
                 <button onClick={goNext} disabled={answers[current] === null || submitting}
                   className="flex-1 bg-primary text-on-primary py-3 rounded-xl text-sm font-bold shadow-lg hover:opacity-90 transition-all disabled:opacity-50 flex items-center justify-center gap-2">
-                  {submitting ? <><span className="material-symbols-outlined animate-spin">progress_activity</span>Submitting...</> : current === questions.length - 1 ? 'Submit Quiz' : 'Next'}
+                  {submitting ? (
+                    <><span className="material-symbols-outlined animate-spin">progress_activity</span>{t('learn.submitting')}</>
+                  ) : current === questions.length - 1 ? (
+                    t('learn.submitQuiz')
+                  ) : (
+                    t('learn.nextBtn')
+                  )}
                 </button>
               </div>
             </div>
@@ -186,14 +202,20 @@ export default function ModuleQuizPage() {
             <div className="space-y-6 animate-fade-in-up">
               <div className="bg-surface-container-lowest rounded-3xl shadow-xl border border-outline-variant/10 p-6 md:p-8 text-center">
                 <div className={`w-20 h-20 rounded-full mx-auto flex items-center justify-center mb-4 ${results.passed ? 'bg-success/10' : 'bg-error-container/20'}`}>
-                  <span className={`material-symbols-outlined text-4xl icon-fill ${results.passed ? 'text-success' : 'text-error'}`}>{results.passed ? 'emoji_events' : 'refresh'}</span>
+                  <span className={`material-symbols-outlined text-4xl icon-fill ${results.passed ? 'text-success' : 'text-error'}`}>
+                    {results.passed ? 'emoji_events' : 'refresh'}
+                  </span>
                 </div>
                 <div className={`text-4xl font-bold mb-1 ${results.passed ? 'text-success' : 'text-error'}`}>{results.score}%</div>
-                <p className="text-sm text-on-surface-variant mb-1">{results.correctCount} of {results.totalQuestions} correct</p>
-                <p className={`text-sm font-semibold ${results.passed ? 'text-success' : 'text-error'}`}>{results.passed ? 'Module passed! Great work.' : 'Not quite — review the explanations below and try again.'}</p>
+                <p className="text-sm text-on-surface-variant mb-1">
+                  {results.correctCount} {t('learn.of')} {results.totalQuestions} {t('learn.correct')}
+                </p>
+                <p className={`text-sm font-semibold ${results.passed ? 'text-success' : 'text-error'}`}>
+                  {results.passed ? t('learn.passedMsg') : t('learn.failedMsg')}
+                </p>
                 {!results.saved && (
                   <p className="text-xs text-on-surface-variant mt-3 bg-surface-container rounded-lg p-2 inline-block">
-                    <Link href="/login" className="text-primary font-semibold hover:underline">Log in</Link> to save your progress and level up.
+                    <Link href="/login" className="text-primary font-semibold hover:underline">{t('learn.loginPrompt')}</Link> {t('learn.loginSuffix')}
                   </p>
                 )}
               </div>
@@ -202,12 +224,18 @@ export default function ModuleQuizPage() {
                 {results.review.map((r, i) => (
                   <div key={i} className={`bg-surface-container-lowest rounded-2xl border p-5 ${r.isCorrect ? 'border-success/20' : 'border-error/20'}`}>
                     <div className="flex items-start gap-3 mb-2">
-                      <span className={`material-symbols-outlined text-lg shrink-0 ${r.isCorrect ? 'text-success' : 'text-error'}`}>{r.isCorrect ? 'check_circle' : 'cancel'}</span>
+                      <span className={`material-symbols-outlined text-lg shrink-0 ${r.isCorrect ? 'text-success' : 'text-error'}`}>
+                        {r.isCorrect ? 'check_circle' : 'cancel'}
+                      </span>
                       <p className="text-sm font-semibold text-on-surface">{r.question}</p>
                     </div>
-                    <p className="text-xs text-on-surface-variant ml-8 mb-1">Correct answer: <span className="font-semibold text-on-surface">{r.options[r.correctIndex]}</span></p>
+                    <p className="text-xs text-on-surface-variant ml-8 mb-1">
+                      {t('learn.correctAnswer')} <span className="font-semibold text-on-surface">{r.options[r.correctIndex]}</span>
+                    </p>
                     {!r.isCorrect && r.selectedIndex !== null && (
-                      <p className="text-xs text-error ml-8 mb-2">Your answer: {r.options[r.selectedIndex]}</p>
+                      <p className="text-xs text-error ml-8 mb-2">
+                        {t('learn.yourAnswer')} {r.options[r.selectedIndex]}
+                      </p>
                     )}
                     <p className="text-xs text-on-surface-variant ml-8 leading-relaxed">{r.explanation}</p>
                   </div>
@@ -215,8 +243,12 @@ export default function ModuleQuizPage() {
               </div>
 
               <div className="flex gap-3">
-                <button onClick={retake} className="flex-1 bg-surface-container hover:bg-surface-container-high text-on-surface py-3 rounded-xl text-sm font-bold transition-colors">Retake Quiz</button>
-                <Link href="/learn" className="flex-1 bg-primary text-on-primary py-3 rounded-xl text-sm font-bold shadow-lg hover:opacity-90 transition-all flex items-center justify-center">Back to Learning Hub</Link>
+                <button onClick={retake} className="flex-1 bg-surface-container hover:bg-surface-container-high text-on-surface py-3 rounded-xl text-sm font-bold transition-colors">
+                  {t('learn.retakeQuiz')}
+                </button>
+                <Link href="/learn" className="flex-1 bg-primary text-on-primary py-3 rounded-xl text-sm font-bold shadow-lg hover:opacity-90 transition-all flex items-center justify-center">
+                  {t('learn.back')}
+                </Link>
               </div>
             </div>
           )}

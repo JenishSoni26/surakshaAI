@@ -12,6 +12,9 @@ module.exports = function(db) {
       const scamsPrevented = userId
         ? db.get("SELECT COUNT(*) as count FROM scans WHERE user_id = ? AND status IN ('blocked','flagged')", [userId])
         : db.get("SELECT COUNT(*) as count FROM scans WHERE status IN ('blocked','flagged')");
+      const safeScans = userId
+        ? db.get("SELECT COUNT(*) as count FROM scans WHERE user_id = ? AND status IN ('safe','verified')", [userId])
+        : db.get("SELECT COUNT(*) as count FROM scans WHERE status IN ('safe','verified')");
       const avgRisk = userId
         ? db.get('SELECT AVG(risk_score) as avg FROM scans WHERE user_id = ?', [userId])
         : db.get('SELECT AVG(risk_score) as avg FROM scans');
@@ -30,6 +33,7 @@ module.exports = function(db) {
       res.json({
         totalScans: totalScans?.count || 0,
         scamsPrevented: scamsPrevented?.count || 0,
+        safeScans: safeScans?.count || 0,
         safetyScore,
         moneySaved: (scamsPrevented?.count || 0) * 250 + Math.floor(Math.random() * 500),
         learningProgress: { completed: completedModules, total: totalModules, level, levelName, modulesUntilNextLevel: Math.max(0, (level < 5 ? (level * 2) - completedModules + 2 : 0)) }

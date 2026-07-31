@@ -16,7 +16,7 @@ export default function Navbar() {
     { href: '/', label: t('nav.home'), icon: null },
     { href: '/scam-analyzer', label: t('nav.scamAnalyzer'), icon: null },
     { href: '/upi-guardian', label: t('nav.upiGuardian'), icon: null },
-    { href: '/voice-detector', label: t('nav.voiceDetect'), icon: 'mic' },
+    { href: '/voice-detector', label: t('nav.voiceDetect'), icon: null },
     { href: '/learn', label: t('nav.learn'), icon: null },
     { href: '/dashboard', label: t('nav.dashboard'), icon: null },
     { href: '/emergency', label: t('nav.emergency'), icon: null },
@@ -39,13 +39,12 @@ export default function Navbar() {
             <Link
               key={link.href}
               href={link.href}
-              className={`text-sm font-semibold transition-colors flex items-center gap-1 ${
-                isActive(link.href)
-                  ? 'text-primary border-b-2 border-primary pb-1'
-                  : link.label === t('nav.emergency')
-                    ? 'text-error hover:text-error/80'
-                    : 'text-on-surface-variant hover:text-primary'
-              }`}
+              className={`text-sm font-semibold transition-colors flex items-center gap-1 ${isActive(link.href)
+                ? 'text-primary border-b-2 border-primary pb-1'
+                : link.label === t('nav.emergency')
+                  ? 'text-error hover:text-error/80'
+                  : 'text-on-surface-variant hover:text-primary'
+                }`}
             >
               {link.icon && <span className="material-symbols-outlined text-sm">{link.icon}</span>}
               {link.label}
@@ -87,9 +86,8 @@ export default function Navbar() {
                 key={link.href}
                 href={link.href}
                 onClick={() => setMobileOpen(false)}
-                className={`px-4 py-3 rounded-xl text-sm font-semibold transition-colors flex items-center gap-2 ${
-                  isActive(link.href) ? 'bg-primary-container text-on-primary-container' : 'text-on-surface-variant hover:bg-surface-container'
-                }`}
+                className={`px-4 py-3 rounded-xl text-sm font-semibold transition-colors flex items-center gap-2 ${isActive(link.href) ? 'bg-primary-container text-on-primary-container' : 'text-on-surface-variant hover:bg-surface-container'
+                  }`}
               >
                 {link.icon && <span className="material-symbols-outlined text-sm">{link.icon}</span>}
                 {link.label}

@@ -14,28 +14,36 @@ function deleteCookie(name) {
 }
 
 export function AuthProvider({ children }) {
-  const [user, setUser] = useState(null);
-  const [token, setToken] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [token, setToken] = useState(() => {
+    if (typeof window !== 'undefined') {
+      return localStorage.getItem('suraksha_token');
+    }
+    return null;
+  });
+
+  const [user, setUser] = useState(() => {
+    if (typeof window !== 'undefined') {
+      const savedUser = localStorage.getItem('suraksha_user');
+      if (savedUser) {
+        try { return JSON.parse(savedUser); } catch {}
+      }
+    }
+    return null;
+  });
+
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    const savedToken = localStorage.getItem('suraksha_token');
-    const savedUser = localStorage.getItem('suraksha_user');
-    if (savedToken && savedUser) {
-      setToken(savedToken);
-      try { setUser(JSON.parse(savedUser)); } catch {}
-      // Ensure cookie is in sync (in case it was cleared)
-      setCookie('suraksha_token', savedToken);
+    if (token) {
+      setCookie('suraksha_token', token);
     }
-    setLoading(false);
-  }, []);
+  }, [token]);
 
   const login = (userData, authToken) => {
     setUser(userData);
     setToken(authToken);
     localStorage.setItem('suraksha_token', authToken);
     localStorage.setItem('suraksha_user', JSON.stringify(userData));
-    // Set cookie so middleware can read it server-side
     setCookie('suraksha_token', authToken);
   };
 
@@ -44,7 +52,6 @@ export function AuthProvider({ children }) {
     setToken(null);
     localStorage.removeItem('suraksha_token');
     localStorage.removeItem('suraksha_user');
-    // Clear cookie
     deleteCookie('suraksha_token');
   };
 
@@ -61,8 +68,6 @@ export function useAuth() {
   return ctx;
 }
 
-// Client-side route guard — use this in any page that needs protection
-// as a fallback in case the cookie is stale or missing
 export function useRequireAuth() {
   const { isAuthenticated, loading } = useAuth();
   const router = useRouter();

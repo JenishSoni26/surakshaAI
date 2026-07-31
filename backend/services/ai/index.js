@@ -17,6 +17,8 @@ class HybridAIService {
    * Helper to construct the unified Standard Response Contract across all analyzers.
    */
   async _orchestratePipeline({ input, inputType, ruleResult, inputContext = {} }) {
+    const lang = inputContext.lang || 'en';
+
     // Ensure models are loaded
     if (!modelLoader.getClassifier('ml').isLoaded) {
       await modelLoader.loadAll();
@@ -43,7 +45,8 @@ class HybridAIService {
       detectedPatterns,
       ruleResult,
       fusionResult,
-      inputType
+      inputType,
+      lang
     });
 
     // Determine status for backward compatibility ('blocked', 'flagged', 'safe', 'verified')
@@ -58,7 +61,7 @@ class HybridAIService {
 
     const threatType = ruleResult.threat_type || ruleResult.threatType || (detectedPatterns[0] || (fusedRiskLevel === 'HIGH' ? 'High Risk Threat' : 'None'));
 
-    // 5. Construct Standard Response Contract (with Task 6 'ml' object)
+    // 5. Construct Standard Response Contract
     const standardResponse = {
       riskLevel: fusedRiskLevel,
       confidence: calculatedConfidence,
@@ -86,22 +89,24 @@ class HybridAIService {
       reason: explanation
     };
 
-    // 6. Optionally enrich via Gemini Service layer (modular placeholder)
-    return await geminiService.enrichExplanation(standardResponse);
+    // 6. Optionally enrich via Gemini Service layer
+    return await geminiService.enrichExplanation(standardResponse, { lang });
   }
 
   /**
    * Analyzes text / SMS messages.
    * @param {string} text 
+   * @param {Object} options { lang }
    * @returns {Promise<Object>} Standard Response Object
    */
-  async analyzeMessage(text) {
+  async analyzeMessage(text, options = {}) {
     const ruleResult = ruleEngine.analyzeMessage(text);
     return await this._orchestratePipeline({
       input: text,
       inputType: 'sms',
       ruleResult,
       inputContext: {
+        lang: options.lang || 'en',
         textLength: text ? text.length : 0,
         emptyInput: !text || typeof text !== 'string' || text.trim() === ''
       }
@@ -111,15 +116,17 @@ class HybridAIService {
   /**
    * Analyzes real-time voice call features or transcripts.
    * @param {Object} features Acoustic DSP features or text transcript
+   * @param {Object} options { lang }
    * @returns {Promise<Object>} Standard Response Object
    */
-  async analyzeVoice(features) {
+  async analyzeVoice(features, options = {}) {
     const ruleResult = ruleEngine.analyzeVoice(features);
     return await this._orchestratePipeline({
       input: features,
       inputType: 'voice',
       ruleResult,
       inputContext: {
+        lang: options.lang || 'en',
         audioDuration: features?.durationSec || 0,
         emptyInput: !features
       }
@@ -129,15 +136,17 @@ class HybridAIService {
   /**
    * Analyzes QR code payloads and URIs.
    * @param {string} url 
+   * @param {Object} options { lang }
    * @returns {Promise<Object>} Standard Response Object
    */
-  async analyzeQR(url) {
+  async analyzeQR(url, options = {}) {
     const ruleResult = ruleEngine.analyzeQR(url);
     return await this._orchestratePipeline({
       input: url,
       inputType: 'qr',
       ruleResult,
       inputContext: {
+        lang: options.lang || 'en',
         emptyInput: !url
       }
     });
@@ -146,15 +155,17 @@ class HybridAIService {
   /**
    * Analyzes UPI IDs and payment handles.
    * @param {string} upiId 
+   * @param {Object} options { lang }
    * @returns {Promise<Object>} Standard Response Object
    */
-  async analyzeUPI(upiId) {
+  async analyzeUPI(upiId, options = {}) {
     const ruleResult = ruleEngine.analyzeUPI(upiId);
     return await this._orchestratePipeline({
       input: upiId,
       inputType: 'upi',
       ruleResult,
       inputContext: {
+        lang: options.lang || 'en',
         emptyInput: !upiId
       }
     });

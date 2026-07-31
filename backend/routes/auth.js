@@ -2,7 +2,7 @@ const express = require('express');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const { v4: uuidv4 } = require('uuid');
-const { JWT_SECRET } = require('../middleware/auth');
+const { JWT_SECRET, authMiddleware } = require('../middleware/auth');
 const { OAuth2Client } = require('google-auth-library');
 
 const router = express.Router();
@@ -61,6 +61,20 @@ module.exports = function(db) {
       res.json({ message: 'Login successful!', token, user: { id: user.id, name: user.name, email: user.email, phone: user.phone } });
     } catch (err) {
       console.error('Login error:', err);
+      res.status(500).json({ error: 'Internal server error.' });
+    }
+  });
+
+  // GET /api/auth/me
+  router.get('/me', authMiddleware, (req, res) => {
+    try {
+      const user = db.get('SELECT id, name, email, phone, avatar_url, two_factor_enabled, created_at FROM users WHERE id = ?', [req.user.id]);
+      if (!user) {
+        return res.status(404).json({ error: 'User not found.' });
+      }
+      res.json({ user });
+    } catch (err) {
+      console.error('Get me error:', err);
       res.status(500).json({ error: 'Internal server error.' });
     }
   });

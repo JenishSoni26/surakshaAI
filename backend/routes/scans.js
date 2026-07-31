@@ -33,9 +33,18 @@ module.exports = function (db) {
   router.post('/upi', optionalAuth, async (req, res) => {
     try {
       const { upiId, lang } = req.body || {};
-      if (!upiId) return res.status(400).json({ error: 'UPI ID is required.' });
+      if (!upiId || typeof upiId !== 'string' || !upiId.trim()) {
+        return res.status(400).json({ error: 'UPI ID is required.' });
+      }
 
-      const normalizedUpi = upiId.trim().toLowerCase();
+      const trimmed = upiId.trim();
+      // UPI ID format regex: must contain exactly one @ symbol with non-empty username and handle
+      const upiRegex = /^[a-zA-Z0-9.\-_]{2,256}@[a-zA-Z0-9.\-_]{2,64}$/;
+      if (!upiRegex.test(trimmed)) {
+        return res.status(400).json({ error: 'Invalid UPI ID format. Expected format: username@bank.' });
+      }
+
+      const normalizedUpi = trimmed.toLowerCase();
       const result = await aiService.analyzeUPI(normalizedUpi, { lang });
       const scanId = uuidv4();
 

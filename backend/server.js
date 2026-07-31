@@ -92,6 +92,7 @@ async function startServer() {
   app.use('/api/learn', require('./routes/learn')(db));
   app.use('/api/emergency', require('./routes/emergency')(db));
   app.use('/api/profile', require('./routes/profile')(db));
+  app.use('/api/assistant', require('./routes/assistant')(db));
 
   // Global error handler
   app.use((err, req, res, next) => {
